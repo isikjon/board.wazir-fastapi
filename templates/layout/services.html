@@ -1,0 +1,179 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Сервисы{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-card {
+        transition: all 0.3s ease;
+        height: 75px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        border-radius: 12px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    }
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+    }
+    .category-title {
+        position: relative;
+        z-index: 2;
+        text-align: left;
+        padding-top: 9px;
+        padding-left: 9px;
+        font-size: 14px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        text-decoration: underline;
+        color: white;
+    }
+    .ad-banner {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .ad-banner img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Рекламный баннер -->
+<div class="ad-banner">
+    <img src="https://wazir.kg/static/reklama.png" alt="Реклама" />
+</div>
+
+<!-- Категории сервисов -->
+<div class="mx-auto mb-16" style="background-color: #fff;">
+    <div class="rounded-md mb-4" style="
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;">
+        <div class="grid grid-cols-2 gap-1">
+            {% if categories %}
+                {% for category in categories %}
+                    {% if category.is_active %}
+                        <a href="{{ url_for('service_category', category_slug=category.slug) }}" 
+                           class="category-card rounded-lg"
+                           style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                            <h3 class="category-title font-medium font-montserrat">{{ category.title }}</h3>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <!-- Fallback если нет категорий в БД -->
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Поеси</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Медицина</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Магазины одежд</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Образования</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Развлечения</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Услуги</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Спец.магазины</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Салон красоты</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Гостиницы</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Комплекс услуг</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Религия</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Спорт</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Студии</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Ремонт</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Безопасность</h3>
+                </div>
+
+                <div class="category-card rounded-lg"
+                    style="background-image: url('https://wazir.kg/static/categories_bg.png');">
+                    <h3 class="category-title text-white font-medium font-montserrat">Проч. товары</h3>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('.nav-item').on('click', function() {
+            $('.nav-item').removeClass('active').addClass('text-gray-500');
+            $(this).addClass('active').removeClass('text-gray-500');
+        });
+    });
+</script>
+{% endblock %} 

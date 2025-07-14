@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Wazir Недвижимость - Регистрация</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link
+            rel="stylesheet"
+            href="https://wazir.kg/static/css/main.css"
+        />
+    </head>
+    <body class="bg-gray-50 font-sans">
+        <div
+            class="min-h-screen flex flex-col items-center justify-center px-4 fade-in">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex justify-center mb-4">
+                        <img
+                            src="{{ url_for('static', path='layout/assets/img/logo.png') }}"
+                            alt="Wazir Logo"
+                            style="width: 120px;">
+                    </div>
+                    <h1
+                        class="text-2xl font-semibold text-gray-700 mb-2 font-montserrat">Регистрация
+                        аккаунта</h1>
+                    <h2
+                        class="text-xl font-medium text-gray-600 font-montserrat">Wazir
+                        Недвижимость</h2>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
+                    <!-- Табы для выбора способа регистрации -->
+                    <div class="flex w-full mb-6 border-b border-gray-200">
+                        <button type="button" id="tab-phone"
+                            class="w-full tab-btn active font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Телефон
+                        </button>
+                        <!-- <button type="button" id="tab-email"
+                            class="tab-btn font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Почта
+                        </button> -->
+                    </div>
+
+                    <form id="register-form">
+                        <div class="mb-5">
+                            <label for="user-id"
+                                class="block text-sm font-medium text-gray-500 mb-1 font-montserrat">
+                                <span id="label-text">Введите телефон</span>
+                            </label>
+                            <input type="tel" id="user-id" name="contact"
+                                class="form-input font-montserrat"
+                                placeholder="+996 XXX XXX XXX">
+                            <p
+                                class="text-xs text-gray-500 mt-1 font-montserrat"
+                                id="phone-format-hint">Формат: +996 XXX XXX XXX</p>
+                        </div>
+
+                        <div id="error-message"
+                            class="hidden mb-4 text-sm text-red-500 font-montserrat"></div>
+
+                        <div class="space-y-3 mt-6">
+                            <button type="submit"
+                                class="btn btn-primary w-full py-3 rounded-lg font-montserrat">
+                                Продолжить
+                            </button>
+
+                            <a href="{{ url_for('mobile_auth') }}"
+                                class="btn btn-secondary w-full py-3 rounded-lg font-montserrat text-center">
+                                У меня уже есть аккаунт
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Применяем маску для телефона Кыргызстана
+            function applyPhoneMask() {
+                $('#user-id').mask('+996 000 000 000', {
+                    placeholder: '+996 XXX XXX XXX',
+                    translation: {
+                        '0': {pattern: /[0-9]/}
+                    }
+                });
+            }
+            
+            // Инициализируем маску при загрузке
+            applyPhoneMask();
+            
+            // Автоматически устанавливаем +996 при фокусе, если поле пустое
+            $('#user-id').on('focus', function() {
+                if ($(this).val() === '') {
+                    $(this).val('+996 ');
+                }
+            });
+            
+            // Предотвращаем удаление +996
+            $('#user-id').on('keydown', function(e) {
+                const value = $(this).val();
+                const cursorPos = this.selectionStart;
+                
+                // Если пытаются удалить часть +996, предотвращаем это
+                if ((e.key === 'Backspace' || e.key === 'Delete') && cursorPos <= 5) {
+                    e.preventDefault();
+                    $(this).val('+996 ');
+                    this.setSelectionRange(5, 5);
+                }
+            });
+            
+            // Обработка табов
+            $('.tab-btn').on('click', function() {
+                $('.tab-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Изменение плейсхолдера и метки в зависимости от выбранного таба
+                if ($(this).attr('id') === 'tab-phone') {
+                    $('#user-id').attr('placeholder', '+996 XXX XXX XXX');
+                    $('#label-text').text('Введите телефон');
+                    $('#user-id').attr('type', 'tel');
+                    $('#phone-format-hint').text('Формат: +996 XXX XXX XXX').show();
+                    applyPhoneMask();
+                } else {
+                    $('#user-id').unmask();
+                    $('#user-id').attr('placeholder', 'Введите почту');
+                    $('#label-text').text('Введите почту');
+                    $('#user-id').attr('type', 'email');
+                    $('#phone-format-hint').hide();
+                }
+            });
+            
+            // Функция для извлечения чистого номера телефона
+            function getCleanPhone(phoneValue) {
+                return phoneValue.replace(/\D/g, '');
+            }
+            
+            // Обработка отправки формы
+            $('#register-form').on('submit', function(e) {
+                e.preventDefault();
+                const contact = $('#user-id').val();
+                const contact_type = $('#tab-phone').hasClass('active') ? 'phone' : 'email';
+                
+                if (!contact) {
+                    $('#error-message').text('Пожалуйста, заполните поле').removeClass('hidden');
+                    return;
+                }
+                
+                // Базовая валидация
+                if (contact_type === 'email') {
+                    // Проверка формата email
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(contact)) {
+                        $('#error-message').text('Введите корректный адрес электронной почты').removeClass('hidden');
+                        return;
+                    }
+                } else {
+                    // Проверка формата телефона для Кыргызстана
+                    const phoneValue = getCleanPhone(contact);
+                    
+                    // Проверяем, что номер начинается с 996 и имеет правильную длину
+                    if (!phoneValue.startsWith('996') || phoneValue.length !== 12) {
+                        $('#error-message').text('Введите корректный номер телефона Кыргызстана (+996 XXX XXX XXX)').removeClass('hidden');
+                        return;
+                    }
+                    
+                    // Проверяем, что после 996 идут корректные цифры
+                    const localNumber = phoneValue.substring(3); // номер без 996
+                    if (localNumber.length !== 9 || !/^[0-9]{9}$/.test(localNumber)) {
+                        $('#error-message').text('Введите корректный номер телефона Кыргызстана (+996 XXX XXX XXX)').removeClass('hidden');
+                        return;
+                    }
+                }
+                
+                $('#error-message').addClass('hidden');
+                
+                // Показываем индикатор загрузки
+                const $submitBtn = $(this).find('button[type="submit"]');
+                $submitBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Проверка...');
+                $submitBtn.prop('disabled', true);
+                
+                // Для телефона отправляем в формате +996XXXXXXXXX (без пробелов)
+                let contactToSend = contact;
+                if (contact_type === 'phone') {
+                    contactToSend = '+' + getCleanPhone(contact);
+                }
+                
+                // Проверяем, существует ли пользователь с таким контактом
+                $.ajax({
+                    url: '/api/v1/auth/check-exists',
+                    type: 'POST',
+                    data: {
+                        contact_type: contact_type,
+                        contact: contactToSend
+                    },
+                    success: function(response) {
+                        if (response.exists) {
+                            // Пользователь уже существует
+                            $('#error-message').text('Пользователь с таким ' + 
+                                (contact_type === 'email' ? 'email' : 'телефоном') + 
+                                ' уже зарегистрирован').removeClass('hidden');
+                            $submitBtn.html('Продолжить');
+                            $submitBtn.prop('disabled', false);
+                        } else {
+                            // Отправляем код подтверждения
+                            $.ajax({
+                                url: '/api/v1/auth/send-code',
+                                type: 'POST',
+                                data: {
+                                    contact_type: contact_type,
+                                    contact: contactToSend
+                                },
+                                beforeSend: function(xhr) {
+                                    console.log("ОТЛАДКА - Отправка данных:", {
+                                        contact_type: contact_type,
+                                        contact: contactToSend,
+                                        original_input: contact,
+                                        clean_phone: contact_type === 'phone' ? getCleanPhone(contact) : null
+                                    });
+                                },
+                                success: function(response) {
+                                    console.log("ОТЛАДКА - Ответ от сервера:", JSON.stringify(response, null, 2));
+                                    
+                                    if (response.success) {
+                                        // Сохраняем данные в sessionStorage
+                                        sessionStorage.setItem('reg_contact_type', contact_type);
+                                        sessionStorage.setItem('reg_contact', contactToSend);
+                                        
+                                        // Перенаправляем на страницу ввода кода
+                                        window.location.href = '/mobile/register/verify';
+                                    } else {
+                                        console.error("Ошибка отправки кода:", response.error);
+                                        $('#error-message').text(response.error || 'Ошибка отправки кода').removeClass('hidden');
+                                        $submitBtn.html('Продолжить');
+                                        $submitBtn.prop('disabled', false);
+                                    }
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error("Ajax ошибка:", textStatus, errorThrown);
+                                    console.log("Ответ:", jqXHR.responseText);
+                                    try {
+                                        var errorData = JSON.parse(jqXHR.responseText);
+                                        $('#error-message').text(errorData.error || 'Произошла ошибка. Пожалуйста, попробуйте позже.').removeClass('hidden');
+                                    } catch(e) {
+                                        $('#error-message').text('Произошла ошибка. Пожалуйста, попробуйте позже.').removeClass('hidden');
+                                    }
+                                    $submitBtn.html('Продолжить');
+                                    $submitBtn.prop('disabled', false);
+                                }
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('#error-message').text('Произошла ошибка при проверке. Пожалуйста, попробуйте позже.').removeClass('hidden');
+                        $submitBtn.html('Продолжить');
+                        $submitBtn.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+    </body>
+</html>

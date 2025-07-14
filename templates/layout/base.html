@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>{% block title %}Wazir Недвижимость{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://wazir.kg/static/css/main.css"
+    />
+    {% block extra_css %}{% endblock %}
+    <link
+      href="https://db.onlinewebfonts.com/c/7330cea698bc9dfd4bd024a38ea56a9a?family=Trajan+Pro+3"
+      rel="stylesheet"
+    />
+    <link
+      href="https://db.onlinewebfonts.com/c/c777ff7746751b04b384029cdbb12b04?family=AGAvalancheC"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        touch-action: manipulation !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        -khtml-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+      }
+      body {
+        overscroll-behavior: none !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      input,
+      textarea {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+      }
+      .category-title {
+        font-size: 17px !important;
+        text-decoration: none !important;
+      }
+      
+      /* Стили для нижней навигации */
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+      }
+      
+      .nav-icon-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .nav-indicator {
+        width: 6px;
+        height: 6px;
+        background-color: #f97316; /* Оранжевый цвет */
+        border-radius: 50%;
+        margin-top: 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .nav-item.active .nav-indicator {
+        opacity: 1;
+      }
+      
+      .nav-item.active .nav-icons {
+        color: #f97316; /* Оранжевый цвет для активной иконки */
+      }
+      
+      .nav-item.active img.nav-icons {
+        filter: brightness(0) saturate(100%) invert(49%) sepia(96%) saturate(2068%) hue-rotate(14deg) brightness(95%) contrast(97%);
+      }
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body style="font-family: 'AGAvalancheC'">
+    <div class="min-h-screen flex flex-col">
+      <header class="bg-white shadow-sm">
+        <div class="mx-auto px-1 py-1">
+          <div class="flex items-center justify-between" style="gap: 5px">
+            <a
+              href="/mobile/"
+              style="
+                box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.21);
+                padding: 7px 8px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+              "
+            >
+              <img
+                src="https://wazir.kg/static/brand.png"
+                alt="brand"
+                style="max-width: 85px; max-height: 100%"
+              />
+            </a>
+
+            <!-- Общий контейнер для погоды, валюты и чата -->
+            <!-- Погода -->
+            <div
+              class="flex items-center weather-currency"
+              style="
+                box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.21);
+                padding: 5px 8px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+              "
+            >
+              <img
+                src="https://wazir.kg/static/weather.png"
+                alt="weather"
+                style="height: 23px; width: 25px"
+              />
+              <span id="weather" style="font-size: 18px">+30°</span>
+            </div>
+            <!-- Валюта -->
+            <div
+              class="flex items-center weather-currency"
+              style="
+                box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.21);
+                padding: 5px 8px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+              "
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/d/de/Flag_of_the_United_States.png"
+                alt="USD"
+                class="h-5 mr-2"
+              />
+              <span id="currency-rate" style="font-size: 18px">87.5</span>
+            </div>
+            <!-- Кнопка почты -->
+            <a
+              href="/mobile/chats"
+              class="flex items-center"
+              style="
+                box-shadow: 0px 6px 6px 0px rgba(0, 0, 0, 0.21);
+                padding: 6px 8px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="color: #333"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                ></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Основное содержимое -->
+      <main class="flex-grow">{% block content %}{% endblock %}</main>
+
+      <!-- Нижняя навигация -->
+      <nav
+        class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10"
+      >
+        <div class="flex justify-around items-center py-4">
+          <a
+            href="{{ url_for('dashboard') }}"
+            class="nav-item {% if request.url.path == '/mobile' or request.url.path == '/mobile/' %}active{% else %}text-gray-500{% endif %}"
+          >
+            <div class="nav-icon-container">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="nav-icons"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </div>
+            <div class="nav-indicator"></div>
+          </a>
+          <a
+            href="{{ url_for('search') }}"
+            class="nav-item {% if request.url.path == '/mobile/search' %}active{% else %}text-gray-500{% endif %}"
+          >
+            <div class="nav-icon-container">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="nav-icons"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <div class="nav-indicator"></div>
+          </a>
+          <a
+            href="{{ url_for('services') }}"
+            class="nav-item {% if request.url.path == '/mobile/services' or request.url.path.startswith('/mobile/services/') %}active{% else %}text-gray-500{% endif %}"
+          >
+            <div class="nav-icon-container">
+              <img
+                src="https://wazir.kg/static/360.png"
+                alt="360"
+                style="width: 30px; height: 24px"
+                class="nav-icons"
+              />
+            </div>
+            <div class="nav-indicator"></div>
+          </a>
+          <a
+            href="{{ url_for('support') }}"
+            class="nav-item {% if request.url.path == '/mobile/support' %}active{% else %}text-gray-500{% endif %}"
+          >
+            <div class="nav-icon-container">
+              <img
+                src="https://wazir.kg/static/support.png"
+                alt="support"
+                style="width: 24px; height: 24px"
+                class="nav-icons"
+              />
+            </div>
+            <div class="nav-indicator"></div>
+          </a>
+          <a
+            href="{{ url_for('profile') }}"
+            class="nav-item {% if request.url.path == '/mobile/profile' %}active{% else %}text-gray-500{% endif %}"
+          >
+            <div class="nav-icon-container">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="nav-icons"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="nav-indicator"></div>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Подключаем скрипт для кэширования данных о погоде и курсе валюты -->
+    <script src="{{ url_for('static', path='layout/assets/js/weather-currency-cache.js') }}"></script>
+    <script>
+      // Блокируем zoom через touch события
+      document.addEventListener(
+        "touchstart",
+        function (event) {
+          if (event.touches.length > 1) {
+            event.preventDefault();
+          }
+        },
+        { passive: false }
+      );
+
+      document.addEventListener(
+        "touchend",
+        function (event) {
+          var now = new Date().getTime();
+          if (lastTouchEnd && now - lastTouchEnd <= 300) {
+            event.preventDefault();
+          }
+          lastTouchEnd = now;
+        },
+        false
+      );
+
+      var lastTouchEnd = 0;
+
+      // Блокируем zoom через wheel события
+      document.addEventListener(
+        "wheel",
+        function (e) {
+          if (e.ctrlKey) {
+            e.preventDefault();
+          }
+        },
+        { passive: false }
+      );
+
+      // Блокируем zoom через клавиши
+      document.addEventListener("keydown", function (e) {
+        if (
+          (e.ctrlKey || e.metaKey) &&
+          (e.which === 61 ||
+            e.which === 107 ||
+            e.which === 173 ||
+            e.which === 109 ||
+            e.which === 187 ||
+            e.which === 189)
+        ) {
+          e.preventDefault();
+        }
+      });
+    </script>
+    <script src="{{ url_for('static', path='layout/assets/js/auth-check.js') }}"></script>
+    {% block scripts %}{% endblock %} {% block extra_js %}{% endblock %}
+  </body>
+</html>

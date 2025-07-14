@@ -1,0 +1,1017 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Поддержка{% endblock %}
+
+{% block extra_css %}
+        <style>
+            .contact-form {
+                display: none;
+            }
+            .tabs {
+                display: flex;
+                border-bottom: 1px solid #e5e7eb;
+                background-color: white;
+            }
+            .tab {
+                flex: 1;
+                padding: 16px 10px;
+                text-align: center;
+                font-weight: 500;
+                color: #6b7280;
+                border-bottom: 2px solid transparent;
+                transition: all 0.2s ease;
+                border-radius: 20%;
+                border: 1px solid #ccc;
+            }
+            .tab.active {
+                color: var(--color-primary);
+                box-shadow: 5px 5px 5px -4px rgba(251,146,60,0.65);
+            }
+            .tab:not(.active) {
+                box-shadow: 5px 5px 5px -4px #c7c5c5;
+            }
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            .faq-item {
+                margin-bottom: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            .faq-question {
+                padding: 16px;
+                background-color: #f9fafb;
+                cursor: pointer;
+                font-weight: 500;
+                color: #374151;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .faq-answer {
+                padding: 0 16px;
+                max-height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                background-color: white;
+            }
+            .faq-answer-inner {
+                padding: 16px 0;
+                color: #4b5563;
+                line-height: 1.5;
+            }
+            .faq-item.active .faq-answer {
+                max-height: 500px;
+            }
+            .faq-item.active .faq-question i {
+                transform: rotate(180deg);
+            }
+            .contact-form {
+                margin-top: 24px;
+                background-color: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 20px;
+            }
+            .form-input, .form-textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                font-size: 1rem;
+                color: #111827;
+                transition: border-color 0.2s ease;
+                margin-bottom: 16px;
+            }
+            .form-input:focus, .form-textarea:focus {
+                border-color: var(--color-primary);
+                outline: none;
+            }
+            .form-textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
+            .form-label {
+                font-size: 0.95rem;
+                color: #4b5563;
+                margin-bottom: 6px;
+                display: block;
+            }
+            .section-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #111827;
+                margin-bottom: 16px;
+            }
+            .company-section {
+                margin-bottom: 24px;
+            }
+            .company-text {
+                color: #4b5563;
+                line-height: 1.6;
+                margin-bottom: 16px;
+            }
+            .team-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                margin-top: 20px;
+            }
+            .team-member {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .team-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 40px;
+                overflow: hidden;
+                margin-bottom: 8px;
+                background-color: #f3f4f6;
+            }
+            .team-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .team-name {
+                font-weight: 500;
+                color: #111827;
+                font-size: 0.95rem;
+            }
+            .team-position {
+                color: #6b7280;
+                font-size: 0.85rem;
+            }
+            
+            .support-tabs {
+                justify-content: space-around;
+                padding: 10px 5px;
+                max-width: 320px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: center;
+                background: transparent;
+                border: 0px none;
+                gap: 10px;
+            }
+            
+            .support-tabs .tab {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                border-radius: 20%;
+                border: 1px solid #ccc;
+            }
+            
+            .tab-icon {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 5px;
+            }
+            
+            .support-content {
+                background-color: white;
+                padding: 0 10px;
+            }
+            
+            .support-text {
+                font-size: 14px;
+                color: #333;
+                text-align: center;
+            }
+            
+            .apartment-image-container {
+                position: relative;
+                margin: 20px 0;
+                text-align: center;
+            }
+            
+            .apartment-image {
+                width: 100%;
+                max-width: 500px;
+                border-radius: 8px;
+            }
+            
+            .rotate-hint {
+                position: relative;
+                margin-top: 20px;
+            }
+            
+            .dashed-circle {
+                width: 60px;
+                height: 60px;
+                border: 2px dashed #ccc;
+                border-radius: 50%;
+                margin: 0 auto;
+            }
+            
+            .rotate-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #666;
+            }
+            
+            .feature-icons {
+                display: flex;
+                justify-content: space-around;
+                margin: 25px 0;
+                flex-wrap: wrap;
+            }
+            
+            .feature-icon {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 22%;
+                margin-bottom: 15px;
+            }
+            
+            .feature-icon img {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 8px;
+            }
+            
+            .feature-icon span {
+                font-size: 12px;
+                color: #333;
+                text-align: center;
+            }
+            
+            .contact-info {
+                margin-top: 30px;
+                padding: 20px 15px;
+                background-color: #f9f9f9;
+                border-radius: 8px;
+                text-align: center;
+            }
+            
+            .contact-title {
+                font-size: 14px;
+                margin-bottom: 15px;
+                color: #555;
+            }
+            
+            .contact-phone {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+            }
+            
+            .contact-address, .contact-site {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 10px;
+            }
+            
+            .social-icons {
+                display: flex;
+                justify-content: center;
+                margin: 20px 0;
+            }
+            
+            .social-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background-color: #eee;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 5px;
+                color: #666;
+                text-decoration: none;
+            }
+            
+            .copyright {
+                font-size: 12px;
+                color: #999;
+                margin-top: 15px;
+            }
+            
+            /* Стили для таба MTT Inc. */
+            .mtt-services {
+                margin: 20px 0;
+            }
+            
+            .service-item {
+                display: flex;
+                margin-bottom: 5px;
+                padding: 10px;
+                background-color: white;
+                border-radius: 14px;
+                border: 2px solid #ccc;
+
+            }
+            
+            .service-icon {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                padding-top: 5px;
+            }
+            
+            .service-icon img {
+                width: 100px;
+            }
+            
+            .service-content {
+                flex: 1;
+                padding-left: 10px;
+            }
+            
+            .service-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 5px;
+            }
+            
+            .service-description {
+                font-size: 14px;
+                color: #555;
+                line-height: 1.4;
+            }
+            
+            /* Стили для таба Братва */
+            .emblem-container {
+                text-align: center;
+                margin: 15px 0 25px;
+            }
+            
+            .bratva-emblem {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .bratva-heading {
+                font-size: 15px;
+                font-weight: 500;
+                text-align: center;
+                margin-bottom: 25px;
+                color: #333;
+            }
+            
+            .bratva-services {
+                margin: 20px 0;
+            }
+            
+            .bratva-service-item {
+                display: flex;
+                margin-bottom: 5px;
+                padding: 10px;
+                background-color: white;
+                border-radius: 14px;
+                border: 2px solid #ccc;
+            }
+            
+            .bratva-service-icon {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+            }
+            
+            .bratva-service-icon img {
+                width: 80px;
+            }
+            
+            .bratva-service-content {
+                flex: 1;
+                padding-left: 10px;
+            }
+            
+            .bratva-service-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 5px;
+            }
+            
+            .bratva-service-description {
+                font-size: 14px;
+                color: #555;
+                line-height: 1.4;
+            }
+            .wazir__icons img {
+                width: 80px;
+                height: 80px;
+            }
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary);
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .nav-icons {
+                font-size: 1.6rem;
+                font-weight: 300;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+        </style>
+        {% endblock %}
+
+        {% block content %}
+        <div class="tabs sticky top-0 z-10 shadow-sm">
+            <h1
+                style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #fb923c;
+                        text-align: center;
+                        border-radius: 12px;
+                        font-size: 18px;
+                        font-weight: 500;
+                        border-radius: 0px;">
+                Техническая поддержка
+            </h1>
+        </div>
+        
+        <!-- Основное содержимое -->
+            <main class="flex-grow pb-20">
+                <!-- Техническая поддержка -->
+                <!-- Tabs navigation -->
+                <div class="tabs support-tabs">
+                    <div class="tab active" data-tab="wazir">
+                        <img
+                            src="{{ url_for('static', path='layout/assets/img/logo_non.png') }}"
+                            alt="Wazir Logo"
+                            class="h-10" alt="Wazir Logo" class="tab-icon">
+                        <span style="margin-top: 6px;">Wazir</span>
+                    </div>
+                    <div class="tab" data-tab="mtt">
+                        <img
+                            src="https://wazir.kg/static/support/kulak.png"
+                            alt="MTT Inc." class="tab-icon">
+                        <span>MTT Inc.</span>
+                    </div>
+                    <div class="tab" data-tab="bratva">
+                        <img
+                            src="https://wazir.kg/static/support/bratva.png"
+                            alt="Братва" class="tab-icon">
+                        <span>Братва</span>
+                    </div>
+                </div>
+
+                <!-- Tab Wazir -->
+                <div id="wazir" class="tab-content active">
+                    <div class="support-content">
+                        <p class="support-text">
+                            Мы предлагаем широкий спектр услуг по созданию Ѵр
+                            видео и съемке 360. Это необычная и оригинальная
+                            технология в областивидеосъемки, которая появилась
+                            совсем недавно. Она позволяет создавать видео с
+                            виртуальной реальностью, панорамы и оригинальные
+                            ролики. Обзорные ракурсы в таких виртуальных
+                            пространствах будут располагаться со всех сторон. В
+                            итоге создается иллюзия присутствия внутри того или
+                            иного события.
+                        </p>
+
+                        <div class="apartment-image-container">
+                            <img
+                                src="https://wazir.kg/static/support/360.png"
+                                alt="3D планировка квартиры"
+                                class="apartment-image">
+                        </div>
+
+                        <p class="support-text">
+                            Определиться с покупкой недвижимости поможет
+                            современный виртуальный тур по будущей квартире. Это
+                            современный метод презентации строений, который
+                            помогает в улучшении качества предоставления
+                            контента на ресурсах риэлтерских агентств,
+                            строительных предприятий, реализующих проекты по
+                            Возведению жилых комплексов.
+                        </p>
+
+                        <div class="feature-icons"
+                            style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="wazir__icons">
+                                <img
+                                    src="https://wazir.kg/static/support/vr.png"
+                                    alt="VR туры">
+                            </div>
+                            <div class="wazir__icons">
+                                <img
+                                    src="https://wazir.kg/static/support/video.png"
+                                    alt="Видео 360">
+                            </div>
+                            <div class="wazir__icons">
+                                <img
+                                    src="https://wazir.kg/static/support/photo.png"
+                                    alt="Фото 360">
+                            </div>
+                            <div class="wazir__icons">
+                                <img
+                                    src="https://wazir.kg/static/support/object.png"
+                                    alt="3D Объект">
+                            </div>
+                        </div>
+
+                        <p class="support-text">
+                            Современный 360 тур по будущему дому - возможность
+                            экономии времени покупателя,
+                            так как ему не нужно выезжать на объект для
+                            просмотра недвижимости, а также маркетинговый
+                            инструмент развития организаций по реализации ЖК,
+                            офисных зданий, строений и др.
+                        </p>
+
+                        <div class="contact-info">
+                            <p class="contact-title">По всем вопросам
+                                обращайтесь наши удобным номером</p>
+                            <div class="contact-phone">+996 312 123 456</div>
+                            <div class="contact-address">ул. Советская 222, офис
+                                222000</div>
+                            <div class="contact-site">WAZIR.KG</div>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-telegram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-whatsapp"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-envelope"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-globe"></i></a>
+                            </div>
+
+                            <div class="copyright">© Wazir.KG Все права
+                                защищены</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab MTT Inc. -->
+                <div id="mtt" class="tab-content">
+                    <div class="support-content">
+                        <div class="mtt__content"
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                gap: 10px;
+                            ">
+                            <img src="https://wazir.kg/static/support/mtt.png"
+                                alt="mtt" style="height: 85px;">
+                            <p class="support-text" style="font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;">
+
+                                МТТ Іпс. - веб студия полного цикла.
+                                Профессиональное создание, продвижение и
+                                поддержка сайтов. Выполняем все работы от
+                                дизайна до копирайтинга под ключ.
+                            </p>
+                        </div>
+                        <div class="mtt-services">
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/site.png"
+                                        alt="Сайт визитка">
+                                </div>
+                                <div class="service-content">
+                                    <h3 class="service-title">Сайт визитка</h3>
+                                    <p class="service-description">
+                                        Подходит для компаний, желающих
+                                        познакомить клиентов со своей
+                                        деятельностью, но не имеющих возможности
+                                        заказать создание корпоративного сайта.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/eshop.png"
+                                        alt="Интернет-магазин">
+                                </div>
+                                <div class="service-content">
+                                    <h3
+                                        class="service-title">Интернет-магазин</h3>
+                                    <p class="service-description">
+                                        Создание площадки для эффективных
+                                        продаж.
+                                        Имеет неограниченное количество
+                                        категорий и товаров с возможностью
+                                        совершения покупки онлайн.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/landing.png"
+                                        alt="Landing-page">
+                                </div>
+                                <div class="service-content">
+                                    <h3 class="service-title">Landing-page</h3>
+                                    <p class="service-description">
+                                        Разработка мини-сайта для продвижения и
+                                        продажи товаров и услуг. Состоит из
+                                        нескольких креативных экранов с
+                                        информацией и форм обратной связи.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/corp.png"
+                                        alt="Корпоративный сайт">
+                                </div>
+                                <div class="service-content">
+                                    <h3 class="service-title">Корпоративный
+                                        сайт</h3>
+                                    <p class="service-description">
+                                        Призван рассказать аудитории о компании,
+                                        привлекает клиентов. Содержит подробную
+                                        информацию о
+                                        деятельности компании, о ее товарах или
+                                        услугах.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/mobile.png"
+                                        alt="Прототип приложения">
+                                </div>
+                                <div class="service-content">
+                                    <h3 class="service-title">Разработка
+                                        приложений</h3>
+                                    <p class="service-description">
+                                        Разработка мобильных приложений для
+                                        интернет-проектов, бизнеса и стартапов
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-info">
+                            <p class="contact-title">По всем вопросам
+                                обращайтесь наши удобным номером</p>
+                            <div class="contact-phone">+996 312 123 456</div>
+                            <div class="contact-address">ул. Советская 222, офис
+                                222000</div>
+                            <div class="contact-site">WAZIR.KG</div>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-telegram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-whatsapp"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-envelope"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-globe"></i></a>
+                            </div>
+
+                            <div class="copyright">© MTT Inc. Все права
+                                защищены</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Братва -->
+                <div id="bratva" class="tab-content">
+                    <div class="support-content">
+                        <div class="bratva-block"
+                            style="display: flex; align-items: center;">
+                            <img
+                                src="https://wazir.kg/static/support/gerb.png"
+                                alt="bratva"
+                                style="max-width: 120px;">
+                            <p class="bratva-heading"
+                                sy>
+                                МТТ Іпс.- веб студия полного цикла. Аккуратно и
+                                профессионально. Все под ключ.
+                            </p>
+                        </div>
+                        <div class="bratva-services">
+                            <div class="bratva-service-item">
+                                <div class="bratva-service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/camera.png"
+                                        alt="Проекты/Разработка">
+                                </div>
+                                <div class="bratva-service-content">
+                                    <h3
+                                        class="bratva-service-title">Видеонаблюдение</h3>
+                                    <p class="bratva-service-description">
+                                        Разработка, установка и обслуживание
+                                        систем видеонаблюдения для дома, офис,
+                                        клад и.т.д.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bratva-service-item">
+                                <div class="bratva-service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/videodomofon.png"
+                                        alt="Аудит и Видеонаблюдение">
+                                </div>
+                                <div class="bratva-service-content">
+                                    <h3 class="bratva-service-title">Аудио и
+                                        Видеодомофоны</h3>
+                                    <p class="bratva-service-description">
+                                        Домофон даёт не только ощущение
+                                        комфорта, удобство общения с пришедшим,
+                                        но и реальную защиту имущества!
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bratva-service-item">
+                                <div class="bratva-service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/skud.png"
+                                        alt="Системы Контроля Доступа">
+                                </div>
+                                <div class="bratva-service-content">
+                                    <h3 class="bratva-service-title">Система
+                                        контроля Доступа (СКУД)</h3>
+                                    <p class="bratva-service-description">
+                                        Только установка СКУД обезопасит от
+                                        незаконного проникновения на вашу
+                                        территорию, дав разрешение на вход
+                                        строго определенному кругу лиц.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bratva-service-item">
+                                <div class="bratva-service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/shlagbaum.png"
+                                        alt="Ворота и шлагбаумы">
+                                </div>
+                                <div class="bratva-service-content">
+                                    <h3 class="bratva-service-title">Ворота и
+                                        шлагбаумы</h3>
+                                    <p class="bratva-service-description">
+                                        Любой дом, офис, предприятие начинаются
+                                        с ворот. Ворота - ваша защита от
+                                        непрошеных гостей.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bratva-service-item">
+                                <div class="bratva-service-icon">
+                                    <img
+                                        src="https://wazir.kg/static/support/fire.png"
+                                        alt="Пожарная безопасность">
+                                </div>
+                                <div class="bratva-service-content">
+                                    <h3 class="bratva-service-title">Пожарная
+                                        безопасность</h3>
+                                    <p class="bratva-service-description">
+                                        Пожарная безопасность включает в себя
+                                        меры по
+                                        предотвращению огня, меры по оповещению
+                                        о начавшемся пожаре, а также средства
+                                        ликвидации возгорания.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-info">
+                            <p class="contact-title">По всем вопросам
+                                обращайтесь наши удобным номером</p>
+                            <div class="contact-phone">+996 312 123 456</div>
+                            <div class="contact-address">ул. Советская 222, офис
+                                222000</div>
+                            <div class="contact-site">WAZIR.KG</div>
+
+                            <div class="social-icons">
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-telegram"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fab fa-whatsapp"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-envelope"></i></a>
+                                <a href="#" class="social-icon"><i
+                                        class="fas fa-globe"></i></a>
+                            </div>
+
+                            <div class="copyright">© MTT Inc. Все права
+                                защищены</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- О компании -->
+                <div id="about" class="tab-content">
+                    <div class="company-section">
+                        <div class="section-title">О компании MTT Wazir</div>
+                        <div class="company-text">
+                            <p class="mb-4">MTT Wazir - инновационная
+                                IT-компания, основанная в 2020 году в
+                                Кыргызстане, специализирующаяся на разработке
+                                современных цифровых решений для рынка
+                                недвижимости. Наша миссия - сделать процесс
+                                поиска, продажи и аренды недвижимости
+                                максимально простым, прозрачным и эффективным
+                                для всех участников рынка.</p>
+
+                            <p class="mb-4">С момента основания мы активно
+                                развиваем цифровую экосистему для рынка
+                                недвижимости Кыргызстана, объединяя продавцов,
+                                покупателей, застройщиков и агентства
+                                недвижимости на единой платформе. Наши
+                                инновационные инструменты, включая виртуальные
+                                туры, аналитику рынка и умный поиск, помогают
+                                пользователям принимать обоснованные
+                                решения.</p>
+
+                            <p>Сегодня MTT Wazir - это команда из более чем 50
+                                специалистов, работающих над развитием
+                                платформы, которой доверяют тысячи
+                                пользователей. Наша цель - стать лидирующей
+                                платформой в сфере недвижимости в Центральной
+                                Азии, расширяя географию присутствия и постоянно
+                                совершенствуя качество предоставляемых
+                                услуг.</p>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Наши ценности</div>
+                        <div class="company-text">
+                            <p class="mb-2"><strong>Инновации</strong> - Мы
+                                постоянно внедряем новые технологии и подходы
+                                для улучшения пользовательского опыта.</p>
+                            <p class="mb-2"><strong>Прозрачность</strong> - Мы
+                                создаем открытую экосистему, где все участники
+                                имеют доступ к актуальной и достоверной
+                                информации.</p>
+                            <p class="mb-2"><strong>Качество</strong> - Мы
+                                стремимся предоставлять сервис высочайшего
+                                класса, уделяя внимание каждой детали.</p>
+                            <p
+                                class="mb-2"><strong>Клиентоориентированность</strong>
+                                - Потребности наших пользователей всегда в
+                                центре принимаемых нами решений.</p>
+                            <p><strong>Доступность</strong> - Мы делаем
+                                современные технологии доступными для всех
+                                участников рынка недвижимости.</p>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Руководство компании</div>
+                        <div class="team-grid">
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="/static/layout/assets/img/ceo.jpg"
+                                        alt="CEO">
+                                </div>
+                                <div class="team-name">Алмаз Ташматов</div>
+                                <div class="team-position">Генеральный
+                                    директор</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="/static/layout/assets/img/cto.jpg"
+                                        alt="CTO">
+                                </div>
+                                <div class="team-name">Улан Джумалиев</div>
+                                <div class="team-position">Технический
+                                    директор</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="/static/layout/assets/img/cmo.jpg"
+                                        alt="CMO">
+                                </div>
+                                <div class="team-name">Айнура Кулматова</div>
+                                <div class="team-position">Директор по
+                                    маркетингу</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="/static/layout/assets/img/coo.jpg"
+                                        alt="COO">
+                                </div>
+                                <div class="team-name">Бакыт Орозбаев</div>
+                                <div class="team-position">Операционный
+                                    директор</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Контакты</div>
+                        <div class="company-text">
+                            <p class="mb-2"><strong>Адрес:</strong> г. Бишкек,
+                                ул. Киевская 123, Бизнес-центр "Авангард"</p>
+                            <p class="mb-2"><strong>Телефон:</strong> +996 312
+                                123 456</p>
+                            <p class="mb-2"><strong>Email:</strong>
+                                info@wazir.kg</p>
+                            <p><strong>Режим работы:</strong> Пн-Пт:
+                                9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            {% endblock %}
+
+            {% block extra_js %}
+            <script>
+                $(document).ready(function() {
+                    // Проверяем наличие табов на странице
+                    if ($('.support-tabs .tab').length > 0) {
+                        console.log('Найдены табы:', $('.support-tabs .tab').length);
+                        
+                        // Явная инициализация активного таба при загрузке
+                        const initialActiveTab = $('.support-tabs .tab.active').data('tab') || 'wazir';
+                        $('.support-tabs .tab').removeClass('active');
+                        $('.support-tabs .tab[data-tab="' + initialActiveTab + '"]').addClass('active');
+                        $('.tab-content').removeClass('active');
+                        $('#' + initialActiveTab).addClass('active');
+                        console.log('Инициализирован активный таб:', initialActiveTab);
+                        
+                        // Переключение табов
+                        $('.support-tabs .tab').on('click', function() {
+                            const tabId = $(this).data('tab');
+                            console.log('Клик по табу:', tabId);
+                            
+                            // Убираем активный класс со всех табов
+                            $('.support-tabs .tab').removeClass('active');
+                            $(this).addClass('active');
+                            
+                            // Скрываем все содержимое табов
+                            $('.tab-content').removeClass('active');
+                            $('#' + tabId).addClass('active');
+                        });
+                        
+                        // Проверка работы табов при загрузке страницы
+                        console.log('Табы инициализированы');
+                        console.log('Активный таб:', $('.support-tabs .tab.active').data('tab'));
+                        console.log('Активный контент:', $('.tab-content.active').attr('id'));
+                    } else {
+                        console.log('Табы не найдены на странице');
+                    }
+                    
+                    // Обработка клика по навигационным элементам
+                    $('.nav-item').on('click', function() {
+                        $('.nav-item').removeClass('active').addClass('text-gray-500');
+                        $(this).addClass('active').removeClass('text-gray-500');
+                    });
+                    
+                    // Загружаем данные о погоде и курсе валют из глобального скрипта
+                    if (typeof getWeather === 'function') {
+                        getWeather(displayWeatherData);
+                    }
+                    
+                    if (typeof getCurrencyRate === 'function') {
+                        getCurrencyRate(displayCurrencyData);
+                    }
+                });
+            </script>
+            {% endblock %}

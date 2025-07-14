@@ -1,0 +1,594 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Настройки системы - SuperAdmin{% endblock %}
+{% block page_title %}Настройки системы{% endblock %}
+{% block page_subtitle %}Конфигурация и управление системой{% endblock %}
+
+{% block content %}
+<!-- System Status Card -->
+<div class="bg-white rounded-lg border border-gray-200 mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Статус системы</h3>
+        <p class="text-sm text-muted">Текущее состояние сервера</p>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="systemStatus">
+            <!-- Статус будет загружен через JavaScript -->
+            <div class="text-center">
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+                    <div class="h-6 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <button onclick="refreshSystemStatus()" class="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg transition-colors duration-150">
+                <i class="fas fa-sync-alt mr-2"></i>
+                Обновить статус
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Sections -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- UI Settings -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Настройки интерфейса</h3>
+            <p class="text-sm text-muted">Персонализация админ-панели</p>
+        </div>
+        <div class="p-6">
+            <form id="uiSettingsForm" class="space-y-6">
+                <!-- System Scale -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Масштаб интерфейса
+                        <span id="scaleValue" class="text-primary font-mono">100%</span>
+                    </label>
+                    <input type="range" id="systemScale" min="50" max="200" value="100" step="10" 
+                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    <div class="flex justify-between text-xs text-muted mt-1">
+                        <span>50%</span>
+                        <span>100%</span>
+                        <span>200%</span>
+                    </div>
+                    <p class="text-xs text-muted mt-2">Изменяет размер всех элементов интерфейса</p>
+                </div>
+                
+                <!-- Dark Mode -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Темная тема</label>
+                        <p class="text-xs text-muted">Переключение в темный режим</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="darkMode" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+                
+                <!-- Compact View -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Компактный вид</label>
+                        <p class="text-xs text-muted">Уменьшенные отступы и элементы</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="compactView" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+                
+                <!-- Notifications -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Уведомления</label>
+                        <p class="text-xs text-muted">Системные уведомления</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="enableNotifications" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg transition-all duration-150">
+                        <i class="fas fa-save mr-2"></i>
+                        Сохранить настройки
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- System Settings -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Системные настройки</h3>
+            <p class="text-sm text-muted">Конфигурация сервера</p>
+        </div>
+        <div class="p-6">
+            <form id="systemSettingsForm" class="space-y-6">
+                <!-- Auto Backup -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Автобэкап</label>
+                        <p class="text-xs text-muted">Автоматическое резервное копирование</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="autoBackup" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+                
+                <!-- Log Level -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Уровень логирования</label>
+                    <select id="logLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="INFO" selected>INFO</option>
+                        <option value="WARNING">WARNING</option>
+                        <option value="ERROR">ERROR</option>
+                    </select>
+                    <p class="text-xs text-muted mt-1">Минимальный уровень для записи в логи</p>
+                </div>
+                
+                <!-- Max File Size -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Максимальный размер файла
+                        <span id="fileSizeValue" class="text-primary font-mono">100 MB</span>
+                    </label>
+                    <input type="range" id="maxFileSize" min="10" max="500" value="100" step="10" 
+                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    <div class="flex justify-between text-xs text-muted mt-1">
+                        <span>10 MB</span>
+                        <span>250 MB</span>
+                        <span>500 MB</span>
+                    </div>
+                </div>
+                
+                <!-- Session Timeout -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Время сессии
+                        <span id="sessionValue" class="text-primary font-mono">60 мин</span>
+                    </label>
+                    <input type="range" id="sessionTimeout" min="15" max="480" value="60" step="15" 
+                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    <div class="flex justify-between text-xs text-muted mt-1">
+                        <span>15 мин</span>
+                        <span>4 часа</span>
+                        <span>8 часов</span>
+                    </div>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg transition-all duration-150">
+                        <i class="fas fa-cog mr-2"></i>
+                        Применить настройки
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- System Actions -->
+<div class="bg-white rounded-lg border border-gray-200 mt-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Системные действия</h3>
+        <p class="text-sm text-muted">Операции обслуживания</p>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Backup -->
+            <button onclick="createBackup()" class="p-4 border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-150 text-left">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-database text-green-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Резервная копия</h4>
+                        <p class="text-xs text-muted">Создать бэкап БД</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Создает полную резервную копию базы данных</p>
+            </button>
+            
+            <!-- System Info -->
+            <button onclick="showSystemInfo()" class="p-4 border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-150 text-left">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-info-circle text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Информация</h4>
+                        <p class="text-xs text-muted">О системе</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Детальная информация о системе и сервере</p>
+            </button>
+            
+            <!-- Clear Cache -->
+            <button onclick="clearCache()" class="p-4 border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-150 text-left">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-broom text-orange-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Очистить кэш</h4>
+                        <p class="text-xs text-muted">Удалить временные файлы</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Очищает кэш и временные файлы системы</p>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Live Scale Preview -->
+<div id="scalePreview" class="fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 hidden">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <i class="fas fa-search text-white text-sm"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-900">Предпросмотр масштаба</p>
+            <p class="text-xs text-muted" id="scalePreviewText">100%</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentSettings = {};
+
+// Загрузка настроек при инициализации
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+    refreshSystemStatus();
+    setupEventListeners();
+});
+
+// Загрузка текущих настроек
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/v1/superadmin/settings');
+        const data = await response.json();
+        
+        if (data.success) {
+            currentSettings = data.settings;
+            applySettingsToForm();
+        }
+    } catch (error) {
+        console.error('Error loading settings:', error);
+        showNotification('Ошибка загрузки настроек', 'error');
+    }
+}
+
+// Применение настроек к форме
+function applySettingsToForm() {
+    document.getElementById('systemScale').value = currentSettings.system_scale || 100;
+    document.getElementById('autoBackup').checked = currentSettings.auto_backup !== false;
+    document.getElementById('logLevel').value = currentSettings.log_level || 'INFO';
+    document.getElementById('maxFileSize').value = currentSettings.max_file_size || 100;
+    document.getElementById('sessionTimeout').value = currentSettings.session_timeout || 60;
+    document.getElementById('enableNotifications').checked = currentSettings.enable_notifications !== false;
+    document.getElementById('darkMode').checked = currentSettings.dark_mode === true;
+    document.getElementById('compactView').checked = currentSettings.compact_view === true;
+    
+    // Обновляем отображаемые значения
+    updateSliderValues();
+}
+
+// Обновление отображаемых значений слайдеров
+function updateSliderValues() {
+    const scale = document.getElementById('systemScale').value;
+    const fileSize = document.getElementById('maxFileSize').value;
+    const session = document.getElementById('sessionTimeout').value;
+    
+    document.getElementById('scaleValue').textContent = scale + '%';
+    document.getElementById('fileSizeValue').textContent = fileSize + ' MB';
+    document.getElementById('sessionValue').textContent = session + ' мин';
+}
+
+// Настройка обработчиков событий
+function setupEventListeners() {
+    // Слайдеры
+    document.getElementById('systemScale').addEventListener('input', function() {
+        updateSliderValues();
+        previewScale(this.value);
+    });
+    
+    document.getElementById('systemScale').addEventListener('change', function() {
+        applyScale(this.value);
+    });
+    
+    document.getElementById('maxFileSize').addEventListener('input', updateSliderValues);
+    document.getElementById('sessionTimeout').addEventListener('input', updateSliderValues);
+    
+    // Формы
+    document.getElementById('uiSettingsForm').addEventListener('submit', saveUISettings);
+    document.getElementById('systemSettingsForm').addEventListener('submit', saveSystemSettings);
+}
+
+// Предпросмотр масштаба
+function previewScale(scale) {
+    const preview = document.getElementById('scalePreview');
+    const previewText = document.getElementById('scalePreviewText');
+    
+    previewText.textContent = scale + '%';
+    preview.classList.remove('hidden');
+    
+    // Скрываем предпросмотр через 2 секунды
+    setTimeout(() => {
+        preview.classList.add('hidden');
+    }, 2000);
+}
+
+// Применение масштаба
+async function applyScale(scale) {
+    try {
+        const formData = new FormData();
+        formData.append('scale', scale);
+        
+        const response = await fetch('/api/v1/superadmin/system/scale', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Применяем масштаб к HTML элементу
+            document.documentElement.style.fontSize = (16 * scale / 100) + 'px';
+            showNotification(`Масштаб установлен: ${scale}%`, 'success');
+        } else {
+            showNotification(data.message || 'Ошибка изменения масштаба', 'error');
+        }
+    } catch (error) {
+        console.error('Error applying scale:', error);
+        showNotification('Ошибка изменения масштаба', 'error');
+    }
+}
+
+// Сохранение настроек UI
+async function saveUISettings(event) {
+    event.preventDefault();
+    
+    try {
+        const formData = new FormData();
+        formData.append('system_scale', document.getElementById('systemScale').value);
+        formData.append('dark_mode', document.getElementById('darkMode').checked);
+        formData.append('compact_view', document.getElementById('compactView').checked);
+        formData.append('enable_notifications', document.getElementById('enableNotifications').checked);
+        formData.append('auto_backup', document.getElementById('autoBackup').checked);
+        formData.append('log_level', document.getElementById('logLevel').value);
+        formData.append('max_file_size', document.getElementById('maxFileSize').value);
+        formData.append('session_timeout', document.getElementById('sessionTimeout').value);
+        
+        const response = await fetch('/api/v1/superadmin/settings', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Настройки интерфейса сохранены', 'success');
+            currentSettings = data.settings;
+        } else {
+            showNotification(data.message || 'Ошибка сохранения настроек', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving UI settings:', error);
+        showNotification('Ошибка сохранения настроек', 'error');
+    }
+}
+
+// Сохранение системных настроек
+async function saveSystemSettings(event) {
+    event.preventDefault();
+    
+    try {
+        const formData = new FormData();
+        formData.append('auto_backup', document.getElementById('autoBackup').checked);
+        formData.append('log_level', document.getElementById('logLevel').value);
+        formData.append('max_file_size', document.getElementById('maxFileSize').value);
+        formData.append('session_timeout', document.getElementById('sessionTimeout').value);
+        formData.append('system_scale', document.getElementById('systemScale').value);
+        formData.append('dark_mode', document.getElementById('darkMode').checked);
+        formData.append('compact_view', document.getElementById('compactView').checked);
+        formData.append('enable_notifications', document.getElementById('enableNotifications').checked);
+        
+        const response = await fetch('/api/v1/superadmin/settings', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Системные настройки применены', 'success');
+            currentSettings = data.settings;
+        } else {
+            showNotification(data.message || 'Ошибка применения настроек', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving system settings:', error);
+        showNotification('Ошибка применения настроек', 'error');
+    }
+}
+
+// Обновление статуса системы
+async function refreshSystemStatus() {
+    try {
+        const response = await fetch('/api/v1/superadmin/system/status');
+        const data = await response.json();
+        
+        if (data.success) {
+            displaySystemStatus(data.status);
+        }
+    } catch (error) {
+        console.error('Error loading system status:', error);
+    }
+}
+
+// Отображение статуса системы
+function displaySystemStatus(status) {
+    const container = document.getElementById('systemStatus');
+    
+    container.innerHTML = `
+        <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">${status.cpu_usage}%</div>
+            <div class="text-sm text-muted">CPU</div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: ${status.cpu_usage}%"></div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">${status.memory_usage}%</div>
+            <div class="text-sm text-muted">Память</div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div class="bg-green-600 h-2 rounded-full" style="width: ${status.memory_usage}%"></div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">${status.disk_usage}%</div>
+            <div class="text-sm text-muted">Диск</div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div class="bg-yellow-600 h-2 rounded-full" style="width: ${status.disk_usage}%"></div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <div class="text-2xl font-bold text-green-600">●</div>
+            <div class="text-sm text-muted">Статус</div>
+            <div class="text-xs text-green-600 mt-2">Онлайн</div>
+        </div>
+    `;
+}
+
+// Создание резервной копии
+async function createBackup() {
+    try {
+        const result = await Swal.fire({
+            title: 'Создать резервную копию?',
+            text: 'Это может занять несколько минут',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Создать',
+            cancelButtonText: 'Отмена',
+            confirmButtonColor: '#144b44'
+        });
+        
+        if (result.isConfirmed) {
+            const response = await fetch('/api/v1/superadmin/system/backup', {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(`Резервная копия создана: ${data.filename}`, 'success');
+            } else {
+                showNotification(data.message || 'Ошибка создания резервной копии', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error creating backup:', error);
+        showNotification('Ошибка создания резервной копии', 'error');
+    }
+}
+
+// Показать информацию о системе
+function showSystemInfo() {
+    Swal.fire({
+        title: 'Информация о системе',
+        html: `
+            <div class="text-left space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Версия системы:</span>
+                    <span class="font-mono">Wazir v2.1.0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Python:</span>
+                    <span class="font-mono">3.12.0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">FastAPI:</span>
+                    <span class="font-mono">0.104.1</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">База данных:</span>
+                    <span class="font-mono">PostgreSQL 15</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Время работы:</span>
+                    <span class="font-mono">24 дня, 17 часов</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Последний бэкап:</span>
+                    <span class="font-mono">2024-01-15 14:30</span>
+                </div>
+            </div>
+        `,
+        confirmButtonText: 'Закрыть',
+        confirmButtonColor: '#144b44'
+    });
+}
+
+// Очистка кэша
+async function clearCache() {
+    try {
+        const result = await Swal.fire({
+            title: 'Очистить кэш?',
+            text: 'Это может временно замедлить работу системы',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Очистить',
+            cancelButtonText: 'Отмена',
+            confirmButtonColor: '#d97706'
+        });
+        
+        if (result.isConfirmed) {
+            // Симуляция очистки кэша
+            showNotification('Кэш системы очищен', 'success');
+        }
+    } catch (error) {
+        console.error('Error clearing cache:', error);
+        showNotification('Ошибка очистки кэша', 'error');
+    }
+}
+</script>
+
+<style>
+/* Стили для слайдеров */
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #144b44;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #144b44;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,1676 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Поиск{% endblock %}
+
+{% block extra_css %}
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+        <style>
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            } 
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary); 
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .nav-icons {
+                font-size: 1.6rem;
+                font-weight: 300;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+            
+            /* Стили для горизонтальной прокрутки категорий */
+            .categories-scroll {
+                display: block; /* Изменяем с flex на block */
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 12px 8px;
+                white-space: nowrap; /* Запрещаем перенос строк */
+               
+                -webkit-overflow-scrolling: touch; /* Для мобильных устройств */
+                width: 100%; /* Принудительная ширина контейнера */
+                max-width: 100vw; /* Не больше ширины экрана */
+            }
+            .categories-scroll::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .category-item {
+                display: inline-block; /* Используем inline-block вместо flex */
+                vertical-align: top;
+                width: 80px; /* Фиксированная ширина */
+                height: 80px;
+                border-radius: 16px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+                border: none;
+                background: transparent;
+            }
+            
+            .category-item:hover {
+                transform: translateY(-2px);
+            }
+            
+            .category-item.active {
+                box-shadow: 7px 7px 7px -4px rgb(251 146 60);
+            }
+            
+            .category-icon {
+                width: 80px; /* Картинка занимает всю кнопку */
+                height: 80px;
+                transition: all 0.3s ease;
+                border-radius: 16px;
+                object-fit: cover;
+            }
+            
+            .category-name {
+                font-size: 10px;
+                font-weight: 500;
+                text-align: center;
+                line-height: 1.2;
+                white-space: normal;
+                word-wrap: break-word;
+                max-width: 70px;
+            }
+            
+            .category-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                background-color: #f9fafb;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 10px 0;
+            }
+            .category-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .category-select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
+                color: #4b5563;
+                background-color: white;
+                outline: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            
+            /* Стили для рекламного слайдера */
+            .ads-slider {
+                width: 100%;
+                height: 85px;
+                position: relative;
+                overflow: hidden;
+                border-radius: 8px;
+                padding: 0 7px;
+            }
+            
+            .ads-slider-container {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+                border-radius: 8px;
+            }
+            
+            .ads-slides-wrapper {
+                display: flex;
+                width: 200%; /* 2 слайда = 200% */
+                height: 100%;
+                transition: transform 0.5s ease-in-out;
+            }
+            
+            .ads-slide {
+                width: 50%; /* Каждый слайд занимает 50% от wrapper */
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            
+            .ads-slide.placeholder {
+                background-color: #9ca3af;
+                color: white;
+                font-size: 1.2rem;
+                font-weight: 500;
+                text-align: center;
+                font-family: 'Montserrat', sans-serif;
+            }
+            
+            .ads-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .swiper {
+                width: 100%;
+                height: 180px;
+                border-radius: 8px;
+                overflow: hidden;
+                position: relative;
+                margin-bottom: 0;
+            }
+            .swiper-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .property-card {
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                margin-bottom: 16px;
+            }
+            .property-info {
+                font-size: 1.05rem;
+                line-height: 1.5;
+                color: #4b5563;
+            }
+            .property-address {
+                font-size: 0.95rem;
+                color: #6b7280;
+            }
+            .property-price {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #111827;
+            }
+            .action-btn {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px;
+                font-size: 1rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                border-radius: 0;
+            }
+            .action-btn i {
+                margin-right: 6px;
+                font-size: 1.1rem;
+            }
+            .action-btn.call-btn {
+                background-color: #f9fafb;
+                color: #4b5563;
+                border-right: 1px solid #e5e7eb;
+            }
+            .action-btn.details-btn {
+                background-color: #f9fafb;
+                color: #4b5563;
+            }
+            .action-btn.tour-btn {
+                background-color: #f9fafb;
+                color: #4b5563;
+            }
+            .pagination-dot {
+                width: 6px;
+                height: 6px;
+                background-color: rgba(255,255,255,0.5);
+                border-radius: 50%;
+                margin: 0 2px;
+            }
+            .pagination-dot.active {
+                background-color: white;
+                width: 8px;
+                height: 8px;
+            }
+            .filter-panel {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+                padding: 0 16px;
+                border-radius: 8px;
+                margin-bottom: 0;
+            }
+            .filter-panel.open {
+                max-height: 2000px;
+                transition: max-height 0.8s ease-in-out;
+                padding: 16px;
+                margin-bottom: 16px;
+                background-color: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .filter-panel.closed {
+                display: none;
+            }
+            .filter-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background-color: #fff;
+                cursor: pointer;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                font-size: 1.05rem;
+                font-weight: 400;
+            }
+            .applied-filters {
+                background-color: #ffedd5;
+                color: var(--color-primary);
+                padding: 8px 16px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                font-weight: 400;
+                display: none;
+            }
+            .applied-filters.visible {
+                display: flex;
+            }
+            .price-range {
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 3px;
+                position: relative;
+            }
+            .price-progress {
+                height: 100%;
+                background: var(--color-primary);
+                position: absolute;
+                border-radius: 3px;
+            }
+            .range-input {
+                position: relative;
+                margin-top: 24px;
+                margin-bottom: 10px;
+            }
+            .range-input input {
+                position: absolute;
+                top: -30px;
+                height: 6px;
+                width: 100%;
+                background: none;
+                pointer-events: none;
+                appearance: none;
+            }
+            .range-input input::-webkit-slider-thumb {
+                height: 24px;
+                width: 24px;
+                border-radius: 50%;
+                pointer-events: auto;
+                appearance: none;
+                background: white;
+                border: 2px solid var(--color-primary);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                cursor: pointer;
+            }
+            .room-btn {
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 1rem;
+                transition: all 0.2s ease;
+            }
+            .room-btn.active {
+                background-color: var(--color-primary);
+                color: white;
+                border-color: var(--color-primary);
+            }
+            .apartment-type-btn, .house-type-btn {
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 1rem;
+                transition: all 0.2s ease;
+            }
+            .apartment-type-btn.active, .house-type-btn.active {
+                background-color: var(--color-primary);
+                color: white;
+                border-color: var(--color-primary);
+            }
+            .checkbox-label {
+                font-size: 1rem;
+            }
+            .no-results {
+                text-align: center;
+                padding: 40px 20px;
+                color: #6b7280;
+            }
+            .no-results i {
+                font-size: 3rem;
+                margin-bottom: 15px;
+                color: #d1d5db;
+            }
+
+            .category-card {
+                transition: all 0.3s ease;
+                height: 75px; /* Уменьшаем высоту */
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                overflow: hidden;
+                width: 100%; /* Делаем карточки шире */
+                border-radius: 12px; /* Скругление */
+                display: flex;
+                justify-content: flex-start; /* Выравниваем содержимое слева */
+                align-items: flex-start; /* Выравниваем содержимое вверху */
+            }
+            .category-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            }
+            .category-card.active {
+                box-shadow: 7px 7px 7px -4px rgb(251 146 60);
+            }
+            .category-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)); /* Увеличиваем затемнение для лучшей читаемости */
+            }
+            .category-title {
+                position: relative;
+                z-index: 2;
+                text-align: left; /* Текст слева */
+                padding-top: 9px;
+                padding-left: 9px;
+                font-size: 16px;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Тень для лучшей читаемости */
+                text-decoration: underline;
+            }
+            
+            .room-btn.active,
+            .apartment-type-btn.active,
+            .house-type-btn.active {
+                box-shadow: 5px 5px 5px -4px rgb(251 146 60 / 70%);
+            }
+            /* Стили для слайдера категорий */
+            .categories-slider-container {
+                margin: 0;
+                width: 100%;
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-bottom: 1px solid #e2e8f0;
+                padding-top: 5px;
+            }
+            
+            .categories-swiper {
+                width: 100%;
+                height: 85px;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+            
+            .categories-swiper .swiper-wrapper {
+                padding: 0;
+            }
+            
+            .categories-swiper .swiper-slide {
+                width: 25% !important; /* Строго 4 слайда = 25% каждый */
+                height: 80px !important;
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .categories-swiper .category-item {
+                display: block;
+                width: 90%; /* Немного меньше чем 100% для визуального отступа */
+                height: 80px;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin: 0 auto;
+            }
+            
+            .categories-swiper .category-item:hover {
+                transform: translateY(-2px);
+            }
+            
+            .categories-swiper .category-item.active {
+                box-shadow: 5px 5px 5px -4px rgba(251, 146, 60, 0.65);
+            }
+            
+            .categories-swiper .category-icon {
+                width: 100%;
+                height: 100%;
+                transition: all 0.3s ease;
+                object-fit: cover;
+                display: block;
+            }
+            
+            .categories-swiper .category-item.active .category-icon {
+                box-shadow: 5px 5px 5px -4px rgba(251, 146, 60, 0.65);
+            }
+            
+            /* 🔥 СТИЛИ ДЛЯ СЛАЙДЕРОВ УРОВНЯ 2 И 3 - ОДИНАКОВАЯ ВЫСОТА */
+            .categories-swiper-level-2,
+            .categories-swiper-level-3 {
+                width: 100%;
+                height: 85px; /* Такая же высота как у уровня 1 */
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+            
+            .categories-swiper-level-2 .swiper-wrapper,
+            .categories-swiper-level-3 .swiper-wrapper {
+                padding: 0;
+            }
+            
+            .categories-swiper-level-2 .swiper-slide,
+            .categories-swiper-level-3 .swiper-slide {
+                width: 25% !important; /* Строго 4 слайда = 25% каждый */
+                height: 80px !important; /* Такая же высота как у уровня 1 */
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .categories-swiper-level-2 .category-item,
+            .categories-swiper-level-3 .category-item {
+                display: block;
+                width: 90%; /* Немного меньше чем 100% для визуального отступа */
+                height: 80px; /* Такая же высота как у уровня 1 */
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin: 0 auto;
+            }
+            
+            .categories-swiper-level-2 .category-item:hover,
+            .categories-swiper-level-3 .category-item:hover {
+                transform: translateY(-2px);
+            }
+            
+            .categories-swiper-level-2 .category-item.active,
+            .categories-swiper-level-3 .category-item.active {
+                box-shadow: 5px 5px 5px -4px rgba(251, 146, 60, 0.65);
+            }
+            
+            .categories-swiper-level-2 .category-icon,
+            .categories-swiper-level-3 .category-icon {
+                width: 100%;
+                height: 100%;
+                transition: all 0.3s ease;
+                object-fit: cover;
+                display: block;
+            }
+            
+            .categories-swiper-level-2 .category-item.active .category-icon,
+            .categories-swiper-level-3 .category-item.active .category-icon {
+                box-shadow: 5px 5px 5px -4px rgba(251, 146, 60, 0.65);
+            }
+        </style>
+{% endblock %}
+
+{% block content %}
+<div class="pb-20">
+                <!-- Рекламный слайдер -->
+                <div class="ads-slider rounded-lg">
+                    <div class="ads-slider-container">
+                        <div class="ads-slides-wrapper">
+                            <div class="ads-slide placeholder">
+                                Место для вашей рекламы
+                            </div>
+                            <div class="ads-slide">
+                                <img src="https://wazir.kg/static/reklama.png" alt="wazir">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Слайдер категорий товаров/услуг -->
+                {% if general_categories %}
+                
+                <!-- Основной уровень категорий (1 уровень) -->
+                <div class="categories-slider-container">
+                    <div class="swiper categories-swiper">
+                        <div class="swiper-wrapper">
+                            {% for category in general_categories %}
+                            {% if category.level == 1 %}
+                            <div class="swiper-slide">
+                                <button class="category-item {% if selected_category == category.name or (selected_category == 'Недвижимость' and category.name == 'Недвижимость') %}active{% endif %}" 
+                                        data-category-id="{{ category.id }}"
+                                        data-has-children="{{ category.has_children | lower }}"
+                                        data-category-name="{{ category.name }}"
+                                        data-level="1">
+                                    <img src="{{ category.image }}" alt="{{ category.name }}" class="category-icon">
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Подкатегории (2 уровень) - скрыты по умолчанию -->
+                <div class="categories-slider-container level-2-container" id="level-2-categories" style="display: none;">
+                    <div class="swiper categories-swiper-level-2">
+                        <div class="swiper-wrapper">
+                            {% for category in general_categories %}
+                            {% if category.level == 2 %}
+                            <div class="swiper-slide subcategory-slide" data-parent-id="{{ category.parent_id }}">
+                                <button class="category-item" 
+                                        data-category-id="{{ category.id }}"
+                                        data-has-children="{{ category.has_children | lower }}"
+                                        data-category-name="{{ category.name }}"
+                                        data-level="2">
+                                    <img src="{{ category.image }}" alt="{{ category.name }}" class="category-icon">
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Бренды (3 уровень) - скрыты по умолчанию -->
+                <div class="categories-slider-container level-3-container" id="level-3-categories" style="display: none;">
+                    <div class="swiper categories-swiper-level-3">
+                        <div class="swiper-wrapper">
+                            {% for category in general_categories %}
+                            {% if category.level == 3 %}
+                            <div class="swiper-slide brand-slide" data-parent-id="{{ category.parent_id }}">
+                                <button class="category-item" 
+                                        data-category-id="{{ category.id }}"
+                                        data-category-name="{{ category.name }}"
+                                        data-level="3">
+                                    <img src="{{ category.image }}" alt="{{ category.name }}" class="category-icon">
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% endif %}
+
+                <!-- Категории недвижимости -->
+                {% if not selected_category or selected_category == "Недвижимость" %}
+                <div class="mx-auto"
+                    style="background-color: #fff;">
+                    <div class="grid grid-cols-2 gap-1" style="padding: 10px 7px;">
+                        <!-- Аренда -->
+                        <a href="/mobile/search?q=&category=Аренда">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Аренда' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/arenda.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Аренда</h3>
+                            </div>
+                        </a>
+                        <!-- Продажа -->
+                        <a href="/mobile/search?q=&category=Продажа">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Продажа' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/prodaja.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Продажа</h3>
+                            </div>
+                        </a>
+                        <!-- Новостройки -->
+                        <a href="/mobile/search?q=&category=Новостройки">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Новостройки' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/novostroyki.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Новостройки</h3>
+                            </div>
+                        </a>
+                        <!-- Посуточная -->
+                        <a href="/mobile/search?q=&category=Посуточная">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Посуточная' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/posutochnaya.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Посуточная</h3>
+                            </div>
+                        </a>
+                        <!-- Коммерческая -->
+                        <a href="/mobile/search?q=&category=Коммерческая">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Коммерческая' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/kommercheskaya.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Коммерческая</h3>
+                            </div>
+                        </a>
+                        <!-- Ипотека -->
+                        <a href="/mobile/search?q=&category=Ипотека">
+                            <div
+                                class="category-card rounded-lg {% if selected_category == 'Ипотека' %}active{% endif %}"
+                                style="background-image: url('https://wazir.kg/static/categories/ipoteka.png')">
+                                <h3
+                                    class="category-title text-white font-medium font-montserrat">Ипотека</h3>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Поисковая строка и фильтры -->
+                <div class="container mx-auto px-4 mb-4 mt-3">
+                    <form id="search-form" method="get"
+                        action="{{ url_for('search') }}">
+                        <div class="flex items-center mb-3">
+                            <div class="relative flex-1">
+                                <input type="text" name="q" id="search-input"
+                                    class="bg-white w-full py-3 pl-10 pr-4 rounded-lg shadow-sm text-base"
+                                    style="border-bottom: 1px solid #e5e7eb; outline: none;"
+                                    placeholder="Поиск недвижимости, улица, слова"
+                                    value="{{ search_query or '' }}">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            <button id="filter-toggle" type="button"
+                                class="ml-2 bg-white p-3 rounded-lg shadow-sm">
+                                <i
+                                    class="fas fa-sliders-h text-gray-600 text-lg"></i>
+                            </button>
+                            <input type="hidden" name="category"
+                                id="category-input"
+                                value="{{ selected_category or '' }}">
+                        </div>
+                    </form>
+
+                    <!-- Индикатор примененных фильтров -->
+                    <div id="applied-filters"
+                        data-has-filters="{% if filter.price_max or filter.max_area or filter.rooms or filter.apartment_type or filter.house_type or filter.min_floor or filter.max_floor or filter.balcony or filter.furniture or filter.renovation or filter.parking or filter.elevator or filter.owner_only %}true{% else %}false{% endif %}"
+                        class="applied-filters {% if max_price or max_area or rooms or apartment_type or house_type or min_floor or max_floor or balcony or furniture or renovation or parking or elevator or owner_only %}visible{% else %}hidden{% endif %}">
+                        <span>Применены фильтры</span>
+                        <button id="reset-all-filters"
+                            class="text-red-500 flex items-center">
+                            <span>Сбросить</span>
+                            <i class="fas fa-times-circle ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Панель фильтров -->
+                    <div id="filter-panel"
+                        class="filter-panel bg-white rounded-lg shadow-sm p-4 mb-4 closed">
+                        <form id="filter-form">
+                            <!-- Цена -->
+                            <div class="mb-5 price-block">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Цена</label>
+                                <div class="price-range mb-6">
+                                    <div class="price-progress"
+                                        style="left: 0%; right: 0%"></div>
+                                </div>
+                                <div class="range-input">
+                                    <input type="range" name="max_price" min="0"
+                                        max="10000000"
+                                        value="{{ max_price or 10000000 }}"
+                                        class="max-range">
+                                </div>
+                                <div
+                                    class="text-left text-sm text-gray-700 mt-2 font-medium">
+                                    <span id="max-price">до {{ max_price or
+                                        10000000 }} СОМ</span>
+                                </div>
+                            </div>
+
+                            <!-- Площадь -->
+                            <div class="mb-5" id="area-block">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Площадь
+                                    (м²)</label>
+                                <div class="price-range mb-6">
+                                    <div class="price-progress"
+                                        style="left: 0%; right: 0%"></div>
+                                </div>
+                                <div class="range-input">
+                                    <input type="range" name="max_area" min="0"
+                                        max="500"
+                                        value="{{ max_area or 500 }}"
+                                        class="max-area">
+                                </div>
+                                <div
+                                    class="text-left text-sm text-gray-700 mt-2 font-medium">
+                                    <span id="max-area">до {{ max_area or 500 }}
+                                        м²</span>
+                                </div>
+                            </div>
+
+                            <!-- Количество комнат -->
+                            <div class="mb-5">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Количество
+                                    комнат</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" data-value="studio"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 'studio' %}active{% endif %}">Студия</button>
+                                    <button type="button" data-value="1"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 1 %}active{% endif %}">1</button>
+                                    <button type="button" data-value="2"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 2 %}active{% endif %}">2</button>
+                                    <button type="button" data-value="3"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 3 %}active{% endif %}">3</button>
+                                    <button type="button" data-value="4"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 4 %}active{% endif %}">4</button>
+                                    <button type="button" data-value="5"
+                                        class="room-btn border border-gray-300 text-gray-700 {% if rooms == 5 %}active{% endif %}">5+</button>
+                                    <input type="hidden" name="rooms"
+                                        id="rooms-input"
+                                        value="{{ rooms or '' }}">
+                                </div>
+                            </div>
+
+                            <!-- Только от собственника -->
+                            <div class="mb-5">
+                                <div class="flex items-center">
+                                    <label class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="owner_only"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if owner_only %}checked{% endif %}>
+                                        Только от собственника
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Квартиры -->
+                            <div class="mb-5">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Квартиры</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" data-value="secondary"
+                                        class="apartment-type-btn border border-gray-300 text-gray-700 {% if apartment_type == 'secondary' %}active{% endif %}">На вторичке</button>
+                                    <button type="button" data-value="new_building"
+                                        class="apartment-type-btn border border-gray-300 text-gray-700 {% if apartment_type == 'new_building' %}active{% endif %}">В новостройке</button>
+                                    <button type="button" data-value="room"
+                                        class="apartment-type-btn border border-gray-300 text-gray-700 {% if apartment_type == 'room' %}active{% endif %}">Комната</button>
+                                    <input type="hidden" name="apartment_type"
+                                        id="apartment-type-input"
+                                        value="{{ apartment_type or '' }}">
+                                </div>
+                            </div>
+
+                            <!-- Дома и участки -->
+                            <div class="mb-5">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Дома и участки</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" data-value="house"
+                                        class="house-type-btn border border-gray-300 text-gray-700 {% if house_type == 'house' %}active{% endif %}">Дом, дача</button>
+                                    <button type="button" data-value="plot"
+                                        class="house-type-btn border border-gray-300 text-gray-700 {% if house_type == 'plot' %}active{% endif %}">Участок</button>
+                                    <button type="button" data-value="part_house"
+                                        class="house-type-btn border border-gray-300 text-gray-700 {% if house_type == 'part_house' %}active{% endif %}">Часть дома</button>
+                                    <input type="hidden" name="house_type"
+                                        id="house-type-input"
+                                        value="{{ house_type or '' }}">
+                                </div>
+                            </div>
+
+                            <!-- Этаж -->
+                            <div class="mb-5">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-2">Этаж</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label
+                                            class="block text-sm text-gray-600 mb-1">От</label>
+                                        <select name="min_floor"
+                                            class="w-full p-3 border border-gray-300 rounded-md text-base">
+                                            <option value>Любой</option>
+                                            {% for i in range(1, 21) %}
+                                            <option value="{{ i }}" {% if
+                                                min_floor == i %}selected{%
+                                                endif %}>{{ i }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-sm text-gray-600 mb-1">До</label>
+                                        <select name="max_floor"
+                                            class="w-full p-3 border border-gray-300 rounded-md text-base">
+                                            <option value>Любой</option>
+                                            {% for i in range(1, 21) %}
+                                            <option value="{{ i }}" {% if
+                                                max_floor == i %}selected{%
+                                                endif %}>{{ i }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Дополнительные опции -->
+                            <div class="mb-5">
+                                <label
+                                    class="block text-base font-medium text-gray-700 mb-3">Дополнительно</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label
+                                        class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="balcony"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if balcony %}checked{% endif %}>
+                                        С балконом
+                                    </label>
+                                    <label
+                                        class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="furniture"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if furniture %}checked{% endif %}>
+                                        С мебелью
+                                    </label>
+                                    <label
+                                        class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="renovation"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if renovation %}checked{% endif %}>
+                                        Ремонт
+                                    </label>
+                                    <label
+                                        class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="parking"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if parking %}checked{% endif %}>
+                                        Паркинг
+                                    </label>
+                                    <label
+                                        class="flex items-center checkbox-label">
+                                        <input type="checkbox" name="elevator"
+                                            value="true" class="mr-2 w-5 h-5" {%
+                                            if elevator %}checked{% endif %}>
+                                        Лифт
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-3">
+                                <button id="apply-filters" type="button"
+                                    class="btn-primary flex-1 py-3 rounded-lg text-base font-medium">Применить</button>
+                                <button id="reset-filters" type="button"
+                                    class="btn-secondary w-1/3 py-3 rounded-lg text-base font-medium">Сбросить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Объявления -->
+                <div class="container mx-auto px-4">
+                    {% if properties %}
+                    {% for prop in properties %}
+                    <!-- Карточка объявления -->
+                    <a href="{{ url_for('property', property_id=prop.id) }}" class="block no-underline">
+                        <div class="property-card bg-white mb-5 hover:shadow-lg transition-shadow">
+                <div class="relative" style="margin-top: 0; margin-bottom: 0;">
+                                <!-- Слайдер изображений -->
+                                <div class="swiper property-swiper" data-property-id="{{ prop.id }}">
+                                    <div class="swiper-wrapper">
+                                        {% if prop.images %}
+                                        {% for image in prop.images %}
+                                        <div class="swiper-slide">
+                                <div class="col-span-1 relative">
+                                                <img src="{{ image }}"
+                                                    alt="{{ prop.title }}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% else %}
+                                        <div class="swiper-slide">
+                                <div class="col-span-1 relative">
+                                                <img
+                                                    src="{{ url_for('static', path='layout/assets/img/property-placeholder.jpg') }}"
+                                                    alt="Нет фото"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Индикатор просмотра фото - ДИНАМИЧЕСКИЙ -->
+                                <div class="absolute bottom-3 right-3 bg-black bg-opacity-75 text-white px-3 py-1 rounded text-sm font-medium z-10 photo-indicator" data-property-id="{{ prop.id }}">
+                                    {% if prop.images %}
+                                    <span class="current-slide">1</span>/<span class="total-slides">{{ prop.images_count or prop.images|length }}</span>
+                                    {% else %}
+                                    <span class="current-slide">1</span>/<span class="total-slides">1</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                <div class="px-4 pb-4 pt-0">
+                    <!-- Заголовок объявления -->
+                    <div class="mb-2 mt-2"> 
+                        <h2 class="text-lg font-semibold text-gray-900 leading-tight">{{ prop.title or "Продается недвижимость" }}</h2>
+                    </div>
+                                <div class="mb-2">
+                                    <h3 class="property-price">{{
+                                        "{:,.0f}".format(prop.price).replace(',',
+                                        ' ') }} СОМ</h3>
+                                </div>
+                                <div class="property-info mb-1">
+                                    <p>{{ prop.rooms or "?" }}-комн.кв • {{
+                                        prop.area or "?" }} м² • {{ prop.floor or
+                                        "?" }}/{{ prop.building_floors or "?" }}
+                                        этаж</p>
+                                </div>
+                                <div class="property-address mb-3">
+                                    <p>{{ prop.address
+                                        or "Адрес не указан" }}</p>
+                                </div>
+
+                                <!-- Кнопки действий -->
+                                <div class="flex" onclick="event.stopPropagation();">
+                                    <a href="tel:+996123456789"
+                                        class="action-btn call-btn"
+                                        onclick="event.stopPropagation();">
+                                        <i class="fas fa-phone-alt"></i> Позвонить
+                                    </a>
+                                    <a
+                                        href="{{ url_for('property', property_id=prop.id) }}"
+                                        class="action-btn details-btn"
+                                        onclick="event.stopPropagation();">
+                                        <i class="fas fa-info-circle"></i> Подробно
+                                    </a>
+                                    {% if prop.has_tour %}
+                                    <a href="{{ url_for('property', property_id=prop.id) }}?auto360=1"
+                                        class="action-btn tour-btn"
+                                        onclick="event.stopPropagation();">
+                                        <i class="fas fa-vr-cardboard"></i> 360°
+                                    </a>
+                                    {% else %}
+                                    <a href="#" class="action-btn tour-btn"
+                                        style="opacity: 0.5; pointer-events: none;"
+                                        onclick="event.stopPropagation();">
+                                        <i class="fas fa-vr-cardboard"></i> 360°
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% else %}
+                    <!-- Если нет объявлений -->
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3 class="text-xl font-semibold mb-2">Объявления не
+                            найдены</h3>
+                        <p class="mb-4">Попробуйте изменить параметры поиска или
+                            сбросить фильтры</p>
+                        <button id="clear-search"
+                            class="bg-white text-gray-700 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50">
+                            Сбросить все фильтры
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                </div>
+{% endblock %}
+
+{% block extra_js %}
+        <script
+            src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            console.log('=== КАТЕГОРИИ: ИНИЦИАЛИЗАЦИЯ ===');
+            
+            // Проверяем загрузку категорий в DOM
+            console.log('Количество категорий уровня 1:', $('.category-item[data-level="1"]').length);
+            console.log('Количество категорий уровня 2:', $('.category-item[data-level="2"]').length);
+            console.log('Количество категорий уровня 3:', $('.category-item[data-level="3"]').length);
+            
+            // Выводим все категории уровня 1
+            $('.category-item[data-level="1"]').each(function() {
+                console.log('Категория 1 уровня:', {
+                    id: $(this).data('category-id'),
+                    name: $(this).data('category-name'),
+                    hasChildren: $(this).data('has-children')
+                });
+            });
+            
+            // Выводим все категории уровня 2
+            $('.category-item[data-level="2"]').each(function() {
+                console.log('Категория 2 уровня:', {
+                    id: $(this).data('category-id'),
+                    name: $(this).data('category-name'),
+                    parentId: $(this).parent().data('parent-id'),
+                    hasChildren: $(this).data('has-children')
+                });
+            });
+            
+            // Выводим все категории уровня 3
+            $('.category-item[data-level="3"]').each(function() {
+                console.log('Категория 3 уровня:', {
+                    id: $(this).data('category-id'),
+                    name: $(this).data('category-name'),
+                    parentId: $(this).parent().data('parent-id')
+                });
+            });
+            
+            // Инициализация основного слайдера категорий (уровень 1)
+            const categoriesSwiper = new Swiper('.categories-swiper', {
+                slidesPerView: 4,
+                slidesPerGroup: 4,
+                spaceBetween: 0,
+                centeredSlides: false,
+                freeMode: false,
+                loop: false,
+                initialSlide: parseInt(localStorage.getItem('categoriesSlideIndex') || 0),
+                speed: 600,
+                navigation: false,
+                pagination: false,
+                touchEventsTarget: 'container',
+                simulateTouch: true,
+                touchRatio: 1,
+                touchAngle: 45,
+                grabCursor: true,
+                allowTouchMove: true,
+                on: {
+                    slideChange: function() {
+                        localStorage.setItem('categoriesSlideIndex', this.activeIndex);
+                    }
+                }
+            });
+            
+            // Инициализация слайдера подкатегорий (уровень 2)
+            const level2Swiper = new Swiper('.categories-swiper-level-2', {
+                slidesPerView: 4,
+                slidesPerGroup: 4,
+                spaceBetween: 0,
+                centeredSlides: false,
+                freeMode: false,
+                loop: false,
+                speed: 600,
+                navigation: false,
+                pagination: false,
+                touchEventsTarget: 'container',
+                simulateTouch: true,
+                touchRatio: 1,
+                touchAngle: 45,
+                grabCursor: true,
+                allowTouchMove: true
+            });
+            
+            // Инициализация слайдера брендов (уровень 3)
+            const level3Swiper = new Swiper('.categories-swiper-level-3', {
+                slidesPerView: 4,
+                slidesPerGroup: 4,
+                spaceBetween: 0,
+                centeredSlides: false,
+                freeMode: false,
+                loop: false,
+                speed: 600,
+                navigation: false,
+                pagination: false,
+                touchEventsTarget: 'container',
+                simulateTouch: true,
+                touchRatio: 1,
+                touchAngle: 45,
+                grabCursor: true,
+                allowTouchMove: true
+            });
+            
+            // 🔥 ФУНКЦИИ ПОКАЗА/СКРЫТИЯ КАТЕГОРИЙ 🔥
+            // Функция показа подкатегорий (уровень 2)
+            function showLevel2Categories(parentId) {
+                console.log('🔥 ФУНКЦИЯ showLevel2Categories ВЫЗВАНА!');
+                console.log('=== ПОКАЗ ПОДКАТЕГОРИЙ ===');
+                console.log('Родительский ID:', parentId);
+                
+                // Скрываем все слайды подкатегорий
+                $('.subcategory-slide').hide();
+                console.log('Скрыты все слайды подкатегорий');
+                
+                // Показываем только подкатегории нужного родителя
+                const targetSlides = $(`.subcategory-slide[data-parent-id="${parentId}"]`);
+                console.log('Найдено подкатегорий для родителя', parentId, ':', targetSlides.length);
+                
+                // Проверяем каждый слайд подкатегорий
+                $('.subcategory-slide').each(function() {
+                    const slideParentId = $(this).data('parent-id');
+                    console.log('Слайд подкатегории parent-id:', slideParentId, 'ищем:', parentId);
+                });
+                
+                targetSlides.show();
+                console.log('Показаны подкатегории для родителя:', parentId);
+                
+                // Показываем весь блок подкатегорий
+                $('#level-2-categories').show();
+                console.log('Показан блок подкатегорий');
+                
+                // Обновляем и сбрасываем слайдер
+                setTimeout(() => {
+                    level2Swiper.update();
+                    level2Swiper.slideTo(0, 300);
+                    console.log('Слайдер подкатегорий обновлен');
+                }, 100);
+            }
+            
+            // Функция показа брендов (уровень 3)
+            function showLevel3Categories(parentId) {
+                console.log('=== ПОКАЗ БРЕНДОВ ===');
+                console.log('Родительский ID:', parentId);
+                
+                // Скрываем все слайды брендов
+                $('.brand-slide').hide();
+                console.log('Скрыты все слайды брендов');
+                
+                // Показываем только бренды нужного родителя
+                const targetSlides = $(`.brand-slide[data-parent-id="${parentId}"]`);
+                console.log('Найдено брендов для родителя', parentId, ':', targetSlides.length);
+                
+                // Проверяем каждый слайд брендов
+                $('.brand-slide').each(function() {
+                    const slideParentId = $(this).data('parent-id');
+                    console.log('Слайд бренда parent-id:', slideParentId, 'ищем:', parentId);
+                });
+                
+                targetSlides.show();
+                console.log('Показаны бренды для родителя:', parentId);
+                
+                // Показываем весь блок брендов
+                $('#level-3-categories').show();
+                console.log('Показан блок брендов');
+                
+                // Обновляем и сбрасываем слайдер
+                setTimeout(() => {
+                    level3Swiper.update();
+                    level3Swiper.slideTo(0, 300);
+                    console.log('Слайдер брендов обновлен');
+                }, 100);
+            }
+            
+            // Функция скрытия брендов (уровень 3)
+            function hideLevel3Categories() {
+                console.log('Скрываем блок брендов');
+                $('#level-3-categories').hide();
+            }
+            
+            // 🔥 АВТОМАТИЧЕСКАЯ АКТИВАЦИЯ КАТЕГОРИИ ПРИ ЗАГРУЗКЕ 🔥
+            console.log('=== ПРОВЕРКА АВТОАКТИВАЦИИ ===');
+            const currentCategory = '{{ selected_category or "" }}';
+            console.log('Текущая выбранная категория:', currentCategory);
+            
+            if (currentCategory && currentCategory !== '' && currentCategory !== 'Недвижимость') {
+                console.log('Ищем товарную категорию:', currentCategory);
+                
+                let foundCategory = null;
+                let foundLevel = null;
+                
+                // 🔥 ПОИСК СРЕДИ ВСЕХ УРОВНЕЙ 🔥
+                // Ищем категорию уровня 1
+                $('.category-item[data-level="1"]').each(function() {
+                    const categoryName = $(this).data('category-name');
+                    if (categoryName === currentCategory) {
+                        foundCategory = $(this);
+                        foundLevel = 1;
+                        return false; // Прерываем цикл
+                    }
+                });
+                
+                // Если не найдена в уровне 1, ищем в уровне 2
+                if (!foundCategory) {
+                    $('.category-item[data-level="2"]').each(function() {
+                        const categoryName = $(this).data('category-name');
+                        if (categoryName === currentCategory) {
+                            foundCategory = $(this);
+                            foundLevel = 2;
+                            return false;
+                        }
+                    });
+                }
+                
+                // Если не найдена в уровне 2, ищем в уровне 3
+                if (!foundCategory) {
+                    $('.category-item[data-level="3"]').each(function() {
+                        const categoryName = $(this).data('category-name');
+                        if (categoryName === currentCategory) {
+                            foundCategory = $(this);
+                            foundLevel = 3;
+                            return false;
+                        }
+                    });
+                }
+                
+                // 🔥 ВОССТАНАВЛИВАЕМ ЦЕПОЧКУ КАТЕГОРИЙ 🔥
+                if (foundCategory) {
+                    console.log('🎯 НАЙДЕНА КАТЕГОРИЯ!', {
+                        name: foundCategory.data('category-name'),
+                        level: foundLevel,
+                        id: foundCategory.data('category-id')
+                    });
+                    
+                    if (foundLevel === 1) {
+                        // Уровень 1: активируем категорию и показываем подкатегории
+                        const categoryId = foundCategory.data('category-id');
+                        const hasChildren = foundCategory.data('has-children') === true;
+                        
+                        foundCategory.addClass('active');
+                        console.log('Активирована категория уровня 1:', foundCategory.data('category-name'));
+                        
+                        if (hasChildren) {
+                            console.log('Показываем подкатегории для ID:', categoryId);
+                            showLevel2Categories(categoryId);
+                        }
+                    } 
+                    else if (foundLevel === 2) {
+                        // Уровень 2: активируем родительскую категорию + подкатегории + текущую
+                        const categoryId = foundCategory.data('category-id');
+                        const parentId = foundCategory.parent().data('parent-id');
+                        const hasChildren = foundCategory.data('has-children') === true;
+                        
+                        console.log('Восстанавливаем цепочку для уровня 2. Parent ID:', parentId);
+                        
+                        // Активируем родительскую категорию уровня 1
+                        $(`.category-item[data-level="1"][data-category-id="${parentId}"]`).addClass('active');
+                        console.log('Активирована родительская категория ID:', parentId);
+                        
+                        // Показываем подкатегории уровня 2
+                        showLevel2Categories(parentId);
+                        
+                        // Активируем текущую подкатегорию уровня 2
+                        setTimeout(() => {
+                            foundCategory.addClass('active');
+                            console.log('Активирована подкатегория уровня 2:', foundCategory.data('category-name'));
+                            
+                            // Если у подкатегории есть бренды, показываем их
+                            if (hasChildren) {
+                                console.log('Показываем бренды для подкатегории ID:', categoryId);
+                                showLevel3Categories(categoryId);
+                            }
+                        }, 200);
+                    }
+                    else if (foundLevel === 3) {
+                        // Уровень 3: восстанавливаем всю цепочку 1→2→3
+                        const brandId = foundCategory.data('category-id');
+                        const subcategoryId = foundCategory.parent().data('parent-id');
+                        
+                        console.log('Восстанавливаем цепочку для уровня 3. Subcategory ID:', subcategoryId);
+                        
+                        // Находим родительскую категорию для подкатегории
+                        let parentCategoryId = null;
+                        $(`.category-item[data-level="2"][data-category-id="${subcategoryId}"]`).each(function() {
+                            parentCategoryId = $(this).parent().data('parent-id');
+                        });
+                        
+                        if (parentCategoryId) {
+                            console.log('Parent Category ID:', parentCategoryId);
+                            
+                            // Активируем категорию уровня 1
+                            $(`.category-item[data-level="1"][data-category-id="${parentCategoryId}"]`).addClass('active');
+                            console.log('Активирована категория уровня 1 ID:', parentCategoryId);
+                            
+                            // Показываем подкатегории уровня 2
+                            showLevel2Categories(parentCategoryId);
+                            
+                            setTimeout(() => {
+                                // Активируем подкатегорию уровня 2
+                                $(`.category-item[data-level="2"][data-category-id="${subcategoryId}"]`).addClass('active');
+                                console.log('Активирована подкатегория уровня 2 ID:', subcategoryId);
+                                
+                                // Показываем бренды уровня 3
+                                showLevel3Categories(subcategoryId);
+                                
+                                setTimeout(() => {
+                                    // Активируем бренд уровня 3
+                                    foundCategory.addClass('active');
+                                    console.log('Активирован бренд уровня 3:', foundCategory.data('category-name'));
+                                }, 200);
+                            }, 200);
+                        }
+                    }
+                } else {
+                    console.log('❌ Категория не найдена среди товарных категорий');
+                }
+            }
+            
+            // Обработчик кликов по категориям
+            $(document).on('click', '.category-item', function(e) {
+                e.preventDefault();
+                
+                const categoryId = $(this).data('category-id');
+                const hasChildren = $(this).data('has-children') === true; // 🔥 ИСПРАВЛЕНО: сравниваем с boolean true
+                const categoryName = $(this).data('category-name');
+                const level = $(this).data('level');
+                
+                console.log('=== КЛИК ПО КАТЕГОРИИ ===');
+                console.log('ID категории:', categoryId);
+                console.log('Название категории:', categoryName);
+                console.log('Уровень:', level);
+                console.log('Есть дети:', hasChildren);
+                console.log('Тип hasChildren:', typeof $(this).data('has-children'));
+                console.log('Сырое значение hasChildren:', $(this).data('has-children'));
+                
+                // Убираем активный класс со всех кнопок этого уровня
+                $(`.category-item[data-level="${level}"]`).removeClass('active');
+                // Добавляем активный класс к текущей кнопке
+                $(this).addClass('active');
+                
+                if (level === 1) {
+                    localStorage.setItem('categoriesSlideIndex', categoriesSwiper.activeIndex);
+                    
+                    if (hasChildren) {
+                        console.log('Показываем подкатегории для категории:', categoryId);
+                        // Показываем подкатегории снизу
+                        showLevel2Categories(categoryId);
+                        // Скрываем уровень 3 если был открыт
+                        hideLevel3Categories();
+                    } else {
+                        console.log('Переходим на поиск для категории:', categoryName);
+                        // Переходим на поиск
+                        window.location.href = `/mobile/search?category=${encodeURIComponent(categoryName)}`;
+                    }
+                } else if (level === 2) {
+                    if (hasChildren) {
+                        console.log('Показываем бренды для подкатегории:', categoryId);
+                        // Показываем бренды снизу
+                        showLevel3Categories(categoryId);
+                    } else {
+                        console.log('Переходим на поиск для подкатегории:', categoryName);
+                        // Переходим на поиск
+                        window.location.href = `/mobile/search?category=${encodeURIComponent(categoryName)}`;
+                    }
+                } else if (level === 3) {
+                    console.log('Переходим на поиск для бренда:', categoryName);
+                    // Переходим на поиск
+                    window.location.href = `/mobile/search?category=${encodeURIComponent(categoryName)}`;
+                }
+            });
+            
+            console.log('=== СЛАЙДЕРЫ КАТЕГОРИЙ ИНИЦИАЛИЗИРОВАНЫ ===');
+            console.log('Начальный слайд:', localStorage.getItem('categoriesSlideIndex'));
+            
+            // Инициализация слайдера для каждой карточки с динамическими индикаторами
+            $('.property-swiper').each(function(index, element) {
+                const propertyId = $(element).data('property-id');
+                const swiper = new Swiper(element, {
+                    loop: true,
+                    on: {
+                        slideChange: function() {
+                            // Обновляем индикатор для этого конкретного слайдера
+                            const indicator = $(`.photo-indicator[data-property-id="${propertyId}"]`);
+                            const currentSlide = this.realIndex + 1; // realIndex для loop
+                            indicator.find('.current-slide').text(currentSlide);
+                        }
+                    }
+                });
+            });
+            
+            // Функция для форматирования чисел с пробелами
+            function formatNumber(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+            
+            // Переключение видимости панели фильтров при нажатии на кнопку
+            $('#filter-toggle').on('click', function() {
+                const filterPanel = $('#filter-panel');
+                
+                if (filterPanel.hasClass('open')) {
+                    // Если панель открыта, закрываем её
+                    filterPanel.removeClass('open');
+                    
+                    // После завершения анимации max-height добавляем класс closed
+                    setTimeout(function() {
+                        filterPanel.addClass('closed');
+                    }, 500); // Таймаут равен времени transition
+                } else {
+                    // Если панель закрыта, открываем её
+                    filterPanel.removeClass('closed').addClass('open');
+                }
+            });
+
+            // Обработка фильтров цены
+            const priceMaxRange = document.querySelector('.max-range');
+            const maxPriceDisplay = document.getElementById('max-price');
+            const priceProgress = document.querySelector('.price-block .price-progress');
+            
+            function updatePriceRanges() {
+                const maxVal = parseInt(priceMaxRange.value);
+                
+                maxPriceDisplay.textContent = 'до ' + formatNumber(maxVal) + ' СОМ';
+                
+                if (priceProgress) {
+                    const leftPercent = 0;
+                    const rightPercent = 100 - ((maxVal / 10000000) * 100);
+                    priceProgress.style.left = leftPercent + '%';
+                    priceProgress.style.right = rightPercent + '%';
+                }
+            }
+            
+            priceMaxRange.addEventListener('input', updatePriceRanges);
+
+            // Обработка фильтров площади
+            const areaMaxRange = document.querySelector('.max-area');
+            const maxAreaDisplay = document.getElementById('max-area');
+            const areaProgress = document.querySelector('#area-block .price-progress');
+            
+            function updateAreaRanges() {
+                const maxVal = parseInt(areaMaxRange.value);
+                
+                maxAreaDisplay.textContent = 'до ' + formatNumber(maxVal) + ' м²';
+                
+                if (areaProgress) {
+                    const leftPercent = 0;
+                    const rightPercent = 100 - ((maxVal / 500) * 100);
+                    areaProgress.style.left = leftPercent + '%';
+                    areaProgress.style.right = rightPercent + '%';
+                }
+            }
+            
+            areaMaxRange.addEventListener('input', updateAreaRanges);
+
+            // Инициализация progress bar при загрузке страницы
+            updatePriceRanges();
+            updateAreaRanges();
+
+            // Обработка кнопок выбора количества комнат
+            $('.room-btn').on('click', function() {
+                $('.room-btn').removeClass('active');
+                $(this).addClass('active');
+                $('#rooms-input').val($(this).data('value'));
+            });
+
+            // Обработка кнопок выбора типа квартир
+            $('.apartment-type-btn').on('click', function() {
+                $('.apartment-type-btn').removeClass('active');
+                $(this).addClass('active');
+                $('#apartment-type-input').val($(this).data('value'));
+            });
+
+            // Обработка кнопок выбора типа домов и участков
+            $('.house-type-btn').on('click', function() {
+                $('.house-type-btn').removeClass('active');
+                $(this).addClass('active');
+                $('#house-type-input').val($(this).data('value'));
+            });
+
+            // Применение фильтров
+            $('#apply-filters').on('click', function() {
+                const searchQuery = $('#search-input').val();
+                const category = $('#category-input').val();
+                const maxPrice = priceMaxRange.value;
+                const maxArea = areaMaxRange.value;
+                let rooms = $('#rooms-input').val();
+                
+                // Обработка значения "studio" - конвертируем в 0 для backend
+                if (rooms === 'studio') {
+                    rooms = '0';
+                }
+                
+                const apartmentType = $('#apartment-type-input').val();
+                const houseType = $('#house-type-input').val();
+                const minFloor = $('select[name="min_floor"]').val();
+                const maxFloor = $('select[name="max_floor"]').val();
+                
+                // Дополнительные параметры
+                const balcony = $('input[name="balcony"]').is(':checked') ? 'true' : '';
+                const furniture = $('input[name="furniture"]').is(':checked') ? 'true' : '';
+                const renovation = $('input[name="renovation"]').is(':checked') ? 'true' : '';
+                const parking = $('input[name="parking"]').is(':checked') ? 'true' : '';
+                const elevator = $('input[name="elevator"]').is(':checked') ? 'true' : '';
+                const ownerOnly = $('input[name="owner_only"]').is(':checked') ? 'true' : '';
+                
+                // Формируем строку запроса
+                let queryParams = new URLSearchParams();
+                if (searchQuery) queryParams.append('q', searchQuery);
+                if (category) queryParams.append('category', category);
+                if (maxPrice && maxPrice < 10000000) queryParams.append('price_max', maxPrice);
+                if (maxArea && maxArea < 500) queryParams.append('max_area', maxArea);
+                if (rooms) queryParams.append('rooms', rooms);
+                if (apartmentType) queryParams.append('apartment_type', apartmentType);
+                if (houseType) queryParams.append('house_type', houseType);
+                if (minFloor) queryParams.append('min_floor', minFloor);
+                if (maxFloor) queryParams.append('max_floor', maxFloor);
+                if (balcony) queryParams.append('balcony', balcony);
+                if (furniture) queryParams.append('furniture', furniture);
+                if (renovation) queryParams.append('renovation', renovation);
+                if (parking) queryParams.append('parking', parking);
+                if (elevator) queryParams.append('elevator', elevator);
+                if (ownerOnly) queryParams.append('owner_only', ownerOnly);
+                
+                // Переходим на страницу с примененными фильтрами
+                window.location.href = '/mobile/search?' + queryParams.toString();
+            });
+
+            // Сброс всех фильтров
+            $('#reset-filters, #reset-all-filters, #clear-search').on('click', function() {
+                window.location.href = '/mobile/search';
+            });
+            
+            // Функция для получения данных о погоде через Visual Crossing Weather
+            function getWeather() {
+                // Сначала проверяем, есть ли кэшированные данные
+                const cachedWeather = getWeatherFromCache();
+                if (cachedWeather) {
+                    // Если есть кэшированные данные, сразу их отображаем
+                    displayWeatherData(cachedWeather);
+                    return;
+                }
+                
+                // Если кэша нет или он устарел, запрашиваем данные с API
+                const city = "Osh,Kyrgyzstan";
+                const apiKey = "JPWU9UY254WNDKUNM9MH9E8AR"; // Публичный ключ с ограничениями
+                
+                $.ajax({
+                    url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}/today`,
+                    data: {
+                        unitGroup: "metric",
+                        key: apiKey,
+                        include: "current"
+                    },
+                    success: function(data) {
+                        try {
+                            if (data && data.currentConditions && data.currentConditions.temp !== undefined) {
+                                // Округляем температуру до целого числа
+                                const temp = Math.round(data.currentConditions.temp);
+                                
+                                // Получаем код состояния погоды и создаем иконку
+                                const condition = data.currentConditions.conditions ? 
+                                    data.currentConditions.conditions.toLowerCase() : '';
+                                const iconCode = data.currentConditions.icon ? 
+                                    data.currentConditions.icon.toLowerCase() : '';
+                                
+                                let iconHtml;
+                                // Определяем иконку на основе кода погоды Visual Crossing
+                                if (iconCode.includes('rain') || condition.includes('дождь') || condition.includes('осадки')) {
+                                    // Дождь
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4c94f2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><line x1="16" y1="13" x2="16" y2="21"></line><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>`;
+                                } else if (iconCode.includes('snow') || condition.includes('снег')) {
+                                    // Снег
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9cc0fa" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="8" y1="20" x2="8.01" y2="20"></line><line x1="12" y1="18" x2="12.01" y2="18"></line><line x1="12" y1="22" x2="12.01" y2="22"></line><line x1="16" y1="16" x2="16.01" y2="16"></line><line x1="16" y1="20" x2="16.01" y2="20"></line></svg>`;
+                                } else if (iconCode.includes('thunder') || iconCode.includes('lightning') || condition.includes('гроза')) {
+                                    // Гроза
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c8aa0" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path><polyline points="13 11 9 17 15 17 11 23"></polyline></svg>`;
+                                } else if (iconCode.includes('fog') || iconCode.includes('mist') || condition.includes('туман') || condition.includes('дымка')) {
+                                    // Туман
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c8aa0" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`;
+                                } else if (iconCode === 'clear-day' || iconCode === 'clear-night' || condition.includes('ясно')) {
+                                    // Ясно
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+                                } else if (iconCode.includes('cloud') || condition.includes('облачно') || condition.includes('пасмурно')) {
+                                    // Облачно
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c8aa0" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`;
+                                } else {
+                                    // По умолчанию или для других условий
+                                    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c8aa0" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`;
+                                }
+                                
+                                // Сохраняем данные в кэш
+                                const weatherData = {
+                                    temp: temp,
+                                    iconHtml: iconHtml,
+                                    condition: condition
+                                };
+                                saveWeatherToCache(weatherData);
+                                
+                                // Отображаем данные
+                                displayWeatherData(weatherData);
+                            } else {
+                                showFallbackWeather();
+                            }
+                        } catch (e) {
+                            showFallbackWeather();
+                        }
+                    },
+                    error: function() {
+                        // При ошибке используем резервные данные
+                        showFallbackWeather();
+                    }
+                });
+            }
+
+            // При загрузке страницы проверяем, есть ли примененные фильтры
+            if ($('#applied-filters').data('has-filters') === 'true') {
+                $('#applied-filters').addClass('visible');
+            }
+            
+            // Автоматический слайдер для рекламы
+            function initAdsSlider() {
+                const slidesWrapper = document.querySelector('.ads-slides-wrapper');
+                const slides = document.querySelectorAll('.ads-slide');
+                let currentSlide = 0;
+                
+                function showSlide(index) {
+                    const translateX = -(index * 50); // 50% для каждого слайда
+                    slidesWrapper.style.transform = `translateX(${translateX}%)`;
+                }
+                
+                function nextSlide() {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    showSlide(currentSlide);
+                }
+                
+                // Переключение каждые 3 секунды
+                setInterval(nextSlide, 2000);
+            }
+            
+            // Инициализируем слайдер после загрузки DOM
+            initAdsSlider();
+        });
+        </script>
+{% endblock %}

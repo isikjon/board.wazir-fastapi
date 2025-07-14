@@ -1,0 +1,489 @@
+{% extends "superadmin/base.html" %}
+
+{% block page_title %}Пользователи{% endblock %}
+{% block page_subtitle %}Управление пользователями системы{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Статистика -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i class="fas fa-users text-xl"></i>
+                    </div>
+                <div class="ml-4">
+                    <h3 class="text-2xl font-semibold text-gray-900">{{ users|length }}</h3>
+                    <p class="text-sm text-muted">Всего пользователей</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-green-50 rounded-xl p-6 border border-green-100">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-user-check text-xl"></i>
+                    </div>
+                <div class="ml-4">
+                    <h3 class="text-2xl font-semibold text-gray-900">{{ users|selectattr('is_active')|list|length }}</h3>
+                    <p class="text-sm text-muted">Активные</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-orange-50 rounded-xl p-6 border border-orange-100">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <i class="fas fa-building text-xl"></i>
+                    </div>
+                <div class="ml-4">
+                    <h3 class="text-2xl font-semibold text-gray-900">{{ users|selectattr('properties_count', 'gt', 0)|list|length }}</h3>
+                    <p class="text-sm text-muted">С недвижимостью</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-red-50 rounded-xl p-6 border border-red-100">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i class="fas fa-user-slash text-xl"></i>
+                    </div>
+                <div class="ml-4">
+                    <h3 class="text-2xl font-semibold text-gray-900">{{ users|selectattr('is_active', 'equalto', False)|list|length }}</h3>
+                    <p class="text-sm text-muted">Заблокированы</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Заголовок и действия -->
+    <div class="bg-gradient-to-r from-green-800 to-green-900 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-white">Управление пользователями</h2>
+                <p class="text-green-100 mt-1">Просмотр и модерация пользователей системы</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="exportUsers()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-all duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Экспорт XLSX
+                </button>
+                <button onclick="showBulkActions()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-all duration-200">
+                    <i class="fas fa-tasks mr-2"></i>
+                    Массовые действия
+                </button>
+        </div>
+    </div>
+</div>
+
+<!-- Поиск и фильтры -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex flex-wrap items-center gap-4">
+        <div class="flex-1 min-w-64">
+            <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" 
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                       placeholder="Поиск по имени, email или телефону...">
+            </div>
+        </div>
+            <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">Все статусы</option>
+            <option value="active">Активные</option>
+            <option value="blocked">Заблокированные</option>
+        </select>
+            <select id="propertyFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">Все пользователи</option>
+            <option value="with">С недвижимостью</option>
+            <option value="without">Без недвижимости</option>
+        </select>
+            <button onclick="resetFilters()" class="btn btn-secondary">
+            <i class="fas fa-undo mr-2"></i>
+            Сбросить
+        </button>
+    </div>
+</div>
+
+<!-- Таблица пользователей -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-user text-blue-500 mr-2"></i>Пользователь
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-envelope text-green-500 mr-2"></i>Контакты
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-building text-orange-500 mr-2"></i>Недвижимость
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-calendar text-purple-500 mr-2"></i>Регистрация
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-toggle-on text-red-500 mr-2"></i>Статус
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <i class="fas fa-cogs mr-2"></i>Действия
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in users %}
+                    <tr class="hover:bg-gray-50" data-user-id="{{ user.id }}">
+                        <!-- Пользователь -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.full_name or 'Пользователь' }}</div>
+                                    <div class="text-sm text-gray-500">ID: {{ user.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <!-- Контакты -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ user.email or 'Не указан' }}</div>
+                            <div class="text-sm text-gray-500">{{ user.phone or 'Не указан' }}</div>
+                        </td>
+                        
+                        <!-- Недвижимость -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {% if user.properties_count > 0 %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    {{ user.properties_count }} объявлений
+                                </span>
+                            {% else %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    Нет объявлений
+                                </span>
+                                    {% endif %}
+                        </td>
+                        
+                        <!-- Регистрация -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ user.registered_at }}
+                        </td>
+                        
+                        <!-- Статус -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if user.is_active %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Активный
+                                </span>
+                            {% else %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Заблокирован
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Действия -->
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <button onclick="toggleUserStatus({{ user.id }})" 
+                                    class="px-4 py-2 text-sm {% if user.is_active %}bg-red-500 hover:bg-red-600 text-white{% else %}bg-green-500 hover:bg-green-600 text-white{% endif %} rounded-lg transition-colors">
+                                {% if user.is_active %}Заблокировать{% else %}Разблокировать{% endif %}
+                                </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not users %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            Пользователи не найдены
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Пагинация -->
+{% if total_pages > 1 %}
+<div class="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+            <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+            Показано <span class="font-medium">{{ start_item }}</span> - 
+            <span class="font-medium">{{ end_item }}</span> из 
+            <span class="font-medium">{{ total_items }}</span> результатов
+        </div>
+        <div class="flex items-center space-x-2">
+            <!-- Предыдущая страница -->
+            {% if current_page > 1 %}
+                <a href="?page={{ current_page - 1 }}{{ query_params }}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Предыдущая
+                </a>
+            {% endif %}
+            
+            <!-- Номера страниц -->
+            {% for page_num in page_range %}
+                {% if page_num == current_page %}
+                    <span class="px-3 py-2 text-sm bg-primary text-white rounded-md">{{ page_num }}</span>
+                {% else %}
+                    <a href="?page={{ page_num }}{{ query_params }}" 
+                       class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        {{ page_num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Следующая страница -->
+            {% if current_page < total_pages %}
+                <a href="?page={{ current_page + 1 }}{{ query_params }}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Следующая
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Модальное окно массовых действий -->
+<div id="bulkActionsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4">
+        <div class="p-6 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Массовые действия</h3>
+        </div>
+        <div class="p-6 space-y-4">
+            <button onclick="bulkAction('activate')" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                <i class="fas fa-check mr-2"></i>
+                Активировать всех пользователей
+            </button>
+            <button onclick="bulkAction('deactivate')" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                <i class="fas fa-ban mr-2"></i>
+                Заблокировать всех пользователей
+            </button>
+            <button onclick="bulkAction('export')" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                <i class="fas fa-download mr-2"></i>
+                Экспортировать выбранных
+                </button>
+        </div>
+        <div class="p-6 border-t border-gray-200 text-right">
+            <button onclick="closeBulkActionsModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    Отмена
+                </button>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log('🚀 НАЧАЛО ЗАГРУЗКИ JAVASCRIPT');
+
+// Глобальная переменная для проверки
+window.SUPERADMIN_USERS_LOADED = true;
+
+console.log('📝 Определяю функцию exportUsers...');
+// Экспорт пользователей
+function exportUsers() {
+    console.log('✅ exportUsers вызвана!');
+    console.log('📤 Экспорт пользователей...');
+    const url = '/api/v1/superadmin/export/users';
+    console.log('🔗 URL для экспорта:', url);
+    window.open(url, '_blank');
+}
+
+console.log('📝 Определяю функцию showBulkActions...');
+// Массовые действия
+function showBulkActions() {
+    console.log('✅ showBulkActions вызвана!');
+    const modal = document.getElementById('bulkActionsModal');
+    console.log('🔍 Ищу модальное окно:', modal);
+    if (modal) {
+        console.log('✅ Модальное окно найдено, показываю');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+                } else {
+        console.error('❌ Модальное окно не найдено!');
+    }
+}
+
+console.log('📝 Определяю функцию closeBulkActionsModal...');
+function closeBulkActionsModal() {
+    console.log('✅ closeBulkActionsModal вызвана!');
+    const modal = document.getElementById('bulkActionsModal');
+    if (modal) {
+        console.log('✅ Закрываю модальное окно');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+console.log('📝 Определяю функцию toggleUserStatus...');
+// Изменение статуса пользователя
+function toggleUserStatus(userId) {
+    console.log('✅ toggleUserStatus вызвана с ID:', userId);
+    
+    if (!confirm('Вы уверены, что хотите изменить статус пользователя?')) {
+        console.log('❌ Пользователь отменил действие');
+        return;
+    }
+    
+    console.log('📡 Отправляю запрос на изменение статуса...');
+    
+    fetch(`/api/v1/superadmin/users/${userId}/toggle-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        console.log('📥 Получен ответ:', response);
+        return response.json();
+    })
+        .then(data => {
+        console.log('📋 Данные ответа:', data);
+            if (data.success) {
+            alert('✅ ' + data.message);
+            console.log('🔄 Перезагружаю страницу...');
+                    location.reload();
+            } else {
+            alert('❌ ' + data.message);
+            }
+        })
+        .catch(error => {
+        console.error('💥 Ошибка запроса:', error);
+        alert('❌ Ошибка изменения статуса');
+    });
+}
+
+console.log('📝 Определяю функцию applyFilters...');
+// Фильтрация
+function applyFilters() {
+    console.log('✅ applyFilters вызвана!');
+    console.log('🔍 Применение фильтров...');
+    
+    const search = document.getElementById('searchInput').value.trim();
+    const status = document.getElementById('statusFilter').value;
+    const propertyFilter = document.getElementById('propertyFilter').value;
+    
+    console.log('📊 Значения фильтров:', { search, status, propertyFilter });
+    
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    if (propertyFilter) params.append('property_filter', propertyFilter);
+    
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    console.log('🔗 Новый URL:', newUrl);
+    window.location.href = newUrl;
+}
+
+console.log('📝 Определяю функцию resetFilters...');
+// Сброс фильтров
+function resetFilters() {
+    console.log('✅ resetFilters вызвана!');
+    console.log('🧹 Сбрасываю все фильтры...');
+    
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('propertyFilter').value = '';
+    
+    console.log('🔄 Перехожу на чистую страницу...');
+    window.location.href = window.location.pathname;
+}
+
+console.log('📝 Определяю функцию debounce...');
+// Debounce для поиска
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+console.log('📝 Определяю функцию bulkAction...');
+// Массовые действия
+function bulkAction(action) {
+    console.log('✅ bulkAction вызвана с действием:', action);
+    
+    if (action === 'activate') {
+        if (confirm('Активировать всех пользователей?')) {
+            alert('Функция будет реализована');
+        }
+    } else if (action === 'deactivate') {
+        if (confirm('Заблокировать всех пользователей?')) {
+            alert('Функция будет реализована');
+        }
+    } else if (action === 'export') {
+        exportUsers();
+    }
+    closeBulkActionsModal();
+}
+
+console.log('⏳ Добавляю обработчик DOMContentLoaded...');
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎉 DOM загружен! Инициализация фильтров...');
+    
+    // Поиск
+    const searchInput = document.getElementById('searchInput');
+    console.log('🔍 Элемент поиска:', searchInput);
+    if (searchInput) {
+        searchInput.value = '{{ search }}';
+        searchInput.addEventListener('input', debounce(applyFilters, 800));
+        console.log('✅ Обработчик поиска добавлен');
+    } else {
+        console.error('❌ Элемент searchInput не найден!');
+    }
+    
+    // Фильтр статуса
+    const statusFilter = document.getElementById('statusFilter');
+    console.log('📊 Элемент фильтра статуса:', statusFilter);
+            if (statusFilter) {
+        statusFilter.value = '{{ status }}';
+        statusFilter.addEventListener('change', applyFilters);
+        console.log('✅ Обработчик фильтра статуса добавлен');
+    } else {
+        console.error('❌ Элемент statusFilter не найден!');
+    }
+    
+    // Фильтр недвижимости
+    const propertyFilter = document.getElementById('propertyFilter');
+    console.log('🏠 Элемент фильтра недвижимости:', propertyFilter);
+            if (propertyFilter) {
+        propertyFilter.value = '{{ property_filter }}';
+        propertyFilter.addEventListener('change', applyFilters);
+        console.log('✅ Обработчик фильтра недвижимости добавлен');
+    } else {
+        console.error('❌ Элемент propertyFilter не найден!');
+    }
+    
+    console.log('🎯 Инициализация завершена!');
+});
+
+console.log('🎯 ВСЕ ФУНКЦИИ ОПРЕДЕЛЕНЫ!');
+console.log('🔍 Проверяем доступность функций в window:');
+console.log('- exportUsers:', typeof exportUsers);
+console.log('- showBulkActions:', typeof showBulkActions);
+console.log('- toggleUserStatus:', typeof toggleUserStatus);
+console.log('- resetFilters:', typeof resetFilters);
+
+// Добавляем функции в глобальную область видимости для отладки
+window.exportUsers = exportUsers;
+window.showBulkActions = showBulkActions;
+window.toggleUserStatus = toggleUserStatus;
+window.resetFilters = resetFilters;
+window.closeBulkActionsModal = closeBulkActionsModal;
+window.bulkAction = bulkAction;
+
+console.log('🌍 Функции добавлены в window объект');
+console.log('✅ JAVASCRIPT ПОЛНОСТЬЮ ЗАГРУЖЕН!');
+</script>
+
+{% endblock %} 

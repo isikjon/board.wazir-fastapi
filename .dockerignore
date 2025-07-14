@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Виртуальное окружение Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Локальные файлы данных
+media/*
+logs/*
+chat_messages.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Другие
+.DS_Store
+Thumbs.db
+.env.local

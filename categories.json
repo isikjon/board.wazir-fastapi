@@ -1,0 +1,227 @@
+[
+  {
+    "id": 1,
+    "name": "Недвижимость",
+    "slug": "real-estate",
+    "image": "https://wazir.kg/board/categories/1.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 2,
+    "name": "Авто",
+    "slug": "auto",
+    "image": "https://wazir.kg/board/categories/2.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 3,
+    "name": "Работа",
+    "slug": "jobs",
+    "image": "https://wazir.kg/board/categories/3.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 4,
+    "name": "Услуги",
+    "slug": "services",
+    "image": "https://wazir.kg/board/categories/4.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 5,
+    "name": "Бытовая техника",
+    "slug": "appliances",
+    "image": "https://wazir.kg/board/categories/5.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 6,
+    "name": "Для дома и дачи",
+    "slug": "home-garden",
+    "image": "https://wazir.kg/board/categories/6.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": true
+  },
+  {
+    "id": 7,
+    "name": "Кухонные товары",
+    "slug": "kitchen",
+    "image": "https://wazir.kg/board/categories/7.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 8,
+    "name": "Строительство",
+    "slug": "construction",
+    "image": "https://wazir.kg/board/categories/8.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 9,
+    "name": "Растения",
+    "slug": "plants",
+    "image": "https://wazir.kg/board/categories/9.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 10,
+    "name": "Вещи",
+    "slug": "items",
+    "image": "https://wazir.kg/board/categories/10.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 11,
+    "name": "Питание",
+    "slug": "food",
+    "image": "https://wazir.kg/board/categories/11.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 12,
+    "name": "Магазины",
+    "slug": "shops",
+    "image": "https://wazir.kg/board/categories/12.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 13,
+    "name": "Fast Food",
+    "slug": "fast-food",
+    "image": "https://wazir.kg/board/categories/13.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 14,
+    "name": "Одежда",
+    "slug": "clothing",
+    "image": "https://wazir.kg/board/categories/14.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 15,
+    "name": "Красота",
+    "slug": "beauty",
+    "image": "https://wazir.kg/board/categories/15.png",
+    "parent_id": null,
+    "level": 1,
+    "has_children": false
+  },
+  {
+    "id": 61,
+    "name": "Подкатегория 1",
+    "slug": "home-garden-1",
+    "image": "https://wazir.kg/board/categories/6_1.png",
+    "parent_id": 6,
+    "level": 2,
+    "has_children": true
+  },
+  {
+    "id": 62,
+    "name": "Подкатегория 2", 
+    "slug": "home-garden-2",
+    "image": "https://wazir.kg/board/categories/6_2.png",
+    "parent_id": 6,
+    "level": 2,
+    "has_children": false
+  },
+  {
+    "id": 63,
+    "name": "Подкатегория 3",
+    "slug": "home-garden-3", 
+    "image": "https://wazir.kg/board/categories/6_3.png",
+    "parent_id": 6,
+    "level": 2,
+    "has_children": false
+  },
+  {
+    "id": 64,
+    "name": "Подкатегория 4",
+    "slug": "home-garden-4",
+    "image": "https://wazir.kg/board/categories/6_4.png",
+    "parent_id": 6,
+    "level": 2,
+    "has_children": false
+  },
+  {
+    "id": 65,
+    "name": "Подкатегория 5",
+    "slug": "home-garden-5",
+    "image": "https://wazir.kg/board/categories/6_5.png",
+    "parent_id": 6,
+    "level": 2,
+    "has_children": false
+  },
+  {
+    "id": 611,
+    "name": "Бренд 1",
+    "slug": "appliances-brand-1",
+    "image": "https://wazir.kg/board/categories/6_1_1.png",
+    "parent_id": 61,
+    "level": 3,
+    "has_children": false
+  },
+  {
+    "id": 612,
+    "name": "Бренд 2",
+    "slug": "appliances-brand-2",
+    "image": "https://wazir.kg/board/categories/6_1_2.png",
+    "parent_id": 61,
+    "level": 3,
+    "has_children": false
+  },
+  {
+    "id": 613,
+    "name": "Бренд 3", 
+    "slug": "appliances-brand-3",
+    "image": "https://wazir.kg/board/categories/6_1_3.png",
+    "parent_id": 61,
+    "level": 3,
+    "has_children": false
+  },
+  {
+    "id": 614,
+    "name": "Бренд 4",
+    "slug": "appliances-brand-4",
+    "image": "https://wazir.kg/board/categories/6_1_4.png",
+    "parent_id": 61,
+    "level": 3,
+    "has_children": false
+  },
+  {
+    "id": 615,
+    "name": "Бренд 5",
+    "slug": "appliances-brand-5",
+    "image": "https://wazir.kg/board/categories/6_1_5.png",
+    "parent_id": 61,
+    "level": 3,
+    "has_children": false
+  }
+] 

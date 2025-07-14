@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Поддержка</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="assets/scss/main.css">
+        <style>
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary);
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .nav-icons {
+                font-size: 1.6rem;
+                font-weight: 300;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+            .tabs {
+                display: flex;
+                border-bottom: 1px solid #e5e7eb;
+                background-color: white;
+            }
+            .tab {
+                flex: 1;
+                padding: 16px 10px;
+                text-align: center;
+                font-weight: 500;
+                color: #6b7280;
+                border-bottom: 2px solid transparent;
+                transition: all 0.2s ease;
+            }
+            .tab.active {
+                color: var(--color-primary);
+                border-bottom-color: var(--color-primary);
+            }
+            .tab-content {
+                display: none;
+                padding: 20px 16px;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            .faq-item {
+                margin-bottom: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            .faq-question {
+                padding: 16px;
+                background-color: #f9fafb;
+                cursor: pointer;
+                font-weight: 500;
+                color: #374151;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .faq-answer {
+                padding: 0 16px;
+                max-height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                background-color: white;
+            }
+            .faq-answer-inner {
+                padding: 16px 0;
+                color: #4b5563;
+                line-height: 1.5;
+            }
+            .faq-item.active .faq-answer {
+                max-height: 500px;
+            }
+            .faq-item.active .faq-question i {
+                transform: rotate(180deg);
+            }
+            .contact-form {
+                margin-top: 24px;
+                background-color: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 20px;
+            }
+            .form-input, .form-textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                font-size: 1rem;
+                color: #111827;
+                transition: border-color 0.2s ease;
+                margin-bottom: 16px;
+            }
+            .form-input:focus, .form-textarea:focus {
+                border-color: var(--color-primary);
+                outline: none;
+            }
+            .form-textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
+            .form-label {
+                font-size: 0.95rem;
+                color: #4b5563;
+                margin-bottom: 6px;
+                display: block;
+            }
+            .section-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #111827;
+                margin-bottom: 16px;
+            }
+            .company-section {
+                margin-bottom: 24px;
+            }
+            .company-text {
+                color: #4b5563;
+                line-height: 1.6;
+                margin-bottom: 16px;
+            }
+            .team-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                margin-top: 20px;
+            }
+            .team-member {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .team-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 40px;
+                overflow: hidden;
+                margin-bottom: 8px;
+                background-color: #f3f4f6;
+            }
+            .team-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .team-name {
+                font-weight: 500;
+                color: #111827;
+                font-size: 0.95rem;
+            }
+            .team-position {
+                color: #6b7280;
+                font-size: 0.85rem;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 font-sans">
+        <div class="min-h-screen flex flex-col">
+            <!-- Верхний блок: Лого, Погода, Валюта -->
+            <header class="bg-white shadow-sm">
+                <div class="container mx-auto px-4 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="assets/img/logo_non.png" alt="Wazir Logo"
+                                class="h-10">
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center weather-currency">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="#f59e0b"
+                                    stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="weather-icon mr-2"><circle cx="12"
+                                        cy="12" r="5"></circle><line x1="12"
+                                        y1="1" x2="12" y2="3"></line><line
+                                        x1="12" y1="21" x2="12"
+                                        y2="23"></line><line x1="4.22" y1="4.22"
+                                        x2="5.64" y2="5.64"></line><line
+                                        x1="18.36" y1="18.36" x2="19.78"
+                                        y2="19.78"></line><line x1="1" y1="12"
+                                        x2="3" y2="12"></line><line x1="21"
+                                        y1="12" x2="23" y2="12"></line><line
+                                        x1="4.22" y1="19.78" x2="5.64"
+                                        y2="18.36"></line><line x1="18.36"
+                                        y1="5.64" x2="19.78"
+                                        y2="4.22"></line></svg>
+                                <span id="weather-temp">+20°</span>
+                            </div>
+                            <div class="flex items-center weather-currency">
+                                <img src="https://flagcdn.com/w20/us.png"
+                                    alt="USD" class="h-5 mr-2">
+                                <span id="currency-rate">69.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Табы -->
+            <div class="tabs sticky top-0 z-10 shadow-sm">
+                <div class="tab active" data-target="support">
+                    Тех.поддержка
+                </div>
+                <div class="tab" data-target="about">
+                    О компании
+                </div>
+            </div>
+
+            <!-- Основное содержимое -->
+            <main class="flex-grow pb-20">
+                <!-- Техническая поддержка -->
+                <div id="support" class="tab-content active">
+                    <div class="section-title">Часто задаваемые вопросы</div>
+
+                    <!-- FAQ аккордеон -->
+                    <div class="faq-accordion">
+                        <!-- Вопрос 1 -->
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Как разместить объявление о
+                                    продаже/аренде?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-inner">
+                                    Для размещения объявления перейдите в раздел
+                                    "Профиль" и нажмите на кнопку "+" в правом
+                                    нижнем углу. Заполните все необходимые поля,
+                                    загрузите минимум 2 фотографии объекта и
+                                    нажмите "Опубликовать объявление". После
+                                    проверки модератором ваше объявление будет
+                                    опубликовано.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Вопрос 2 -->
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Как связаться с
+                                    продавцом/арендодателем?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-inner">
+                                    На странице объявления вы можете
+                                    использовать кнопку "Позвонить" для прямого
+                                    контакта или "Написать" для отправки
+                                    сообщения. Все сообщения будут отображаться
+                                    в разделе "Сообщения" в нижней навигационной
+                                    панели.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Вопрос 3 -->
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Как редактировать или удалить
+                                    объявление?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-inner">
+                                    Перейдите в раздел "Профиль", выберите
+                                    вкладку "Мои объявления" и найдите нужное
+                                    объявление. Нажмите на объявление и выберите
+                                    "Редактировать" или "Удалить" в меню опций.
+                                    После редактирования объявление может снова
+                                    пройти проверку модератором.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Вопрос 4 -->
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Как заказать виртуальный тур 360°?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-inner">
+                                    При создании объявления поставьте галочку
+                                    напротив пункта "Запросить съемку 360° тур"
+                                    в разделе "Дополнительные услуги". Наш
+                                    специалист свяжется с вами для согласования
+                                    даты и времени съемки. Услуга
+                                    предоставляется в г. Ош и Бишкек.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Вопрос 5 -->
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Сколько объявлений я могу
+                                    разместить?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-inner">
+                                    Обычные пользователи могут разместить до 3
+                                    объявлений бесплатно. Для размещения
+                                    большего количества объявлений требуется
+                                    перейти на премиум-аккаунт. Агентства
+                                    недвижимости и застройщики могут обратиться
+                                    за специальными тарифами.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Форма обратной связи -->
+                    <div class="contact-form">
+                        <div class="section-title">Связаться с поддержкой</div>
+                        <form id="support-form">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Ваше
+                                    имя</label>
+                                <input type="text" id="name" class="form-input"
+                                    placeholder="Иван Петров">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email"
+                                    class="form-label">Email</label>
+                                <input type="email" id="email"
+                                    class="form-input"
+                                    placeholder="ivan@example.com">
+                            </div>
+                            <div class="mb-4">
+                                <label for="topic" class="form-label">Тема
+                                    обращения</label>
+                                <select id="topic" class="form-input">
+                                    <option value disabled selected>Выберите
+                                        тему</option>
+                                    <option value="tech">Технические
+                                        проблемы</option>
+                                    <option value="account">Вопросы по
+                                        аккаунту</option>
+                                    <option value="payment">Вопросы по
+                                        оплате</option>
+                                    <option value="other">Другое</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="message"
+                                    class="form-label">Сообщение</label>
+                                <textarea id="message" class="form-textarea"
+                                    placeholder="Опишите вашу проблему или вопрос..."></textarea>
+                            </div>
+                            <button type="submit"
+                                class="btn-primary w-full py-3 rounded-lg">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- О компании -->
+                <div id="about" class="tab-content">
+                    <div class="company-section">
+                        <div class="section-title">О компании MTT Wazir</div>
+                        <div class="company-text">
+                            <p class="mb-4">MTT Wazir - инновационная
+                                IT-компания, основанная в 2020 году в
+                                Кыргызстане, специализирующаяся на разработке
+                                современных цифровых решений для рынка
+                                недвижимости. Наша миссия - сделать процесс
+                                поиска, продажи и аренды недвижимости
+                                максимально простым, прозрачным и эффективным
+                                для всех участников рынка.</p>
+
+                            <p class="mb-4">С момента основания мы активно
+                                развиваем цифровую экосистему для рынка
+                                недвижимости Кыргызстана, объединяя продавцов,
+                                покупателей, застройщиков и агентства
+                                недвижимости на единой платформе. Наши
+                                инновационные инструменты, включая виртуальные
+                                туры, аналитику рынка и умный поиск, помогают
+                                пользователям принимать обоснованные
+                                решения.</p>
+
+                            <p>Сегодня MTT Wazir - это команда из более чем 50
+                                специалистов, работающих над развитием
+                                платформы, которой доверяют тысячи
+                                пользователей. Наша цель - стать лидирующей
+                                платформой в сфере недвижимости в Центральной
+                                Азии, расширяя географию присутствия и постоянно
+                                совершенствуя качество предоставляемых
+                                услуг.</p>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Наши ценности</div>
+                        <div class="company-text">
+                            <p class="mb-2"><strong>Инновации</strong> - Мы
+                                постоянно внедряем новые технологии и подходы
+                                для улучшения пользовательского опыта.</p>
+                            <p class="mb-2"><strong>Прозрачность</strong> - Мы
+                                создаем открытую экосистему, где все участники
+                                имеют доступ к актуальной и достоверной
+                                информации.</p>
+                            <p class="mb-2"><strong>Качество</strong> - Мы
+                                стремимся предоставлять сервис высочайшего
+                                класса, уделяя внимание каждой детали.</p>
+                            <p
+                                class="mb-2"><strong>Клиентоориентированность</strong>
+                                - Потребности наших пользователей всегда в
+                                центре принимаемых нами решений.</p>
+                            <p><strong>Доступность</strong> - Мы делаем
+                                современные технологии доступными для всех
+                                участников рынка недвижимости.</p>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Руководство компании</div>
+                        <div class="team-grid">
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="assets/img/ceo.jpg" alt="CEO">
+                                </div>
+                                <div class="team-name">Алмаз Ташматов</div>
+                                <div class="team-position">Генеральный
+                                    директор</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="assets/img/cto.jpg" alt="CTO">
+                                </div>
+                                <div class="team-name">Улан Джумалиев</div>
+                                <div class="team-position">Технический
+                                    директор</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="assets/img/cmo.jpg" alt="CMO">
+                                </div>
+                                <div class="team-name">Айнура Кулматова</div>
+                                <div class="team-position">Директор по
+                                    маркетингу</div>
+                            </div>
+                            <div class="team-member">
+                                <div class="team-avatar">
+                                    <img src="assets/img/coo.jpg" alt="COO">
+                                </div>
+                                <div class="team-name">Бакыт Орозбаев</div>
+                                <div class="team-position">Операционный
+                                    директор</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="company-section">
+                        <div class="section-title">Контакты</div>
+                        <div class="company-text">
+                            <p class="mb-2"><strong>Адрес:</strong> г. Бишкек,
+                                ул. Киевская 123, Бизнес-центр "Авангард"</p>
+                            <p class="mb-2"><strong>Телефон:</strong> +996 312
+                                123 456</p>
+                            <p class="mb-2"><strong>Email:</strong>
+                                info@wazir.kg</p>
+                            <p><strong>Режим работы:</strong> Пн-Пт:
+                                9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Нижняя навигация -->
+            <nav
+                class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+                <div class="flex justify-around items-center py-4">
+                    <a href="dashboard.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline
+                                points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </a>
+                    <a href="search.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="11" cy="11"
+                                r="8"></circle><line x1="21" y1="21" x2="16.65"
+                                y2="16.65"></line></svg>
+                    </a>
+                    <a href="chats.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </a>
+                    <a href="support.html" class="nav-item active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="12" cy="12"
+                                r="10"></circle><path
+                                d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line
+                                x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </a>
+                    <a href="profile.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
+                                cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="/static/layout/assets/js/weather-currency-cache.js"></script>
+        <script src="/static/layout/assets/js/auth-check.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Обработка переключения табов
+            $('.tab').on('click', function() {
+                const target = $(this).data('target');
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                $('.tab-content').removeClass('active');
+                $('#' + target).addClass('active');
+            });
+            // Обработка аккордеона FAQ
+            $('.faq-question').on('click', function() {
+                const faqItem = $(this).parent();
+                if (faqItem.hasClass('active')) {
+                    faqItem.removeClass('active');
+                } else {
+                    $('.faq-item').removeClass('active');
+                    faqItem.addClass('active');
+                }
+            });
+            // Обработка отправки формы поддержки
+            $('#support-form').on('submit', function(e) {
+                e.preventDefault();
+                // Собираем данные
+                const subject = $('#topic option:selected').text();
+                const description = $('#message').val();
+                if (!subject || !description) {
+                    alert('Пожалуйста, заполните все поля!');
+                    return;
+                }
+                // Получаем токен
+                let token = localStorage.getItem('access_token');
+                if (!token) {
+                    // Пробуем из cookies
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        const [name, value] = cookie.trim().split('=');
+                        if (name === 'access_token') {
+                            token = value;
+                        }
+                    }
+                }
+                if (!token) {
+                    alert('Необходима авторизация!');
+                    window.location.href = '/mobile/auth';
+                    return;
+                }
+                // Отправляем тикет через API
+                $.ajax({
+                    url: '/api/v1/support/tickets',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        subject: subject,
+                        description: description
+                    }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                    },
+                    success: function(resp) {
+                        alert('Ваше обращение отправлено! Мы свяжемся с вами в ближайшее время.');
+                        $('#support-form').trigger('reset');
+                    },
+                    error: function(xhr) {
+                        alert('Ошибка отправки обращения: ' + (xhr.responseJSON?.detail || xhr.statusText));
+                    }
+                });
+            });
+            // Обработка клика по навигационным элементам
+            $('.nav-item').on('click', function() {
+                $('.nav-item').removeClass('active').addClass('text-gray-500');
+                $(this).addClass('active').removeClass('text-gray-500');
+            });
+            // Погода и валюта (кеш/запрос)
+            function displayWeatherData(data) {
+                $('.weather-icon').replaceWith(data.iconHtml);
+                $('#weather-temp').text('+' + data.temp + '°');
+            }
+            function displayCurrencyData(data) {
+                $('#currency-rate').text(data.rate);
+            }
+            if (typeof getWeatherFromCache === 'function') {
+                const cachedWeather = getWeatherFromCache();
+                if (cachedWeather) displayWeatherData(cachedWeather);
+                else if (typeof getWeather === 'function') getWeather(displayWeatherData);
+            }
+            if (typeof getCurrencyFromCache === 'function') {
+                const cachedCurrency = getCurrencyFromCache();
+                if (cachedCurrency) displayCurrencyData(cachedCurrency);
+                else if (typeof getCurrencyRate === 'function') getCurrencyRate(displayCurrencyData);
+            }
+        });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,330 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Дашборд - SuperAdmin{% endblock %}
+{% block page_title %}Дашборд{% endblock %}
+{% block page_subtitle %}Обзор системы и ключевые метрики{% endblock %}
+
+{% block content %}
+<!-- Key Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Администраторы -->
+    <div class="card bg-white rounded-lg border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.admins_count }}</p>
+                <p class="text-sm text-muted mt-1">Администраторы</p>
+            </div>
+            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-user-shield text-primary"></i>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center">
+            <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">+12%</span>
+            <span class="text-xs text-muted ml-2">от прошлого месяца</span>
+        </div>
+    </div>
+    
+    <!-- Пользователи -->
+    <div class="card bg-white rounded-lg border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.users_count }}</p>
+                <p class="text-sm text-muted mt-1">Пользователи</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-users text-blue-600"></i>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center">
+            <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">+24%</span>
+            <span class="text-xs text-muted ml-2">активный рост</span>
+        </div>
+    </div>
+    
+    <!-- Объявления -->
+    <div class="card bg-white rounded-lg border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.properties_count }}</p>
+                <p class="text-sm text-muted mt-1">Объявления</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-building text-yellow-600"></i>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center">
+            <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">+8%</span>
+            <span class="text-xs text-muted ml-2">новые публикации</span>
+        </div>
+    </div>
+    
+    <!-- На модерации -->
+    <div class="card bg-white rounded-lg border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.pending_requests }}</p>
+                <p class="text-sm text-muted mt-1">На модерации</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clock text-orange-600"></i>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center">
+            {% if stats.pending_requests > 0 %}
+                <span class="text-xs text-warning font-medium bg-yellow-50 px-2 py-1 rounded">Требует внимания</span>
+            {% else %}
+                <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">Все обработано</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="bg-white rounded-lg border border-gray-200 mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Быстрые действия</h3>
+        <p class="text-sm text-muted">Наиболее часто используемые функции</p>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button onclick="location.href='/superadmin/admins'" 
+                    class="btn-primary text-white rounded-lg p-4 text-left hover:shadow-lg transition-all duration-150">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-plus text-lg"></i>
+                    <span class="text-xs opacity-75">ДЕЙСТВИЕ</span>
+                </div>
+                <h4 class="font-medium" style="color: #fff">Создать админа</h4>
+                <p class="text-xs opacity-75 mt-1">Добавить администратора</p>
+            </button>
+            
+            <button onclick="showSystemInfo()" 
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg p-4 text-left transition-colors duration-150">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-info-circle text-lg"></i>
+                    <span class="text-xs text-muted">СИСТЕМА</span>
+                </div>
+                <h4 class="font-medium">Системная информация</h4>
+                <p class="text-xs text-muted mt-1">Статус сервера</p>
+            </button>
+            
+            <button onclick="exportData()" 
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg p-4 text-left transition-colors duration-150">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-download text-lg"></i>
+                    <span class="text-xs text-muted">ДАННЫЕ</span>
+                </div>
+                <h4 class="font-medium">Экспорт данных</h4>
+                <p class="text-xs text-muted mt-1">Скачать отчеты</p>
+            </button>
+            
+            <button onclick="showLogs()" 
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg p-4 text-left transition-colors duration-150">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-file-alt text-lg"></i>
+                    <span class="text-xs text-muted">ЛОГИ</span>
+                </div>
+                <h4 class="font-medium">Системные логи</h4>
+                <p class="text-xs text-muted mt-1">Последние события</p>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Последние действия</h3>
+            <p class="text-sm text-muted">Активность в системе</p>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user-plus text-primary text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900">Новый администратор добавлен</p>
+                        <p class="text-xs text-muted">5 минут назад</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900">Объявление одобрено</p>
+                        <p class="text-xs text-muted">12 минут назад</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-yellow-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-edit text-yellow-600 text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900">Настройки системы обновлены</p>
+                        <p class="text-xs text-muted">1 час назад</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-database text-green-600 text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900">Резервное копирование завершено</p>
+                        <p class="text-xs text-muted">2 часа назад</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                <a href="/superadmin/logs" class="text-sm text-primary hover:text-primary-light font-medium">
+                    Посмотреть все действия →
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Статус системы</h3>
+            <p class="text-sm text-muted">Мониторинг компонентов</p>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-success rounded-full"></div>
+                        <span class="text-sm text-gray-900">База данных</span>
+                    </div>
+                    <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">Активна</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-success rounded-full"></div>
+                        <span class="text-sm text-gray-900">API сервер</span>
+                    </div>
+                    <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">Активен</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-warning rounded-full"></div>
+                        <span class="text-sm text-gray-900">Файловое хранилище</span>
+                    </div>
+                    <span class="text-xs text-warning font-medium bg-yellow-50 px-2 py-1 rounded">Загружено</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-success rounded-full"></div>
+                        <span class="text-sm text-gray-900">WebSocket</span>
+                    </div>
+                    <span class="text-xs text-success font-medium bg-green-50 px-2 py-1 rounded">Подключен</span>
+                </div>
+            </div>
+            
+            <!-- System Info -->
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-muted">Время работы</p>
+                        <p class="font-mono text-gray-900">24:17:43</p>
+                    </div>
+                    <div>
+                        <p class="text-muted">Память</p>
+                        <p class="font-mono text-gray-900">2.4GB / 8GB</p>
+                    </div>
+                    <div>
+                        <p class="text-muted">CPU</p>
+                        <p class="font-mono text-gray-900">12%</p>
+                    </div>
+                    <div>
+                        <p class="text-muted">Диск</p>
+                        <p class="font-mono text-gray-900">45GB / 100GB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Banner -->
+<div class="mt-8 bg-white border border-gray-200 rounded-lg">
+    <div class="p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-success text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900">Система работает стабильно</h4>
+                    <p class="text-sm text-muted">Все сервисы функционируют в штатном режиме</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-muted">Последняя проверка</p>
+                <p class="text-sm font-mono text-gray-900">{{ current_time or '15:42:30' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showSystemInfo() {
+    Swal.fire({
+        title: 'Системная информация',
+        html: `
+            <div class="text-left space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Версия:</span>
+                    <span class="font-mono">v2.1.0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Python:</span>
+                    <span class="font-mono">3.11.2</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">FastAPI:</span>
+                    <span class="font-mono">0.104.1</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">База данных:</span>
+                    <span class="font-mono">PostgreSQL 15</span>
+                </div>
+            </div>
+        `,
+        confirmButtonText: 'Закрыть',
+        confirmButtonColor: '#144b44'
+    });
+}
+
+function exportData() {
+    Swal.fire({
+        title: 'Экспорт данных',
+        text: 'Выберите данные для экспорта',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Экспортировать',
+        cancelButtonText: 'Отмена',
+        confirmButtonColor: '#144b44'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showNotification('Экспорт данных начат', 'success');
+        }
+    });
+}
+
+function showLogs() {
+    window.location.href = '/superadmin/logs';
+}
+</script>
+{% endblock %} 

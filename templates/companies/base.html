@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Wazir Business{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#144b44',
+                        'primary-light': '#1a5650',
+                        'primary-dark': '#0f3d37',
+                        secondary: '#f8fafc',
+                        accent: '#64748b',
+                        success: '#059669',
+                        warning: '#d97706',
+                        danger: '#dc2626',
+                        muted: '#64748b',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .sidebar-shadow {
+            box-shadow: 1px 0 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(20, 75, 68, 0.08);
+            transform: translateX(2px);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(20, 75, 68, 0.1);
+            border-right: 3px solid #144b44;
+            color: #144b44;
+        }
+        
+        .card {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .text-primary { color: #144b44; }
+        .bg-primary { background-color: #144b44; }
+        .border-primary { border-color: #144b44; }
+        
+        .btn-primary {
+            background-color: #144b44;
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a5650;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white sidebar-shadow flex flex-col">
+            <!-- Logo Section -->
+            <div class="flex items-center px-6" style="padding-top: 1.5rem; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-briefcase text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Business</h1>
+                    <p class="text-xs text-muted font-medium">{{ company_name or 'КОМПАНИЯ' }}</p>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6">
+                <div class="space-y-1">
+                    <a href="/companies/dashboard" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group {% if request.url.path == '/companies/dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Обзор</span>
+                    </a>
+                    
+                    <a href="/companies/listings" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group {% if 'listings' in request.url.path %}active{% endif %}">
+                        <i class="fas fa-list mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Мои объявления</span>
+                    </a>
+                    
+                    <a href="/companies/analytics" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group {% if 'analytics' in request.url.path %}active{% endif %}">
+                        <i class="fas fa-chart-pie mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Аналитика</span>
+                    </a>
+                    
+                    <a href="/companies/create-listing" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group {% if 'create-listing' in request.url.path %}active{% endif %}">
+                        <i class="fas fa-plus-circle mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Создать объявление</span>
+                    </a>
+                    
+                    <a href="/companies/bulk-upload" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group {% if 'bulk-upload' in request.url.path %}active{% endif %}">
+                        <i class="fas fa-upload mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Массовая загрузка</span>
+                    </a>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-100 my-6"></div>
+                
+                <!-- Account Links -->
+                <div class="space-y-1">
+                    <a href="/companies/settings" 
+                       class="nav-item flex items-center px-4 py-3 text-gray-700 rounded-lg group">
+                        <i class="fas fa-cog mr-3 text-muted group-hover:text-primary"></i>
+                        <span class="font-medium">Настройки</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <!-- User Section -->
+            <div class="p-4 border-t border-gray-100">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                        {% if current_user and current_user.company_logo_url %}
+                            <img src="{{ current_user.company_logo_url }}" alt="Логотип" class="w-full h-full rounded-full object-cover">
+                        {% else %}
+                            <i class="fas fa-briefcase text-gray-500"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">
+                            {{ current_user.company_name if current_user and current_user.company_name else 'Компания' }}
+                        </p>
+                        <p class="text-xs text-muted truncate">
+                            {{ current_user.email if current_user and current_user.email else 'company@wazir.kg' }}
+                        </p>
+                    </div>
+                </div>
+                <a href="/companies/logout" 
+                   class="flex items-center justify-center w-full py-2 px-4 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-150">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Выйти
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200">
+                <div class="flex items-center justify-between px-8 py-4">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">{% block page_title %}Панель управления{% endblock %}</h1>
+                        <p class="text-sm text-muted mt-1">{% block page_subtitle %}Управление объявлениями и аналитика{% endblock %}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        {% block header_actions %}{% endblock %}
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto bg-gray-50">
+                <div class="p-8">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Smooth interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click feedback
+            document.querySelectorAll('button, .nav-item').forEach(element => {
+                element.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                });
+            });
+        });
+        
+        // Global notification function
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-50 text-green-800 border-green-200',
+                error: 'bg-red-50 text-red-800 border-red-200',
+                warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+                info: 'bg-blue-50 text-blue-800 border-blue-200'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 border rounded-lg shadow-lg z-50 ${colors[type]}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current opacity-50 hover:opacity-100">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,305 @@
+{% extends "companies/base.html" %}
+
+{% block title %}Обзор - Wazir Business{% endblock %}
+{% block page_title %}Обзор{% endblock %}
+{% block page_subtitle %}Основные показатели и статистика{% endblock %}
+
+{% block header_actions %}
+<a href="/companies/listings/create" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium flex items-center">
+    <i class="fas fa-plus mr-2"></i>
+    Создать объявление
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Быстрые действия -->
+<div class="bg-white rounded-lg p-6 border border-gray-200 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Быстрые действия</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="/companies/create-listing" class="flex flex-col items-center p-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+            <i class="fas fa-plus text-xl mb-2"></i>
+            <span class="text-sm font-medium">Создать объявление</span>
+        </a>
+        <a href="/companies/listings" class="flex flex-col items-center p-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="fas fa-list text-xl mb-2"></i>
+            <span class="text-sm font-medium">Мои объявления</span>
+        </a>
+        <a href="/companies/analytics" class="flex flex-col items-center p-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="fas fa-chart-line text-xl mb-2"></i>
+            <span class="text-sm font-medium">Аналитика</span>
+        </a>
+        <a href="/companies/profile" class="flex flex-col items-center p-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="fas fa-user text-xl mb-2"></i>
+            <span class="text-sm font-medium">Профиль</span>
+        </a>
+    </div>
+</div>
+
+<!-- Статистические карточки -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Общее количество объявлений -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Всего объявлений</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.total_properties or 0 }}</p>
+                <p class="text-xs text-green-600 mt-1">
+                    <i class="fas fa-arrow-up"></i>
+                    +{{ stats.properties_growth or 0 }}% за месяц
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-building text-primary text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Активные объявления -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Активные</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.active_properties or 0 }}</p>
+                <p class="text-xs text-blue-600 mt-1">
+                    <i class="fas fa-check-circle"></i>
+                    {{ ((stats.active_properties or 0) / (stats.total_properties or 1) * 100)|round(1) }}% от общего
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-check text-green-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Общие просмотры -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Общие просмотры</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.total_views or 0 }}</p>
+                <p class="text-xs text-primary mt-1">
+                    <i class="fas fa-eye"></i>
+                    {{ ((stats.total_views or 0) / (stats.total_properties or 1))|round(1) }} на объявление
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-eye text-blue-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Средняя цена -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Средняя цена</p>
+                <p class="text-2xl font-bold text-gray-900">{{ "{:,.0f}".format(stats.avg_price or 0) }} ₽</p>
+                <p class="text-xs text-orange-600 mt-1">
+                    <i class="fas fa-ruble-sign"></i>
+                    {% if stats.price_change >= 0 %}+{% endif %}{{ stats.price_change or 0 }}% за месяц
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-chart-line text-orange-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- График и таблица -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- График просмотров -->
+    <div class="lg:col-span-2 card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Просмотры за последние 30 дней</h3>
+            <div class="flex items-center space-x-2">
+                <select class="text-sm border border-gray-300 rounded-md px-3 py-1 bg-white">
+                    <option>30 дней</option>
+                    <option>7 дней</option>
+                    <option>90 дней</option>
+                </select>
+            </div>
+        </div>
+        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+            <canvas id="viewsChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
+
+    <!-- Топ объявления -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Популярные объявления</h3>
+        <div class="space-y-4">
+            {% for property in top_properties %}
+            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div class="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0">
+                    {% if property.image_url %}
+                    <img src="{{ property.image_url }}" alt="{{ property.title }}" class="w-full h-full object-cover rounded-lg">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ property.title }}</p>
+                    <p class="text-xs text-gray-500">{{ property.views or 0 }} просмотров</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-primary">{{ "{:,.0f}".format(property.price) }} ₽</p>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not top_properties %}
+            <div class="text-center py-8">
+                <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
+                <p class="text-gray-500">Нет данных для отображения</p>
+                <a href="/companies/listings/create" class="text-primary text-sm font-medium mt-2 inline-block">
+                    Создать первое объявление
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Последние объявления -->
+<div class="card bg-white rounded-lg border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Последние объявления</h3>
+            <a href="/companies/listings" class="text-primary text-sm font-medium hover:text-primary-dark">
+                Посмотреть все
+            </a>
+        </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Объявление</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Цена</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Просмотры</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                    <th class="relative px-6 py-3"><span class="sr-only">Действия</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for property in recent_properties %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
+                                {% if property.image_url %}
+                                <img src="{{ property.image_url }}" alt="{{ property.title }}" class="w-full h-full object-cover rounded-lg">
+                                {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i class="fas fa-image text-gray-400 text-sm"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ property.title }}</div>
+                                <div class="text-sm text-gray-500">{{ property.address }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ "{:,.0f}".format(property.price) }} ₽</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if property.status == 'active' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Активно
+                        </span>
+                        {% elif property.status == 'pending' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            На модерации
+                        </span>
+                        {% elif property.status == 'draft' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Черновик
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Отклонено
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ property.views or 0 }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ property.created_at.strftime('%d.%m.%Y') if property.created_at else '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="/companies/listings/{{ property.id }}" class="text-primary hover:text-primary-dark">
+                            Просмотр
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                {% if not recent_properties %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center">
+                        <i class="fas fa-plus-circle text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500 mb-4">У вас пока нет объявлений</p>
+                        <a href="/companies/listings/create" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium">
+                            Создать первое объявление
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // График просмотров
+    const ctx = document.getElementById('viewsChart').getContext('2d');
+    const viewsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|tojson if chart_labels else '[]'|safe }},
+            datasets: [{
+                label: 'Просмотры',
+                data: {{ chart_data|tojson if chart_data else '[]'|safe }},
+                borderColor: '#144b44',
+                backgroundColor: 'rgba(20, 75, 68, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

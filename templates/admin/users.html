@@ -1,0 +1,689 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Wazir Недвижимость - Пользователи{% endblock %}
+
+{% block page_title %}Пользователи{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Таблица пользователей */
+.users-container {
+    padding: 1.5rem;
+} 
+
+.users-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.users-header {
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.users-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.users-title i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.users-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.search-bar {
+    position: relative;
+    width: 240px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-bar input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-bar i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-button i {
+    font-size: 1rem;
+}
+
+.users-table-container {
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.users-table th {
+    font-weight: 600;
+    color: #4b5563;
+    background-color: #f9fafb;
+    font-size: 0.875rem;
+}
+
+.users-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.users-table td {
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    overflow: hidden;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-full-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.user-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.user-phone,
+.user-email {
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.user-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.status-inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.status-banned {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.user-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.user-action {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-action:hover {
+    background-color: #e5e7eb;
+}
+
+.user-action.edit:hover {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.user-action.delete:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.users-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.page-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-item:hover {
+    background-color: #f3f4f6;
+}
+
+.page-item.active {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.page-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.filter-dropdown {
+    position: relative;
+    z-index: 10;
+}
+
+.filter-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 160px;
+    overflow: hidden;
+    display: none;
+}
+
+.filter-menu.show {
+    display: block;
+}
+
+.filter-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-item:hover {
+    background-color: #f3f4f6;
+}
+
+.filter-item.active {
+    background-color: #f3f4f6;
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.export-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.export-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Для отображения последней активности */
+.activity-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.active-now .activity-dot {
+    background-color: #10b981;
+}
+
+.active-today .activity-dot {
+    background-color: #3b82f6;
+}
+
+.active-week .activity-dot {
+    background-color: #f59e0b;
+}
+
+.inactive .activity-dot {
+    background-color: #9ca3af;
+}
+
+.activity-text {
+    font-size: 0.875rem;
+}
+
+.active-now .activity-text {
+    color: #10b981;
+}
+
+.active-today .activity-text {
+    color: #3b82f6;
+}
+
+.active-week .activity-text {
+    color: #f59e0b;
+}
+
+.inactive .activity-text {
+    color: #9ca3af;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="users-container">
+    <div class="users-card">
+        <div class="users-header">
+            <div class="users-title">
+                <i class="fas fa-users"></i>
+                <span>Все пользователи</span>
+            </div>
+            <div class="users-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="user-search-input"
+                        placeholder="Поиск пользователей..."
+                        value="{{ search_query }}">
+                </div>
+
+                <!-- Удалены фильтры по статусу -->
+
+                <a href="/admin/users/export" id="export-button" class="export-button">
+                    <i class="fas fa-download"></i>
+                    <span>Экспорт</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Пользователь</th>
+                        <th>Телефон</th>
+                        <th>Email</th>
+                        <th>Статус</th>
+                        <th>Кол-во объявлений</th>
+                        <th>360-туры</th>
+                        <th>Дата регистрации</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}">
+                        <td>
+                            <div class="user-name">
+                                <div class="user-avatar">
+                                    {% if user.avatar_url %}
+                                    <img src="{{ user.avatar_url }}"
+                                        alt="{{ user.full_name }}">
+                                    {% else %}
+                                    <i class="fas fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-full-name">{{
+                                        user.full_name }}</div>
+                                    <div class="user-id">ID: {{ user.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="user-phone">{{ user.phone }}</td>
+                        <td class="user-email">{{ user.email }}</td>
+                        <td>
+                            <span
+                                class="user-status status-{% if user.is_active %}active{% else %}inactive{% endif %}">
+                                {% if user.is_active %}
+                                Активен
+                                {% else %}
+                                Неактивен
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ user.properties_count }}</td>
+                        <td>{{ user.tours_count }}</td>
+                        <td class="user-date">{{ user.registered_at }}</td>
+                        <td>
+                            <div class="user-actions">
+                                <!-- Кнопка блокировки/разблокировки -->
+                                <a href="javascript:void(0);" class="user-action {% if user.is_active %}ban{% else %}activate{% endif %}"
+                                    onclick="confirmAction('{{ user.id }}', '{% if user.is_active %}ban{% else %}activate{% endif %}', '{{ user.full_name }}')">
+                                    <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"
+                                       title="{% if user.is_active %}Заблокировать{% else %}Разблокировать{% endif %}"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="users-pagination">
+            <div class="pagination-info">
+                Показано {{ start_item }}-{{ end_item }} из {{ total_users }}
+                пользователей
+            </div>
+            <div class="pagination-pages">
+                <a
+                    href="{{ request.url.path }}?{% if search_query %}search={{ search_query }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page=1"
+                    class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a
+                    href="{{ request.url.path }}?{% if search_query %}search={{ search_query }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ current_page - 1 }}"
+                    class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+
+                {% for p in pages %}
+                {% if p == '...' and show_ellipsis %}
+                <span class="page-item disabled">...</span>
+                {% else %}
+                <a
+                    href="{{ request.url.path }}?{% if search_query %}search={{ search_query }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ p }}"
+                    class="page-item {% if p == current_page %}active{% endif %}">
+                    {{ p }}
+                </a>
+                {% endif %}
+                {% endfor %}
+
+                <a
+                    href="{{ request.url.path }}?{% if search_query %}search={{ search_query }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ current_page + 1 }}"
+                    class="page-item {% if current_page >= total_pages %}disabled{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a
+                    href="{{ request.url.path }}?{% if search_query %}search={{ search_query }}&{% endif %}{% if status %}status={{ status }}&{% endif %}page={{ total_pages }}"
+                    class="page-item {% if current_page >= total_pages %}disabled{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Документ загружен
+    document.addEventListener('DOMContentLoaded', function() {
+        // Поиск в реальном времени
+        const searchInput = document.getElementById('user-search-input');
+        const userRows = document.querySelectorAll('.users-table tbody tr');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                userRows.forEach(row => {
+                    const userName = row.querySelector('.user-full-name').textContent.toLowerCase();
+                    const userId = row.querySelector('.user-id').textContent.toLowerCase();
+                    const userPhone = row.querySelector('.user-phone').textContent.toLowerCase();
+                    const userEmail = row.querySelector('.user-email').textContent.toLowerCase();
+                    
+                    // Поиск по имени, ID, телефону или email
+                    if (userName.includes(searchTerm) || userId.includes(searchTerm) || 
+                        userPhone.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Обновляем информацию о пагинации
+                updatePaginationInfo();
+            });
+        }
+        
+        // Обновление информации о количестве отображаемых пользователей
+        function updatePaginationInfo() {
+            const visibleRows = document.querySelectorAll('.users-table tbody tr:not([style*="display: none"])');
+            const paginationInfo = document.querySelector('.pagination-info');
+            
+            if (paginationInfo) {
+                const totalUsers = userRows.length;
+                const visibleUsersCount = visibleRows.length;
+                
+                if (visibleUsersCount === totalUsers) {
+                    paginationInfo.textContent = `Показано 1-${totalUsers} из ${totalUsers} пользователей`;
+                } else {
+                    paginationInfo.textContent = `Показано ${visibleUsersCount} из ${totalUsers} пользователей (поиск)`;
+                }
+            }
+        }
+        
+        // Экспорт данных
+        const exportButton = document.getElementById('export-button');
+        
+        if (exportButton) {
+            exportButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Собираем данные только видимых пользователей
+                const visibleRows = document.querySelectorAll('.users-table tbody tr:not([style*="display: none"])');
+                const searchTerm = searchInput ? searchInput.value : '';
+                
+                // Формируем URL для экспорта
+                let exportUrl = '/admin/users/export';
+                
+                if (searchTerm) {
+                    exportUrl += `?search=${encodeURIComponent(searchTerm)}`;
+                }
+                
+                // Переходим по URL для экспорта
+                window.location.href = exportUrl;
+            });
+        }
+    });
+    
+    // Подтверждение действия (блокировка/активация/удаление)
+    function confirmAction(userId, action, userName) {
+        let message = '';
+        let url = '';
+        
+        if (action === 'ban') {
+            message = `Вы уверены, что хотите заблокировать пользователя ${userName}?`;
+            url = `/admin/users/${userId}/ban`;
+        } else if (action === 'activate') {
+            message = `Вы уверены, что хотите активировать пользователя ${userName}?`;
+            url = `/admin/users/${userId}/activate`;
+        } else if (action === 'delete') {
+            message = `Вы уверены, что хотите полностью удалить пользователя ${userName}? Это действие нельзя отменить.`;
+            url = `/admin/users/${userId}/delete`;
+        }
+        
+        if (confirm(message)) {
+            // Отправляем AJAX запрос вместо перехода по URL
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'Операция выполнена успешно!');
+                    
+                    // Обновляем страницу или обновляем только конкретную строку
+                    if (action === 'delete') {
+                        // Удаляем строку из таблицы
+                        const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+                        if (row) {
+                            row.remove();
+                        }
+                    } else {
+                        // Обновляем статус пользователя и кнопку действия
+                        location.reload(); // Пока просто перезагружаем страницу
+                    }
+                } else {
+                    alert(data.error || 'Произошла ошибка. Попробуйте еще раз.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при выполнении операции.');
+            });
+        }
+    }
+</script>
+{% endblock %}

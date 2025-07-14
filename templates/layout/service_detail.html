@@ -1,0 +1,661 @@
+{% extends "layout/base.html" %}
+
+{% block title %}{{ service_card.title }} - Wazir Сервисы{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+<!-- Pannellum for 360° panorama viewing -->
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+<style>
+    .btn favorite-btn {
+        width: 100%;
+    }
+    .bottom-nav {
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+        transition: all 0.2s ease;
+    }
+    .nav-item.active {
+        color: var(--color-primary);
+    }
+    .nav-item:hover {
+        color: var(--color-primary-hover);
+    }
+    .nav-icons {
+        font-size: 1.6rem;
+        font-weight: 300;
+    }
+    .weather-currency {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    .weather-icon {
+        font-size: 1.4rem;
+    }
+    .swiper {
+        width: 100%;
+        height: 280px;
+        border-radius: 0;
+        overflow: hidden;
+    }
+    .swiper-slide {
+        position: relative;
+        background-color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 1.3rem;
+    }
+    .swiper-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .action-buttons .btn {
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        background-color: #f9fafb;
+        color: #4b5563;
+        width: 100%;
+    }
+    .service-description {
+        font-size: 1.05rem;
+        line-height: 1.5;
+        color: #4b5563;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        color: #4b5563;
+        padding: 4px 0;
+    }
+    .info-item i {
+        width: 20px;
+        margin-right: 8px;
+        color: #9ca3af;
+    }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        font-weight: 500;
+        border-radius: 4px;
+        font-size: 1.05rem;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
+    .action-btn.primary {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+    }
+    .action-btn.secondary {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* Стили для рекламного слайдера */
+    .ads-slider {
+        width: 100%;
+        height: 85px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        padding: 0 7px;
+        margin: 7px 0;
+    }
+    
+    .ads-slider-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    
+    .ads-slides-wrapper {
+        display: flex;
+        width: 200%; /* 2 слайда = 200% */
+        height: 100%;
+        transition: transform 0.5s ease-in-out;
+    }
+    
+    .ads-slide {
+        width: 50%; /* Каждый слайд занимает 50% от wrapper */
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .ads-slide.placeholder {
+        background-color: #9ca3af;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 500;
+        text-align: center;
+        font-family: 'Montserrat', sans-serif;
+    }
+    
+    .ads-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Google Maps стили */
+    .service-map-container {
+        width: 100%;
+        height: 300px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        margin: 16px 0;
+    }
+    
+    .map-section {
+        background-color: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .map-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #111827;
+        display: flex;
+        align-items: center;
+    }
+    
+    .map-title i {
+        margin-right: 8px;
+        color: #4b5563;
+    }
+    
+    .map-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .map-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .map-btn:hover {
+        background-color: #e5e7eb;
+        color: #374151;
+    }
+    
+    .map-btn i {
+        margin-right: 6px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pb-20">
+    <!-- Рекламный слайдер -->
+    <div class="ads-slider rounded-lg">
+        <div class="ads-slider-container">
+            <div class="ads-slides-wrapper">
+                <div class="ads-slide placeholder">
+                    Место для вашей рекламы
+                </div>
+                <div class="ads-slide">
+                    <img src="https://wazir.kg/static/reklama.png" alt="wazir">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Слайдер изображений -->
+    <div class="service-slider">
+        <div class="swiper main-swiper">
+            <div class="swiper-wrapper">
+                {% if service_card.images and service_card.images|length > 0 %}
+                    {% for image in service_card.images %}
+                    <div class="swiper-slide">
+                        <img src="{{ image.url }}" alt="{{ service_card.title }}">
+                    </div>
+                    {% endfor %}
+                {% elif service_card.image_url %}
+                <div class="swiper-slide">
+                    <img src="{{ service_card.image_url }}" alt="{{ service_card.title }}">
+                </div>
+                {% else %}
+                <div class="swiper-slide">
+                    <img src="{{ url_for('static', path='layout/assets/img/property-placeholder.jpg') }}" alt="Фото отсутствует">
+                </div>
+                {% endif %}
+            </div>
+            <div class="swiper-pagination absolute bottom-2 left-0 right-0 flex justify-center"></div>
+        </div>
+    </div>
+
+    <!-- Контент -->
+    <div class="service-content mt-2">
+        <div class="container mx-auto px-4">
+            <!-- Кнопки действий -->
+            <div class="action-buttons grid grid-cols-2 gap-3 mt-4 mb-6">
+                {% if service_card.phone %}
+                <a href="tel:{{ service_card.phone }}" class="btn">
+                    <i class="fas fa-phone mr-1"></i>
+                    <span>Позвонить</span>
+                </a>
+                {% endif %}
+                
+                {% if service_card.website %}
+                <a href="{{ service_card.website }}" target="_blank" class="btn">
+                    <i class="fas fa-external-link-alt mr-1"></i>
+                    <span>Веб-сайт</span>
+                </a>
+                {% endif %}
+                
+                {% if service_card.has_360_tour %}
+                <button class="btn" id="view-360-btn" data-has-tour="true" 
+                        data-tour-url="{% if service_card.tour_360_optimized_url %}{{ service_card.tour_360_optimized_url }}{% else %}{{ service_card.tour_360_url }}{% endif %}">
+                    <i class="fas fa-vr-cardboard mr-1"></i> 360° тур
+                </button>
+                {% else %}
+                <button class="btn disabled" style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-vr-cardboard mr-1"></i> 360° недоступно
+                </button>
+                {% endif %}
+                
+                <button class="btn" id="share-btn">
+                    <i class="fas fa-share-alt mr-1"></i> Поделиться
+                </button>
+            </div>
+
+            <!-- Информация о заведении -->
+            <div class="service-header mb-4">
+                <h1 class="text-2xl font-semibold text-gray-900 mt-1">{{ service_card.title }}</h1>
+            </div>
+
+            <!-- Описание -->
+            {% if service_card.description %}
+            <div class="service-description mb-6">
+                <h3 class="text-gray-800 font-medium mb-2">Описание</h3>
+                <p class="text-gray-600">{{ service_card.description }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Адрес заведения -->
+            {% if service_card.address %}
+            <div class="service-address mb-6">
+                <p class="text-gray-800 font-bold text-lg">
+                    Адрес заведения: <span class="font-bold text-gray-700">{{ service_card.address }}</span>
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Подробная информация -->
+            <div class="mb-6">
+                <h3 class="text-gray-800 font-medium mb-3">Информация</h3>
+                <div class="info-grid">
+                    {% if service_card.phone %}
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ service_card.phone }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if service_card.email %}
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ service_card.email }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if service_card.website %}
+                    <div class="info-item">
+                        <i class="fas fa-globe"></i>
+                        <span>
+                            <a href="{{ service_card.website }}" target="_blank" class="text-blue-600">
+                                Веб-сайт
+                            </a>
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-item">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ category.title }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Добавлено {{ service_card.created_at.strftime('%d.%m.%Y') if service_card.created_at else 'недавно' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карта местоположения -->
+            {% if service_card.latitude and service_card.longitude %}
+            <div class="map-section">
+                <div class="map-header">
+                    <h3 class="map-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Местоположение
+                    </h3>
+                </div>
+                <div class="service-map-container" id="service-map"></div>
+                <div class="map-actions">
+                    <a href="https://www.google.com/maps?q={{ service_card.latitude }},{{ service_card.longitude }}" 
+                       target="_blank" class="map-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Открыть в Google Maps
+                    </a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ service_card.latitude }},{{ service_card.longitude }}"
+                       target="_blank" class="map-btn">
+                        <i class="fas fa-route"></i>
+                        Проложить маршрут
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Кнопки действий -->
+            <div class="grid grid-cols-1 gap-3 mb-6">
+                <a href="/mobile/services/{{ category.slug }}" class="action-btn primary">
+                    <i class="fas fa-arrow-left mr-2"></i> Назад к {{ category.title }}
+                </a>
+            </div>
+
+            <!-- Похожие заведения -->
+            {% if similar_services %}
+            <div class="similar-services">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                    Другие заведения в категории "{{ category.title }}"
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    {% for service in similar_services %}
+                    <a href="/mobile/services/card/{{ service.id }}" class="block no-underline">
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="h-24 overflow-hidden bg-gray-100">
+                                {% if service.image_url %}
+                                <img src="{{ service.image_url }}" alt="{{ service.title }}" class="w-full h-full object-cover">
+                                {% else %}
+                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-store text-2xl"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="p-3">
+                                <div class="font-medium text-sm text-gray-900 mb-1 truncate">{{ service.title }}</div>
+                                {% if service.address %}
+                                <div class="text-xs text-gray-500 truncate">{{ service.address }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для 360 просмотра -->
+<div
+    class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden"
+    id="modal-360">
+    <div
+        class="bg-white rounded-lg w-full h-full md:w-4/5 md:h-4/5 relative overflow-hidden flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="text-lg font-medium">360° Просмотр</h3>
+            <button id="close-360-modal"
+                class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="flex-grow">
+            {% if service_card.tour_360_url %}
+            <!-- Если есть внешний URL (например Kuula) -->
+            <iframe src="{{ service_card.tour_360_url }}" allowfullscreen
+                class="w-full h-full"></iframe>
+            {% elif service_card.tour_360_optimized_url %}
+            <!-- Если есть загруженный файл, используем 360° viewer -->
+            <div class="w-full h-full" id="panorama-container">
+                <div id="panorama-sphere" style="width: 100%; height: 100%;"></div>
+            </div>
+            {% else %}
+            <div
+                class="flex items-center justify-center h-full bg-gray-100">
+                <div class="text-center p-5">
+                    <i
+                        class="fas fa-vr-cardboard text-gray-400 text-5xl mb-3"></i>
+                    <p class="text-gray-500">360° панорама недоступна
+                        для этого заведения</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgctqtqKOus6A6cDJaOBqsyo4-3r3zuQA&libraries=places&language=ru&region=KG" async defer></script>
+
+<!-- Скрытый элемент для передачи данных из Jinja в JavaScript -->
+<div id="page-data"
+    data-has-tour360="{% if service_card.has_360_tour %}true{% else %}false{% endif %}"
+    data-service-latitude="{% if service_card.latitude %}{{ service_card.latitude }}{% else %}42.8746{% endif %}"
+    data-service-longitude="{% if service_card.longitude %}{{ service_card.longitude }}{% else %}74.5698{% endif %}"
+    data-service-title="{{ service_card.title|e }}"
+    data-service-address="{{ service_card.address|e }}"
+    style="display:none;"></div>
+
+<script>
+// Получаем данные из скрытого элемента
+var pageData = document.getElementById('page-data');
+var hasTour360 = pageData.getAttribute('data-has-tour360') === 'true';
+var panoramaViewer = null;
+
+$(document).ready(function() {
+    // Инициализация слайдера
+    var mainSwiper = new Swiper('.main-swiper', {
+        loop: false,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
+    
+    // Обработчик кнопки 360° только если панорама доступна
+    if (hasTour360) {
+        $('#view-360-btn').on('click', function() {
+            $('#modal-360').removeClass('hidden');
+            $('body').addClass('overflow-hidden'); // Запретить прокрутку страницы
+            
+            // Инициализируем Pannellum для загруженных файлов
+            {% if service_card.tour_360_optimized_url %}
+            setTimeout(function() {
+                if (!panoramaViewer) {
+                    try {
+                        panoramaViewer = pannellum.viewer('panorama-sphere', {
+                            "type": "equirectangular",
+                            "panorama": "{{ service_card.tour_360_optimized_url }}",
+                            "autoLoad": true,
+                            "autoRotate": -2,
+                            "autoRotateInactivityDelay": 3000,
+                            "showFullscreenCtrl": true,
+                            "showZoomCtrl": true,
+                            "mouseZoom": true,
+                            "dragToLook": true,
+                            "loadButtonLabel": "Загрузить панораму",
+                            "loadingLabel": "Загрузка...",
+                            "bylineLabel": "360° Панорама",
+                            "nothingLabel": "Панорама не найдена"
+                        });
+                    } catch (error) {
+                        console.error('Ошибка инициализации панорамы:', error);
+                        document.querySelector('#panorama-sphere').innerHTML = 
+                            '<div class="flex items-center justify-center h-full"><p class="text-gray-500">Ошибка загрузки панорамы</p></div>';
+                    }
+                }
+            }, 200);
+            {% endif %}
+        });
+    }
+    
+    // Закрытие модального окна
+    $('#close-360-modal').on('click', function() {
+        $('#modal-360').addClass('hidden');
+        $('body').removeClass('overflow-hidden'); // Разрешить прокрутку страницы
+        
+        // Очищаем viewer при закрытии для освобождения памяти
+        if (panoramaViewer) {
+            try {
+                panoramaViewer.destroy();
+                panoramaViewer = null;
+            } catch (error) {
+                console.log('Ошибка при закрытии панорамы:', error);
+                panoramaViewer = null;
+            }
+        }
+    });
+    
+    // Обработчик кнопки "Поделиться"
+    $('#share-btn').on('click', function() {
+        var serviceTitle = '{{ service_card.title }}';
+        var serviceUrl = window.location.href;
+        
+        // Проверяем поддержку Web Share API
+        if (navigator.share) {
+            navigator.share({
+                title: serviceTitle,
+                text: 'Посмотрите это заведение на Wazir',
+                url: serviceUrl
+            }).catch(function(error) {
+                console.log('Ошибка при попытке поделиться:', error);
+                fallbackShare(serviceTitle, serviceUrl);
+            });
+        } else {
+            // Fallback для браузеров без поддержки Web Share API
+            fallbackShare(serviceTitle, serviceUrl);
+        }
+    });
+    
+    // Функция для браузеров без поддержки Web Share API
+    function fallbackShare(title, url) {
+        // Копируем ссылку в буфер обмена
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Ссылка скопирована в буфер обмена!');
+            }).catch(function() {
+                // Если не удалось скопировать, показываем ссылку
+                prompt('Скопируйте эту ссылку:', url);
+            });
+        } else {
+            // Для старых браузеров
+            prompt('Скопируйте эту ссылку:', url);
+        }
+    }
+    
+    // Автоматический слайдер для рекламы
+    function initAdsSlider() {
+        const slidesWrapper = document.querySelector('.ads-slides-wrapper');
+        const slides = document.querySelectorAll('.ads-slide');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+            const translateX = -(index * 50); // 50% для каждого слайда
+            slidesWrapper.style.transform = `translateX(${translateX}%)`;
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+        
+        // Переключение каждые 2 секунды
+        setInterval(nextSlide, 2000);
+    }
+    
+    // Инициализируем слайдер после загрузки DOM
+    initAdsSlider();
+    
+    // Google Maps инициализация
+    setTimeout(function() {
+        if (typeof google !== 'undefined' && document.getElementById('service-map')) {
+            var pageData = document.getElementById('page-data');
+            var lat = parseFloat(pageData.getAttribute('data-service-latitude')) || 42.8746;
+            var lng = parseFloat(pageData.getAttribute('data-service-longitude')) || 74.5698;
+            var title = pageData.getAttribute('data-service-title') || 'Заведение';
+            var address = pageData.getAttribute('data-service-address') || 'Адрес не указан';
+            
+            var location = { lat: lat, lng: lng };
+            
+            var map = new google.maps.Map(document.getElementById('service-map'), {
+                zoom: 16,
+                center: location,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+            
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: title,
+                icon: {
+                    url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+            
+            // Информационное окно с адресом
+            var infoWindow = new google.maps.InfoWindow({
+                content: '<div style="padding: 10px;"><h4>' + title + '</h4><p>' + address + '</p></div>'
+            });
+            
+            marker.addListener('click', function() {
+                infoWindow.open(map, marker);
+            });
+            
+            console.log('Google Maps для заведения инициализирована с координатами:', location);
+        } else {
+            console.log('Google Maps API не загружен или элемент карты не найден');
+        }
+    }, 2000);
+});
+</script>
+{% endblock %} 

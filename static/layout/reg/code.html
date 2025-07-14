@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Подтверждение</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="../assets/scss/main.css">
+        <style>
+            .code-input {
+                letter-spacing: 1em;
+                text-align: center;
+                font-size: 1.5rem;
+                font-weight: 500;
+            }
+            
+            .digit-box {
+                width: 50px;
+                height: 60px;
+                border-radius: 8px;
+                border: 1px solid #e5e7eb;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                font-weight: 500;
+                margin: 0 6px;
+                transition: all 0.2s ease;
+            }
+            
+            .digit-box.focused {
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.2);
+            }
+            
+            .digit-box.filled {
+                background-color: #f9fafb;
+            }
+            
+            .timer {
+                font-variant-numeric: tabular-nums;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50 font-sans">
+        <div
+            class="min-h-screen flex flex-col items-center justify-center px-4 fade-in">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex justify-center mb-4">
+                        <img src="../assets/img/logo.png" alt="Wazir Logo"
+                            style="width: 120px;">
+                    </div>
+                    <h1
+                        class="text-2xl font-semibold text-gray-700 mb-2 font-playfair">Подтвердите
+                        регистрацию</h1>
+                    <p class="text-gray-500 font-montserrat">
+                        Мы отправили код на <span id="user-id-display"
+                            class="font-medium"></span>
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
+                    <form id="code-form">
+                        <div class="mb-5">
+                            <div class="flex justify-center space-x-1 mb-4">
+                                <div class="digit-box font-montserrat"
+                                    id="digit-box-1"></div>
+                                <div class="digit-box font-montserrat"
+                                    id="digit-box-2"></div>
+                                <div class="digit-box font-montserrat"
+                                    id="digit-box-3"></div>
+                                <div class="digit-box font-montserrat"
+                                    id="digit-box-4"></div>
+                            </div>
+
+                            <input type="text" inputmode="numeric"
+                                pattern="[0-9]*" maxlength="4"
+                                id="code-input"
+                                class="opacity-0 position-absolute h-0 w-0"
+                                autocomplete="one-time-code">
+
+                            <div class="text-center mb-4">
+                                <p
+                                    class="text-gray-500 font-montserrat text-sm">
+                                    Повторная отправка через <span id="timer"
+                                        class="font-medium timer text-primary">01:00</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="error-message"
+                            class="hidden mb-4 text-sm text-red-500 text-center font-montserrat"></div>
+
+                        <div class="space-y-3 mt-6">
+                            <button type="submit"
+                                class="btn btn-primary w-full py-3 rounded-lg font-montserrat">
+                                Подтвердить
+                            </button>
+
+                            <a href="index.html"
+                                class="btn btn-secondary w-full py-3 rounded-lg font-montserrat text-center">
+                                Назад
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Получение сохраненных данных
+            const userId = localStorage.getItem('regUserId') || '';
+            const idType = localStorage.getItem('regIdType') || 'phone';
+            
+            // Отображение маскированного ID пользователя
+            let displayId = userId;
+            if (idType === 'phone' && userId.length > 4) {
+                displayId = userId.substring(0, 4) + '***' + userId.substring(userId.length - 2);
+            } else if (idType === 'email' && userId.includes('@')) {
+                const parts = userId.split('@');
+                if (parts[0].length > 2) {
+                    displayId = parts[0].substring(0, 2) + '***@' + parts[1];
+                }
+            }
+            
+            $('#user-id-display').text(displayId);
+            
+            // Фокус на поле ввода кода
+            const codeInput = $('#code-input');
+            setTimeout(() => {
+                codeInput.focus();
+            }, 500);
+            
+            // Обработка ввода кода
+            codeInput.on('input', function() {
+                const code = $(this).val();
+                // Обновляем отображение цифр
+                for (let i = 0; i < 4; i++) {
+                    if (i < code.length) {
+                        $(`#digit-box-${i+1}`).text(code[i]).addClass('filled');
+                    } else {
+                        $(`#digit-box-${i+1}`).text('').removeClass('filled');
+                    }
+                }
+                
+                // Автоматическая отправка при вводе 4 цифр
+                if (code.length === 4) {
+                    setTimeout(() => {
+                        $('#code-form').submit();
+                    }, 300);
+                }
+            });
+            
+            // Фокус на поле ввода при клике на любой digit-box
+            $('.digit-box').on('click', function() {
+                codeInput.focus();
+                // Добавляем класс focused текущему digit-box
+                $('.digit-box').removeClass('focused');
+                const index = codeInput.val().length;
+                if (index < 4) {
+                    $(`#digit-box-${index+1}`).addClass('focused');
+                } else {
+                    $('#digit-box-4').addClass('focused');
+                }
+            });
+            
+            // Обработка фокуса
+            codeInput.on('focus', function() {
+                const index = $(this).val().length;
+                $('.digit-box').removeClass('focused');
+                if (index < 4) {
+                    $(`#digit-box-${index+1}`).addClass('focused');
+                }
+            }).on('blur', function() {
+                $('.digit-box').removeClass('focused');
+            });
+            
+            // Таймер обратного отсчета
+            let timeLeft = 60; // 1 минута
+            const timerElement = $('#timer');
+            
+            const timerInterval = setInterval(function() {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.text('00:00');
+                    // Здесь можно добавить кнопку "Отправить код повторно"
+                }
+            }, 1000);
+            
+            // Обработка отправки формы
+            $('#code-form').on('submit', function(e) {
+                e.preventDefault();
+                const code = $('#code-input').val();
+                
+                if (!code || code.length !== 4) {
+                    $('#error-message').text('Введите 4-значный код').removeClass('hidden');
+                    return;
+                }
+                
+                // Для отладки - проверяем, что код равен 1111
+                if (code !== '1111') {
+                    $('#error-message').text('Неверный код подтверждения').removeClass('hidden');
+                    // Очищаем код
+                    $('#code-input').val('');
+                    $('.digit-box').text('').removeClass('filled');
+                    setTimeout(() => {
+                        $('#code-input').focus();
+                    }, 100);
+                    return;
+                }
+                
+                $('#error-message').addClass('hidden');
+                
+                // Имитация загрузки
+                const $submitBtn = $(this).find('button[type="submit"]');
+                $submitBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Проверка...');
+                $submitBtn.prop('disabled', true);
+                
+                // Имитация проверки кода через 1 секунду
+                setTimeout(function() {
+                    // Переход на страницу ввода имени и фамилии
+                    window.location.href = 'profile.html';
+                }, 1000);
+            });
+        });
+    </script>
+    </body>
+</html>

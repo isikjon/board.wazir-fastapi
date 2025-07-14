@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Тех. поддержка</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <style>
+        :root {
+            --color-primary: #f97316;
+            --color-primary-hover: #ea580c;
+            --color-secondary: #0f172a;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--color-secondary);
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            left: -250px;
+        }
+        
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-sidebar {
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toggle-sidebar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .sidebar-menu-item {
+            padding: 0.75rem 1.5rem;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            font-weight: 300;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 1.5rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content-expanded {
+            margin-left: 0;
+        }
+        
+        /* Top Navbar */
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.63rem 1.5rem;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .page-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .admin-dropdown {
+            position: relative;
+        }
+        
+        .admin-dropdown button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+        
+        .admin-dropdown button:hover {
+            color: var(--color-primary);
+        }
+        
+        .admin-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 6px;
+            width: 200px;
+            z-index: 20;
+            display: none;
+        }
+        
+        .admin-menu.show {
+            display: block;
+        }
+        
+        .admin-menu-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            color: #4b5563;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .admin-menu-item:hover {
+            background-color: #f9fafb;
+            color: var(--color-primary);
+        }
+        
+        .admin-menu-item i {
+            margin-right: 0.75rem;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+            display: none;
+        }
+        
+        .mobile-overlay.show {
+            display: block;
+        }
+        
+        /* Support Chat */
+        .support-container {
+            display: flex;
+            height: calc(100vh - 60px); /* высота минус верхняя навигация */
+        }
+        
+        .tickets-sidebar {
+            width: 300px;
+            background-color: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tickets-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            color: white;
+        }
+        
+        .tickets-title {
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tickets-title i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .tickets-search {
+            margin-top: 0.75rem;
+            position: relative;
+        }
+        
+        .tickets-search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .tickets-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .tickets-search input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .tickets-search i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .tickets-filters {
+            display: flex;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-tab:hover {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .filter-tab.active {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            font-weight: 500;
+        }
+        
+        .tickets-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .ticket-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .ticket-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .ticket-item.active {
+            background-color: #f3f4f6;
+            border-left: 3px solid var(--color-primary);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        
+        .ticket-name {
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 0.9rem;
+        }
+        
+        .ticket-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .ticket-subject {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .ticket-preview {
+            font-size: 0.75rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .ticket-status {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-left: 0.25rem;
+        }
+        
+        .status-new {
+            background-color: #fef2f2;
+            color: #ef4444;
+        }
+        
+        .status-waiting {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        
+        .status-closed {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .status-active {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f3f4f6;
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 1.1rem;
+            margin-right: 0.75rem;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 0.95rem;
+        }
+        
+        .user-id {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .ticket-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .ticket-action {
+            padding: 0.4rem 0.75rem;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ticket-action:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .ticket-action i {
+            margin-right: 0.4rem;
+        }
+        
+        .ticket-action.close-ticket {
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-color: #fecaca;
+        }
+        
+        .ticket-action.close-ticket:hover {
+            background-color: #fee2e2;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 75%;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-user {
+            align-self: flex-start;
+        }
+        
+        .message-admin {
+            align-self: flex-end;
+        }
+        
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            position: relative;
+        }
+        
+        .message-user .message-bubble {
+            background-color: white;
+            color: #4b5563;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .message-admin .message-bubble {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .message-info {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-user .message-info {
+            margin-left: 0.5rem;
+        }
+        
+        .message-admin .message-info {
+            margin-right: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .message-time {
+            margin-right: 0.5rem;
+        }
+        
+        .message-admin .message-time {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+        
+        .message-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-status i {
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+        }
+        
+        .date-divider {
+            display: flex;
+            align-items: center;
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin: 1rem 0;
+        }
+        
+        .date-divider::before,
+        .date-divider::after {
+            content: "";
+            flex: 1;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .date-divider::before {
+            margin-right: 0.75rem;
+        }
+        
+        .date-divider::after {
+            margin-left: 0.75rem;
+        }
+        
+        .chat-input {
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        .input-box textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 3rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            resize: none;
+            max-height: 120px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .input-box textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+        
+        .input-actions {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-action {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .input-action:hover {
+            color: #6b7280;
+        }
+        
+        .input-action.attach {
+            margin-right: 0.5rem;
+        }
+        
+        .send-button {
+            margin-left: 1rem;
+            padding: 0.75rem;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-button:hover {
+            background-color: var(--color-primary-hover);
+        }
+        
+        .send-button i {
+            font-size: 1.2rem;
+        }
+        
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-subtext {
+            font-size: 0.875rem;
+            max-width: 400px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar.mobile-show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .support-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .tickets-sidebar {
+                width: 100%;
+                height: 300px;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 360px);
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Сайдбар -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="flex items-center">
+                    <img src="../layout/assets/img/logo_non.png"
+                        alt="Wazir Logo" class="h-8 mr-2">
+                    <h1 class="text-white text-lg font-semibold playfair">
+                        <a href="dashboard.html"
+                            class="text-white hover:text-white">Wazir Admin</a>
+                    </h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="requests.html" class="sidebar-menu-item">
+                    <i class="far fa-clipboard"></i>
+                    <span>Заявки</span>
+                </a>
+                <a href="users.html" class="sidebar-menu-item">
+                    <i class="far fa-user"></i>
+                    <span>Пользователи</span>
+                </a>
+                <a href="properties.html" class="sidebar-menu-item">
+                    <i class="far fa-building"></i>
+                    <span>Объявления</span>
+                </a>
+                <a href="support.html" class="sidebar-menu-item"
+                    style="background:#f97316">
+                    <i class="far fa-life-ring"></i>
+                    <span>Тех. поддержка</span>
+                </a>
+                <a href="settings.html" class="sidebar-menu-item">
+                    <i class="far fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="index.html" class="sidebar-menu-item">
+                    <i class="far fa-sign-out-alt"></i>
+                    <span>Выход</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <div class="main-content" id="main-content">
+            <!-- Верхняя навигация -->
+            <div class="top-navbar">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar" class="toggle-sidebar mr-3">
+                        <i class="fas fa-bars text-gray-600"></i>
+                    </button>
+                    <h1 class="page-title text-xl">Тех. поддержка</h1>
+                </div>
+
+                <div class="admin-dropdown">
+                    <button id="admin-dropdown-toggle">
+                        <span class="mr-2 hidden sm:inline">Администратор</span>
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </button>
+
+                    <div class="admin-menu" id="admin-menu">
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-user"></i>
+                            <span>Профиль</span>
+                        </a>
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="border-t border-gray-200 my-1"></div>
+                        <a href="index.html" class="admin-menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выйти</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контейнер техподдержки -->
+            <div class="support-container">
+                <!-- Левая колонка с тикетами -->
+                <div class="tickets-sidebar">
+                    <div class="tickets-filters">
+                        <div class="filter-tab active">Все</div>
+                        <div class="filter-tab">Новые</div>
+                        <div class="filter-tab">Активные</div>
+                        <div class="filter-tab">Закрытые</div>
+                    </div>
+                    <div class="tickets-list">
+                        <div class="ticket-item active">
+                            <div class="ticket-header">
+                                <div class="ticket-name">Иванов Иван</div>
+                                <div class="ticket-time">14:25</div>
+                            </div>
+                            <div class="ticket-subject">Проблема с загрузкой
+                                фото <span
+                                    class="ticket-status status-new">Новый</span></div>
+                            <div class="ticket-preview">Не могу загрузить
+                                фотографии к объявлению, выдает ошибку...</div>
+                        </div>
+                        <div class="ticket-item">
+                            <div class="ticket-header">
+                                <div class="ticket-name">Петрова Елена</div>
+                                <div class="ticket-time">Вчера</div>
+                            </div>
+                            <div class="ticket-subject">Не отображается 360-тур
+                                <span
+                                    class="ticket-status status-waiting">Ожидает</span></div>
+                            <div class="ticket-preview">После загрузки 360-тура,
+                                он не отображается на странице
+                                объявления...</div>
+                        </div>
+                        <div class="ticket-item">
+                            <div class="ticket-header">
+                                <div class="ticket-name">Сидоров Алексей</div>
+                                <div class="ticket-time">12.06</div>
+                            </div>
+                            <div class="ticket-subject">Не могу зайти в аккаунт
+                                <span
+                                    class="ticket-status status-active">Активный</span></div>
+                            <div class="ticket-preview">После ввода пароля
+                                выдает ошибку аутентификации, хотя
+                                пароль...</div>
+                        </div>
+                        <div class="ticket-item">
+                            <div class="ticket-header">
+                                <div class="ticket-name">Козлов Дмитрий</div>
+                                <div class="ticket-time">10.06</div>
+                            </div>
+                            <div class="ticket-subject">Не приходят уведомления
+                                <span
+                                    class="ticket-status status-active">Активный</span></div>
+                            <div class="ticket-preview">Перестали приходить
+                                уведомления о новых сообщениях...</div>
+                        </div>
+                        <div class="ticket-item">
+                            <div class="ticket-header">
+                                <div class="ticket-name">Смирнова Ольга</div>
+                                <div class="ticket-time">08.06</div>
+                            </div>
+                            <div class="ticket-subject">Ошибка оплаты <span
+                                    class="ticket-status status-closed">Закрыт</span></div>
+                            <div class="ticket-preview">При попытке оплаты
+                                VIP-размещения произошла ошибка...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка с чатом -->
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Иванов Иван</div>
+                                <div class="user-id">ID: 100234 | Тикет
+                                    #T-4589</div>
+                            </div>
+                        </div>
+                        <div class="ticket-actions">
+                            <button class="ticket-action">
+                                <i class="fas fa-phone"></i>
+                                <span>Позвонить</span>
+                            </button>
+                            <button class="ticket-action">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Профиль</span>
+                            </button>
+                            <button class="ticket-action close-ticket">
+                                <i class="fas fa-times"></i>
+                                <span>Закрыть тикет</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages">
+                        <div class="date-divider">
+                            <span>Сегодня</span>
+                        </div>
+
+                        <div class="message message-user">
+                            <div class="message-bubble">
+                                Здравствуйте, у меня возникла проблема с
+                                загрузкой фотографий к объявлению.
+                                При попытке загрузить выдает ошибку
+                                "Формат файла не поддерживается", хотя я
+                                загружаю обычные JPG.
+                            </div>
+                            <div class="message-info">
+                                <span class="message-time">11:45</span>
+                            </div>
+                        </div>
+
+                        <div class="message message-admin">
+                            <div class="message-bubble">
+                                Добрый день, Иван! Спасибо за обращение.
+                                Подскажите, пожалуйста, какое устройство и
+                                браузер вы используете?
+                                Также уточните, пожалуйста, размер загружаемых
+                                файлов.
+                            </div>
+                            <div class="message-info">
+                                <span class="message-status">
+                                    <i class="fas fa-check-double"></i>
+                                    Прочитано
+                                </span>
+                                <span class="message-time">12:02</span>
+                            </div>
+                        </div>
+
+                        <div class="message message-user">
+                            <div class="message-bubble">
+                                Я использую Windows 10, Chrome последней версии.
+                                Размер файлов примерно 3-5 МБ каждый.
+                                Раньше всё работало нормально, проблема
+                                появилась сегодня утром.
+                            </div>
+                            <div class="message-info">
+                                <span class="message-time">12:15</span>
+                            </div>
+                        </div>
+
+                        <div class="message message-admin">
+                            <div class="message-bubble">
+                                Спасибо за информацию! Действительно, у нас были
+                                небольшие технические работы сегодня утром,
+                                которые могли повлиять на загрузку изображений.
+
+                                Пожалуйста, попробуйте следующее:
+                                1. Очистите кэш браузера
+                                2. Перезагрузите страницу
+                                3. Попробуйте загрузить фотографии повторно
+
+                                Если проблема сохранится, сообщите нам.
+                            </div>
+                            <div class="message-info">
+                                <span class="message-status">
+                                    <i class="fas fa-check-double"></i>
+                                    Прочитано
+                                </span>
+                                <span class="message-time">12:23</span>
+                            </div>
+                        </div>
+
+                        <div class="message message-user">
+                            <div class="message-bubble">
+                                Спасибо за быстрый ответ! Я очистил кэш и
+                                перезагрузил страницу, но проблема осталась.
+                                Может ли это быть связано с форматом фотографий?
+                                У меня iPhone и фотографии в формате HEIC.
+                            </div>
+                            <div class="message-info">
+                                <span class="message-time">14:25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <div class="input-box">
+                            <textarea placeholder="Введите сообщение..."
+                                rows="2"></textarea>
+                            <div class="input-actions">
+                                <button class="input-action attach">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <button class="input-action emoji">
+                                    <i class="far fa-smile"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобильное наложение -->
+        <div class="mobile-overlay" id="mobile-overlay"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Переключение видимости сайдбара
+                $('#toggle-sidebar').on('click', function() {
+                    $('#sidebar').toggleClass('sidebar-collapsed mobile-show');
+                    $('#main-content').toggleClass('main-content-expanded');
+                    $('#mobile-overlay').toggleClass('show');
+                });
+                
+                // Закрытие сайдбара на мобильных устройствах
+                $('#close-sidebar, #mobile-overlay').on('click', function() {
+                    $('#sidebar').removeClass('mobile-show');
+                    $('#mobile-overlay').removeClass('show');
+                });
+                
+                // Раскрытие меню администратора
+                $('#admin-dropdown-toggle').on('click', function() {
+                    $('#admin-menu').toggleClass('show');
+                });
+                
+                // Закрытие меню администратора при клике вне его
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.admin-dropdown').length) {
+                        $('#admin-menu').removeClass('show');
+                    }
+                });
+                
+                // Переключение вкладок фильтров
+                $('.filter-tab').on('click', function() {
+                    $('.filter-tab').removeClass('active');
+                    $(this).addClass('active');
+                });
+                
+                // Выбор тикета
+                $('.ticket-item').on('click', function() {
+                    $('.ticket-item').removeClass('active');
+                    $(this).addClass('active');
+                });
+            });
+        </script>
+    </body>
+</html>

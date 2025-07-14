@@ -1,0 +1,708 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Wazir Недвижимость - Сервисы{% endblock %}
+
+{% block page_title %}Сервисы{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Таблица категорий */
+.services-container {
+    padding: 1.5rem;
+} 
+
+.services-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.services-header {
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.services-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.services-title i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.services-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.search-bar {
+    position: relative;
+    width: 240px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-bar input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-bar i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.action-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.action-button i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.services-table-container {
+    overflow-x: auto;
+}
+
+.services-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.services-table th,
+.services-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.services-table th {
+    font-weight: 600;
+    color: #4b5563;
+    background-color: #f9fafb;
+    font-size: 0.875rem;
+}
+
+.services-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.services-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.services-table td {
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+.category-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.category-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.status-inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.category-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.category-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.category-action {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.category-action:hover {
+    background-color: #e5e7eb;
+    text-decoration: none;
+    color: #4b5563;
+}
+
+.category-action.view:hover {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.category-action.edit:hover {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.category-action.delete:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.services-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.page-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.page-item:hover {
+    background-color: #f3f4f6;
+    text-decoration: none;
+    color: #4b5563;
+}
+
+.page-item.active {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.page-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-item.disabled:hover {
+    background-color: transparent;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #374151;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-checkbox input {
+    width: auto;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="services-container">
+    <div class="services-card">
+        <div class="services-header">
+            <div class="services-title">
+                <i class="fas fa-concierge-bell"></i>
+                Управление категориями сервисов
+            </div>
+            <div class="services-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="category-search-input" placeholder="Поиск категорий...">
+                </div>
+                <button class="action-button" id="add-category-btn">
+                    <i class="fas fa-plus"></i>
+                    Добавить категорию
+                </button>
+            </div>
+        </div>
+
+        <div class="services-table-container">
+            <table class="services-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Статус</th>
+                        <th>Карточки</th>
+                        <th>Дата создания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>
+                            <div class="category-name">{{ category.title }}</div>
+                        </td>
+                        <td>
+                            <span class="category-status status-{% if category.is_active %}active{% else %}inactive{% endif %}">
+                                {% if category.is_active %}Активна{% else %}Неактивна{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_service_cards', category_id=category.id) }}" class="text-blue-600 hover:text-blue-800">
+                                {{ category.cards_count }} заведений
+                            </a>
+                        </td>
+                        <td class="category-date">{{ category.created_at.strftime('%d.%m.%Y %H:%M') if category.created_at else '' }}</td>
+                        <td>
+                            <div class="category-actions">
+                                <a href="{{ url_for('admin_service_cards', category_id=category.id) }}" class="category-action view" title="Управление карточками">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button class="category-action edit" onclick="editCategory({{ category.id }}, '{{ category.title }}', {{ category.is_active|lower }})" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="category-action delete" onclick="deleteCategory({{ category.id }}, '{{ category.title }}')" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="services-pagination">
+            <div class="pagination-info">
+                Показано 1-{{ categories|length }} из {{ categories|length }} категорий
+            </div>
+            <div class="pagination-pages">
+                <a href="#" class="page-item disabled">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="#" class="page-item disabled">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                <a href="#" class="page-item active">1</a>
+                <a href="#" class="page-item disabled">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="#" class="page-item disabled">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления категории -->
+<div id="addCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Добавить категорию</h3>
+            <button class="modal-close" onclick="closeModal('addCategoryModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label class="form-label">Название категории</label>
+                    <input type="text" class="form-input" id="addCategoryTitle" placeholder="Введите название..." required>
+                </div>
+                <div class="form-group">
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="addCategoryActive" checked>
+                        <label>Активна</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="submitAddCategory()">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования категории -->
+<div id="editCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Редактировать категорию</h3>
+            <button class="modal-close" onclick="closeModal('editCategoryModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editCategoryForm">
+                <input type="hidden" id="editCategoryId">
+                <div class="form-group">
+                    <label class="form-label">Название категории</label>
+                    <input type="text" class="form-input" id="editCategoryTitle" required>
+                </div>
+                <div class="form-group">
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="editCategoryActive">
+                        <label>Активна</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editCategoryModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="submitEditCategory()">Сохранить</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Поиск категорий
+document.getElementById('category-search-input').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.services-table tbody tr');
+    
+    rows.forEach(row => {
+        const categoryName = row.querySelector('.category-name').textContent.toLowerCase();
+        
+        if (categoryName.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Модальные окна
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('show');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+// Добавление категории
+document.getElementById('add-category-btn').addEventListener('click', function() {
+    openModal('addCategoryModal');
+});
+
+function submitAddCategory() {
+    const title = document.getElementById('addCategoryTitle').value;
+    const isActive = document.getElementById('addCategoryActive').checked;
+    
+    if (!title) {
+        alert('Введите название категории');
+        return;
+    }
+    
+    fetch('/api/v1/admin/service-categories', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            is_active: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success || data.id) {
+            alert('Категория успешно добавлена!');
+            location.reload();
+        } else {
+            alert(data.error || 'Ошибка при добавлении категории');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка при добавлении категории');
+    });
+}
+
+// Редактирование категории
+function editCategory(id, title, isActive) {
+    document.getElementById('editCategoryId').value = id;
+    document.getElementById('editCategoryTitle').value = title;
+    document.getElementById('editCategoryActive').checked = isActive;
+    openModal('editCategoryModal');
+}
+
+function submitEditCategory() {
+    const id = document.getElementById('editCategoryId').value;
+    const title = document.getElementById('editCategoryTitle').value;
+    const isActive = document.getElementById('editCategoryActive').checked;
+    
+    if (!title) {
+        alert('Введите название категории');
+        return;
+    }
+    
+    fetch(`/api/v1/admin/service-categories/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            is_active: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Категория успешно обновлена!');
+            location.reload();
+        } else {
+            alert(data.error || 'Ошибка при обновлении категории');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка при обновлении категории');
+    });
+}
+
+// Удаление категории
+function deleteCategory(id, title) {
+    if (confirm(`Вы уверены, что хотите удалить категорию "${title}"?`)) {
+        fetch(`/api/v1/admin/service-categories/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Категория успешно удалена!');
+                location.reload();
+            } else {
+                alert(data.error || 'Ошибка при удалении категории');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при удалении категории');
+        });
+    }
+}
+
+// Закрытие модальных окон по клику вне области
+window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('show');
+    }
+});
+</script>
+{% endblock %} 

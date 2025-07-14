@@ -1,0 +1,151 @@
+@import "root";
+@import "assets";
+
+body {
+    font-family: var(--font-body);
+    background-color: #f9fafb;
+    color: var(--color-text-primary);
+    font-weight: 400;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+// Стили для заголовков
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    &.font-playfair {
+        font-weight: 600;
+        line-height: 1.2;
+        text-transform: none;
+        color: #2d3748;
+    }
+}
+
+// Стили для текста
+.font-montserrat {
+    font-feature-settings:
+        "salt" on,
+        "ss01" on;
+
+    &.text-sm {
+        letter-spacing: 0.02em;
+    }
+
+    &.font-medium {
+        font-weight: 500;
+    }
+}
+
+// Улучшенные стили для инпутов
+input.form-input {
+    transition: all 0.3s ease;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    background-color: transparent;
+    padding: 0.75rem 0;
+    width: 100%;
+    outline: none;
+    font-weight: 400;
+
+    &:focus {
+        border-color: var(--color-primary);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+        opacity: 0.7;
+        font-weight: 300;
+    }
+}
+
+// Улучшенные стили для кнопок
+button {
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.02em;
+    text-transform: none;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition:
+            width 0.4s,
+            height 0.4s;
+    }
+
+    &:active::after {
+        width: 200%;
+        height: 200%;
+    }
+}
+
+a {
+    transition: color 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    font-weight: 400;
+
+    &::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background-color: var(--color-primary);
+        transition: width 0.2s ease;
+    }
+
+    &:hover::after {
+        width: 100%;
+    }
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-lg {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.rounded-2xl {
+    border-radius: 1rem;
+}
+
+.focused {
+    label {
+        color: var(--color-primary);
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

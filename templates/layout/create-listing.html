@@ -1,0 +1,1398 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Создать объявление{% endblock %}
+
+{% block extra_css %}
+        <style>
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary);
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .nav-icons {
+        font-size: 1.6rem;
+        font-weight: 300;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+            .form-section {
+                background-color: white;
+        margin-bottom: 10px;
+                padding: 16px;
+        border-bottom: 1px solid #f3f4f6;
+            }
+    .form-title {
+                font-weight: 600;
+                font-size: 1.1rem;
+                color: #111827;
+        margin-bottom: 12px;
+    }
+    .form-input {
+                width: 100%;
+                padding: 12px;
+        border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 1rem;
+        background-color: white;
+                transition: border-color 0.2s ease;
+            }
+    .form-input:focus {
+        outline: none;
+                border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            }
+            .form-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        background-color: white;
+        min-height: 80px;
+                resize: vertical;
+            }
+    .form-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        background-color: white;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+        padding-right: 40px;
+    }
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+    }
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        accent-color: var(--color-primary);
+    }
+    .checkbox-item label {
+        font-size: 1rem;
+        color: #374151;
+        cursor: pointer;
+    }
+    .submit-btn {
+        width: 100%;
+                background-color: var(--color-primary);
+                color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    .submit-btn:hover {
+        background-color: var(--color-primary-hover);
+    }
+    .submit-btn:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+    }
+    .photo-upload {
+        border: 2px dashed #d1d5db;
+        border-radius: 6px;
+        padding: 20px;
+                text-align: center;
+                cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+    .photo-upload:hover {
+        border-color: var(--color-primary);
+            }
+    .photo-upload.dragover {
+                border-color: var(--color-primary);
+        background-color: rgba(99, 102, 241, 0.05);
+            }
+    .photo-preview {
+                display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+            }
+            .photo-item {
+                position: relative;
+        aspect-ratio: 1;
+                border-radius: 6px;
+                overflow: hidden;
+        border: 1px solid #e5e7eb;
+            }
+            .photo-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .photo-remove {
+                position: absolute;
+        top: 4px;
+        right: 4px;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        border: none;
+                border-radius: 50%;
+        width: 20px;
+        height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+        cursor: pointer;
+        font-size: 0.75rem;
+    }
+    .input-group {
+        display: flex;
+        gap: 8px;
+    }
+    .input-group .form-input {
+        flex: 1;
+    }
+    .room-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .room-btn {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background-color: white;
+        color: #374151;
+                cursor: pointer;
+                transition: all 0.2s ease;
+    } 
+    .room-btn.active {
+        background-color: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+    }
+    .room-btn:hover {
+        border-color: var(--color-primary);
+    }
+    .property-type-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .property-type-btn {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background-color: white;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+    .property-type-btn.active {
+        background-color: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+    }
+    .property-type-btn:hover {
+        border-color: var(--color-primary);
+    }
+    .form-help {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+    .required {
+                color: #ef4444;
+            }
+        
+        /* Google Maps стили */
+        .map-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .address-autocomplete {
+            position: relative;
+        }
+        
+        .address-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .address-suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .address-suggestion:hover {
+            background-color: #f9fafb;
+        }
+        
+        .address-suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .map-instructions {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .map-instructions i {
+            margin-right: 6px;
+            color: #9ca3af;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="pb-20">
+    <div class="container mx-auto px-4 py-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Создать объявление</h1>
+        
+        <form id="create-property-form" enctype="multipart/form-data">
+            <!-- Основная информация -->
+            <div class="form-section">
+                <div class="form-title">Основная информация</div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Заголовок объявления <span class="required">*</span>
+                    </label>
+                    <input type="text" name="title" class="form-input" 
+                           placeholder="Например: Продается 3-комнатная квартира" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Описание <span class="required">*</span>
+                    </label>
+                    <textarea name="description" class="form-textarea" 
+                              placeholder="Опишите недвижимость подробно..." required></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Категория <span class="required">*</span>
+                    </label>
+                    <select name="category" class="form-select" required>
+                                    <option value="">Выберите категорию</option>
+                        <option value="Продажа">Продажа</option>
+                        <option value="Аренда">Аренда</option>
+                        <option value="Новостройки">Новостройки</option>
+                        <option value="Посуточная">Посуточная аренда</option>
+                        <option value="Коммерческая">Коммерческая недвижимость</option>
+                        <option value="Ипотека">Ипотека</option>
+                                </select>
+                                </div>
+                            </div>
+
+            <!-- Цена и параметры -->
+            <div class="form-section">
+                <div class="form-title">Цена и параметры</div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Цена (СОМ) <span class="required">*</span>
+                    </label>
+                    <input type="number" name="price" class="form-input" 
+                           placeholder="0" min="0" required>
+                            </div>
+
+                            <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Количество комнат
+                    </label>
+                    <div class="room-selector">
+                        <button type="button" class="room-btn" data-rooms="studio">Студия</button>
+                        <button type="button" class="room-btn" data-rooms="1">1</button>
+                        <button type="button" class="room-btn" data-rooms="2">2</button>
+                        <button type="button" class="room-btn" data-rooms="3">3</button>
+                        <button type="button" class="room-btn" data-rooms="4">4</button>
+                        <button type="button" class="room-btn" data-rooms="5">5+</button>
+                    </div>
+                    <input type="hidden" name="rooms" id="rooms-input">
+                </div>
+
+                <!-- Тип квартиры -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Тип квартиры
+                    </label>
+                    <div class="property-type-selector">
+                        <button type="button" class="property-type-btn apartment-type-btn" data-type="secondary">На вторичке</button>
+                        <button type="button" class="property-type-btn apartment-type-btn" data-type="new_building">В новостройке</button>
+                        <button type="button" class="property-type-btn apartment-type-btn" data-type="room">Комната</button>
+                    </div>
+                    <input type="hidden" name="apartment_type" id="apartment-type-input">
+                </div>
+
+                <!-- Тип дома -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Дома и участки
+                    </label>
+                    <div class="property-type-selector">
+                        <button type="button" class="property-type-btn house-type-btn" data-type="house">Дом, дача</button>
+                        <button type="button" class="property-type-btn house-type-btn" data-type="plot">Участок</button>
+                        <button type="button" class="property-type-btn house-type-btn" data-type="part_house">Часть дома</button>
+                    </div>
+                    <input type="hidden" name="house_type" id="house-type-input">
+                </div>
+                
+                <div class="input-group mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Площадь (м²)
+                        </label>
+                        <input type="number" name="area" class="form-input" 
+                               placeholder="0" min="0" step="0.1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Этаж
+                        </label>
+                        <input type="number" name="floor" class="form-input" 
+                               placeholder="0" min="1">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Этажность здания
+                    </label>
+                    <input type="number" name="building_floors" class="form-input" 
+                           placeholder="0" min="1">
+                                </div>
+                            </div>
+
+            <!-- Адрес -->
+            <div class="form-section">
+                <div class="form-title">Адрес</div>
+                
+                                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Город <span class="required">*</span>
+                    </label>
+                    <select name="city" class="form-select" required>
+                        <option value="">Выберите город</option>
+                        <option value="Бишкек">Бишкек</option>
+                        <option value="Ош">Ош</option>
+                        <option value="Джалал-Абад">Джалал-Абад</option>
+                        <option value="Каракол">Каракол</option>
+                        <option value="Токмок">Токмок</option>
+                        <option value="Кара-Балта">Кара-Балта</option>
+                        <option value="Нарын">Нарын</option>
+                        <option value="Талас">Талас</option>
+                        <option value="Баткен">Баткен</option>
+                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Адрес <span class="required">*</span>
+                    </label>
+                    <div class="address-autocomplete">
+                        <input type="text" name="address" id="address-input" class="form-input" 
+                               placeholder="Начните вводить адрес..." required>
+                        <div class="address-suggestions" id="address-suggestions"></div>
+                    </div>
+                    <div class="form-help">Например: ул. Манаса 45, микрорайон Джал</div>
+                    
+                    <!-- Скрытые поля для координат -->
+                    <input type="hidden" name="latitude" id="latitude-input">
+                    <input type="hidden" name="longitude" id="longitude-input">
+                    <input type="hidden" name="formatted_address" id="formatted-address-input">
+                    
+                    <!-- Интерактивная карта -->
+                    <div class="map-container" id="map-container"></div>
+                    <div class="map-instructions">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Перетащите маркер для уточнения местоположения или кликните на карте
+                    </div>
+                            </div>
+                        </div>
+
+            <!-- Дополнительные опции -->
+            <div class="form-section">
+                <div class="form-title">Дополнительные опции</div>
+                
+                <!-- Скрытое поле - автоматически от собственника для мобильных пользователей -->
+                <input type="hidden" name="owner_only" value="true">
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" name="has_balcony" id="has_balcony">
+                    <label for="has_balcony">Балкон</label>
+                            </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" name="has_furniture" id="has_furniture">
+                    <label for="has_furniture">Мебель</label>
+                                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" name="has_renovation" id="has_renovation">
+                    <label for="has_renovation">Ремонт</label>
+                                    </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" name="has_parking" id="has_parking">
+                    <label for="has_parking">Парковка</label>
+                                    </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" name="has_elevator" id="has_elevator">
+                    <label for="has_elevator">Лифт</label>
+                </div>
+                                </div>
+
+            <!-- Фотографии -->
+            <div class="form-section">
+                <div class="form-title">Фотографии</div>
+                
+                <div class="photo-upload" id="photo-upload">
+                    <i class="fas fa-camera text-3xl text-gray-400 mb-2"></i>
+                    <div class="text-gray-600 mb-2">Нажмите или перетащите фото сюда</div>
+                    <div class="text-sm text-gray-500">Максимум 10 фотографий, до 5 МБ каждая</div>
+                    <input type="file" name="photos" id="photos-input" multiple 
+                           accept="image/*" style="display: none;">
+                        </div>
+
+                <div class="photo-preview" id="photo-preview"></div>
+                            </div>
+
+            <!-- 360° Тур -->
+            <div class="form-section">
+                <div class="form-title">360° Панорама (опционально)</div>
+                
+                <div class="checkbox-item mb-4">
+                    <input type="checkbox" name="request_360_tour" id="request_360_tour">
+                    <label for="request_360_tour">Заказать съемку квартиры на 360°</label>
+                </div>
+                
+                <div id="request-tour-info" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800 hidden">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Заказ профессиональной съемки на 360° является дополнительной платной услугой. 
+                    Наш специалист свяжется с вами для уточнения деталей и стоимости.
+                </div>
+            </div>
+
+            <!-- Контактная информация -->
+            <div class="form-section">
+                <div class="form-title">Контактная информация</div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        ФИО
+                    </label>
+                    <input type="text" name="full_name" id="user-fullname" class="form-input bg-gray-100" 
+                           value="{% if user.role.value == 'COMPANY' %}{{ user.company_name or 'Компания' }}{% else %}{{ user.full_name or 'Не указано' }}{% endif %}" readonly>
+                    <div class="form-help">Используется ФИО из вашего профиля</div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Телефон
+                    </label>
+                    <input type="tel" name="phone" id="user-phone" class="form-input bg-gray-100" 
+                           value="{{ user.phone or 'Не указан' }}" readonly>
+                    <div class="form-help">Используется номер телефона из вашего профиля</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                    </label>
+                    <input type="email" name="email" id="user-email" class="form-input bg-gray-100" 
+                           value="{{ user.email or 'Не указан' }}" readonly>
+                    <div class="form-help">Используется email из вашего профиля</div>
+                </div>
+
+            </div>
+
+            <!-- Кнопка отправки -->
+            <div class="form-section">
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    <i class="fas fa-plus mr-2"></i>
+                    Создать объявление
+                </button>
+                                    </div>
+        </form>
+                            </div>
+                        </div>
+
+<!-- Модальное окно успешного создания -->
+<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+        <div class="text-center">
+            <i class="fas fa-check-circle text-green-500 text-4xl mb-4"></i>
+            <h3 class="text-lg font-semibold mb-2">Объявление создано!</h3>
+            <p class="text-gray-600 mb-4">Ваше объявление отправлено на модерацию и будет опубликовано в ближайшее время.</p>
+            <button onclick="closeSuccessModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                Понятно
+            </button>
+                                </div>
+                            </div>
+                        </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgctqtqKOus6A6cDJaOBqsyo4-3r3zuQA&libraries=places&language=ru&region=KG" async defer></script>
+<script>
+    let selectedPhotos = [];
+    let selectedRooms = null;
+    let selectedApartmentType = null;
+    let selectedHouseType = null;
+    
+    // Google Maps переменные
+    let map = null;
+    let marker = null;
+    let autocomplete = null;
+    let geocoder = null;
+    
+    // Координаты городов Кыргызстана
+    const cityCoordinates = {
+        'Бишкек': { lat: 42.8746, lng: 74.5698 },
+        'Ош': { lat: 40.5283, lng: 72.7985 },
+        'Джалал-Абад': { lat: 40.9333, lng: 73.0000 },
+        'Каракол': { lat: 42.4906, lng: 78.3936 },
+        'Токмок': { lat: 42.8421, lng: 75.3015 },
+        'Кара-Балта': { lat: 42.8144, lng: 73.8486 },
+        'Нарын': { lat: 41.4286, lng: 76.0059 },
+        'Талас': { lat: 42.5228, lng: 72.2428 },
+        'Баткен': { lat: 40.0623, lng: 70.8197 }
+    };
+    
+    $(document).ready(function() {
+        // Инициализация обработчиков
+        initPhotoUpload();
+        initRoomSelector();
+        initPropertyTypeSelectors();
+        initFormSubmit();
+        init360TourOptions();
+        
+        // Инициализация Google Maps
+        initGoogleMaps();
+        
+        // Обработчик смены города
+        initCitySelector();
+        
+        // Загружаем данные о погоде и валюте
+        getWeather();
+        getCurrencyRate();
+    });
+    
+    // Инициализация селекторов типов недвижимости
+    function initPropertyTypeSelectors() {
+        // Селектор типа квартиры
+        document.querySelectorAll('.apartment-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Убираем активный класс со всех кнопок типа квартиры
+                document.querySelectorAll('.apartment-type-btn').forEach(b => b.classList.remove('active'));
+                
+                // Добавляем активный класс к выбранной кнопке
+                btn.classList.add('active');
+                
+                // Сохраняем значение
+                selectedApartmentType = btn.dataset.type;
+                document.getElementById('apartment-type-input').value = selectedApartmentType;
+                
+                // Сбрасываем тип дома
+                document.querySelectorAll('.house-type-btn').forEach(b => b.classList.remove('active'));
+                selectedHouseType = null;
+                document.getElementById('house-type-input').value = '';
+            });
+        });
+        
+        // Селектор типа дома
+        document.querySelectorAll('.house-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Убираем активный класс со всех кнопок типа дома
+                document.querySelectorAll('.house-type-btn').forEach(b => b.classList.remove('active'));
+                
+                // Добавляем активный класс к выбранной кнопке
+                btn.classList.add('active');
+                
+                // Сохраняем значение
+                selectedHouseType = btn.dataset.type;
+                document.getElementById('house-type-input').value = selectedHouseType;
+                
+                // Сбрасываем тип квартиры
+                document.querySelectorAll('.apartment-type-btn').forEach(b => b.classList.remove('active'));
+                selectedApartmentType = null;
+                document.getElementById('apartment-type-input').value = '';
+            });
+        });
+    }
+    
+    // Инициализация опций 360° тура (упрощенная версия)
+    function init360TourOptions() {
+        const requestTourCheckbox = $('#request_360_tour');
+        const requestTourInfo = $('#request-tour-info');
+        
+        // При изменении состояния чекбокса
+        requestTourCheckbox.on('change', function() {
+            if (this.checked) {
+                requestTourInfo.slideDown();
+            } else {
+                requestTourInfo.slideUp();
+            }
+        });
+        
+        // Инициализация начального состояния
+        if (requestTourCheckbox.is(':checked')) {
+            requestTourInfo.show();
+        } else {
+            requestTourInfo.hide();
+        }
+    }
+    
+    function initPhotoUpload() {
+        const photoUpload = document.getElementById('photo-upload');
+        const photosInput = document.getElementById('photos-input');
+        const photoPreview = document.getElementById('photo-preview');
+        
+        // Клик по области загрузки
+        photoUpload.addEventListener('click', () => {
+            photosInput.click();
+        });
+        
+        // Обработка выбора файлов
+        photosInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        // Drag & Drop
+        photoUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            photoUpload.classList.add('dragover');
+        });
+        
+        photoUpload.addEventListener('dragleave', () => {
+            photoUpload.classList.remove('dragover');
+        });
+        
+        photoUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            photoUpload.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+    }
+    
+    function handleFiles(files) {
+        for (let file of files) {
+            if (selectedPhotos.length >= 10) {
+                alert('Максимум 10 фотографий');
+                break;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Файл ${file.name} слишком большой (максимум 5 МБ)`);
+                continue;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                alert(`Файл ${file.name} не является изображением`);
+                continue;
+            }
+            
+            selectedPhotos.push(file);
+            
+            // Создаем превью
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Превью">
+                    <button type="button" class="photo-remove" onclick="removePhoto(${selectedPhotos.length - 1})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('photo-preview').appendChild(photoItem);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    function removePhoto(index) {
+        selectedPhotos.splice(index, 1);
+        updatePhotoPreview();
+    }
+    
+    function updatePhotoPreview() {
+        const photoPreview = document.getElementById('photo-preview');
+        photoPreview.innerHTML = '';
+        
+        selectedPhotos.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Превью">
+                    <button type="button" class="photo-remove" onclick="removePhoto(${index})">
+                        <i class="fas fa-times"></i>
+                        </button>
+                `;
+                photoPreview.appendChild(photoItem);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function initRoomSelector() {
+        document.querySelectorAll('.room-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Убираем активный класс со всех кнопок
+                document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+                
+                // Добавляем активный класс к выбранной кнопке
+                btn.classList.add('active');
+                
+                // Сохраняем значение
+                selectedRooms = btn.dataset.rooms;
+                document.getElementById('rooms-input').value = selectedRooms;
+            });
+        });
+    }
+    
+    function initFormSubmit() {
+        document.getElementById('create-property-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Показываем состояние загрузки
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Создание...';
+            
+            try {
+                // Отладочная информация для проверки токена
+                const debugCookieToken = document.cookie.split('; ').find(row => row.startsWith('access_token='));
+                const debugTokenValue = debugCookieToken ? debugCookieToken.split('=')[1] : null;
+                console.log('DEBUG: Cookie token:', debugTokenValue);
+                console.log('DEBUG: All cookies:', document.cookie);
+                
+                // Проверяем наличие обязательных полей
+                const title = document.querySelector('input[name="title"]').value.trim();
+                const description = document.querySelector('textarea[name="description"]').value.trim();
+                const price = document.querySelector('input[name="price"]').value;
+                const address = document.querySelector('input[name="address"]').value.trim();
+                const city = document.querySelector('select[name="city"]').value;
+                const category = document.querySelector('select[name="category"]').value;
+                
+                if (!title) {
+                    alert('Укажите заголовок объявления');
+                    return;
+                }
+                
+                if (!description) {
+                    alert('Укажите описание объявления');
+                    return;
+                }
+                
+                if (!price || price <= 0) {
+                    alert('Укажите корректную цену');
+                    return;
+                }
+                
+                if (!address) {
+                    alert('Укажите адрес объекта');
+                    return;
+                }
+                
+                if (!city) {
+                    alert('Выберите город');
+                    return;
+                }
+                
+                if (!category) {
+                    alert('Выберите категорию');
+                    return;
+                }
+                
+                if (selectedPhotos.length < 2) {
+                    alert('Загрузите минимум 2 фотографии');
+                    return;
+                }
+                
+                const formData = new FormData();
+                
+                // Основные поля
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('price', price);
+                formData.append('address', address);
+                formData.append('city', city);
+                formData.append('category', category);
+                
+                // Дополнительные параметры
+                const area = document.querySelector('input[name="area"]').value;
+                if (area) formData.append('area', area);
+                
+                const floor = document.querySelector('input[name="floor"]').value;
+                if (floor) formData.append('floor', floor);
+                
+                const buildingFloors = document.querySelector('input[name="building_floors"]').value;
+                if (buildingFloors) formData.append('building_floors', buildingFloors);
+                
+                // Количество комнат
+                if (selectedRooms) {
+                    formData.append('rooms', selectedRooms);
+                }
+                
+                // Типы недвижимости  
+                if (selectedApartmentType) {
+                    formData.append('apartment_type', selectedApartmentType);
+                }
+                if (selectedHouseType) {
+                    formData.append('house_type', selectedHouseType);
+                }
+                
+                // Координаты
+                const latitude = document.getElementById('latitude-input').value;
+                const longitude = document.getElementById('longitude-input').value;
+                const formattedAddress = document.getElementById('formatted-address-input').value;
+                
+                if (latitude && longitude) {
+                    formData.append('latitude', latitude);
+                    formData.append('longitude', longitude);
+                }
+                if (formattedAddress) {
+                    formData.append('formatted_address', formattedAddress);
+                }
+                
+                // Дополнительные опции (чекбоксы)
+                const checkboxes = [
+                    'has_balcony', 'has_furniture', 'has_renovation', 
+                    'has_parking', 'has_elevator'
+                ];
+                
+                checkboxes.forEach(checkboxName => {
+                    const checkbox = document.querySelector(`input[name="${checkboxName}"]`);
+                    if (checkbox) {
+                        formData.append(checkboxName, checkbox.checked);
+                    }
+                });
+                
+                // 360° тур
+                const request360Tour = document.querySelector('input[name="request_360_tour"]');
+                if (request360Tour && request360Tour.checked) {
+                    formData.append('request_360_tour', 'true');
+                }
+                
+                // Контактная информация
+                const fullName = document.querySelector('input[name="full_name"]').value;
+                const phone = document.querySelector('input[name="phone"]').value;
+                const email = document.querySelector('input[name="email"]').value;
+                
+                formData.append('full_name', fullName || '');
+                formData.append('phone', phone || '');
+                formData.append('email', email || '');
+                
+                // Добавляем фотографии
+                selectedPhotos.forEach((photo, index) => {
+                    formData.append('photos', photo);
+                });
+                
+                console.log('Отправляем данные формы...');
+                
+                // Получаем токен из cookies для заголовка Authorization
+                let authHeaders = {};
+                const authCookieToken = document.cookie.split('; ').find(row => row.startsWith('access_token='));
+                if (authCookieToken) {
+                    const tokenValue = authCookieToken.split('=')[1];
+                    authHeaders['Authorization'] = `Bearer ${tokenValue}`;
+                    console.log('DEBUG: Добавлен заголовок Authorization:', authHeaders['Authorization']);
+                }
+                
+                // Отправляем запрос
+                const response = await fetch('/api/v1/properties/with-media', {
+                    method: 'POST',
+                    headers: authHeaders,
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Объявление создано:', result);
+                    showSuccessModal();
+                } else {
+                    const error = await response.json();
+                    console.error('Ошибка сервера:', error);
+                    alert('Ошибка при создании объявления: ' + (error.detail || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при создании объявления. Проверьте подключение к интернету.');
+            } finally {
+                // Восстанавливаем кнопку
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    }
+    
+    function showSuccessModal() {
+        document.getElementById('success-modal').classList.remove('hidden');
+    }
+    
+    function closeSuccessModal() {
+        document.getElementById('success-modal').classList.add('hidden');
+        // Перенаправляем на страницу профиля
+        window.location.href = '/mobile/profile';
+    }
+    
+    // Google Maps функции
+    function initGoogleMaps() {
+        // Ждем загрузки Google Maps API
+        if (typeof google === 'undefined') {
+            setTimeout(initGoogleMaps, 100);
+            return;
+        }
+        
+        // Инициализация geocoder
+        geocoder = new google.maps.Geocoder();
+        
+        // Определяем начальный центр карты
+        const citySelect = document.querySelector('select[name="city"]');
+        const selectedCity = citySelect ? citySelect.value : 'Бишкек';
+        const initialCenter = cityCoordinates[selectedCity] || cityCoordinates['Бишкек'];
+        
+        // Создание карты
+        map = new google.maps.Map(document.getElementById('map-container'), {
+            zoom: 12,
+            center: initialCenter,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false
+        });
+        
+        // Создание маркера
+        marker = new google.maps.Marker({
+            position: initialCenter,
+            map: map,
+            draggable: true,
+            title: 'Местоположение объекта'
+        });
+        
+        // Обработчик перетаскивания маркера
+        marker.addListener('dragend', function() {
+            const position = marker.getPosition();
+            updateLocationData(position.lat(), position.lng());
+        });
+        
+        // Обработчик клика по карте
+        map.addListener('click', function(event) {
+            const position = event.latLng;
+            marker.setPosition(position);
+            updateLocationData(position.lat(), position.lng());
+        });
+        
+        // Инициализация автокомплита
+        initAddressAutocomplete();
+    }
+    
+    function initAddressAutocomplete() {
+        const addressInput = document.getElementById('address-input');
+        const suggestionsContainer = document.getElementById('address-suggestions');
+        
+        // Создание автокомплита для Кыргызстана
+        autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            types: ['address'],
+            componentRestrictions: { country: 'kg' },
+            fields: ['address_components', 'formatted_address', 'geometry', 'name']
+        });
+        
+        // Устанавливаем bounds для автокомплита на основе выбранного города
+        updateAutocompleteBounds();
+        
+        // Обработчик выбора места
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            
+            if (!place.geometry) {
+                console.log("Место не найдено: " + place.name);
+                return;
+            }
+            
+            // Принудительно обновляем поле адреса
+            const addressInput = document.getElementById('address-input');
+            if (addressInput && place.formatted_address) {
+                addressInput.value = place.formatted_address;
+                
+                // Принудительно вызываем события для обновления
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            
+            // Обновляем карту и маркер
+            const location = place.geometry.location;
+            map.setCenter(location);
+            map.setZoom(16);
+            marker.setPosition(location);
+            
+            // Обновляем данные
+            updateLocationData(location.lat(), location.lng(), place.formatted_address);
+            
+            // Автоматически определяем и устанавливаем город
+            updateCityFromPlace(place);
+        });
+        
+        // Альтернативный автокомплит через ввод
+        let searchTimeout;
+        addressInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value;
+            
+            if (query.length < 3) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                searchAddresses(query);
+            }, 300);
+        });
+        
+        // Скрытие подсказок при клике вне
+        document.addEventListener('click', function(e) {
+            if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
+    
+    function searchAddresses(query) {
+        const request = {
+            query: query + ', Кыргызстан',
+            fields: ['name', 'formatted_address', 'geometry']
+        };
+        
+        const service = new google.maps.places.PlacesService(map);
+        service.textSearch(request, function(results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                displayAddressSuggestions(results.slice(0, 5)); // Показываем первые 5 результатов
+            }
+        });
+    }
+    
+    function displayAddressSuggestions(places) {
+        const suggestionsContainer = document.getElementById('address-suggestions');
+        suggestionsContainer.innerHTML = '';
+        
+        places.forEach(function(place) {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'address-suggestion';
+            suggestion.textContent = place.formatted_address;
+            
+            suggestion.addEventListener('click', function() {
+                selectAddress(place);
+                suggestionsContainer.style.display = 'none';
+            });
+            
+            suggestionsContainer.appendChild(suggestion);
+        });
+        
+        suggestionsContainer.style.display = 'block';
+    }
+    
+    function selectAddress(place) {
+        const addressInput = document.getElementById('address-input');
+        
+        // Принудительно обновляем поле ввода
+        if (addressInput) {
+            addressInput.value = place.formatted_address || place.name || '';
+            
+            // Принудительно вызываем события для обновления
+            addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+            addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        
+        // Обновляем карту
+        const location = place.geometry.location;
+        map.setCenter(location);
+        map.setZoom(16);
+        marker.setPosition(location);
+        
+        // Обновляем данные
+        updateLocationData(location.lat(), location.lng(), place.formatted_address);
+        
+        // Автоматически определяем и устанавливаем город
+        updateCityFromPlace(place);
+    }
+    
+    function updateLocationData(lat, lng, formattedAddress = null) {
+        // Обновляем скрытые поля
+        document.getElementById('latitude-input').value = lat;
+        document.getElementById('longitude-input').value = lng;
+        
+        if (formattedAddress) {
+            document.getElementById('formatted-address-input').value = formattedAddress;
+            
+            // Обновляем основное поле адреса если оно пустое или если адрес отличается
+            const addressInput = document.getElementById('address-input');
+            if (addressInput && (!addressInput.value || addressInput.value !== formattedAddress)) {
+                addressInput.value = formattedAddress;
+                
+                // Принудительно вызываем события для обновления
+                addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        } else {
+            // Получаем адрес по координатам
+            geocoder.geocode({ location: { lat: lat, lng: lng } }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    const foundAddress = results[0].formatted_address;
+                    document.getElementById('formatted-address-input').value = foundAddress;
+                    
+                    // Обновляем поле адреса если оно пустое
+                    const addressInput = document.getElementById('address-input');
+                    if (addressInput && !addressInput.value) {
+                        addressInput.value = foundAddress;
+                        
+                        // Принудительно вызываем события для обновления
+                        addressInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        addressInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
+            });
+        }
+    }
+    
+    function updateCityFromPlace(place) {
+        // Пытаемся определить город из компонентов адреса
+        const addressComponents = place.address_components;
+        const citySelect = document.querySelector('select[name="city"]');
+        
+        if (!addressComponents || !citySelect) return;
+        
+        // Список всех возможных названий городов для сопоставления
+        const cityMappings = {
+            'Бишкек': ['бишкек', 'bishkek', 'бішкек'],
+            'Ош': ['ош', 'osh', 'өш'],
+            'Джалал-Абад': ['джалал-абад', 'джалалабад', 'jalal-abad', 'jalalabad', 'жалал-абад'],
+            'Каракол': ['каракол', 'karakol', 'караколь'],
+            'Токмок': ['токмок', 'tokmok', 'токмак'],
+            'Кара-Балта': ['кара-балта', 'караbalта', 'kara-balta', 'karabalta'],
+            'Нарын': ['нарын', 'naryn'],
+            'Талас': ['талас', 'talas'],
+            'Баткен': ['баткен', 'batken']
+        };
+        
+        let detectedCity = null;
+        
+        // Ищем город в разных типах компонентов адреса
+        const componentTypes = ['locality', 'administrative_area_level_2', 'administrative_area_level_1', 'sublocality'];
+        
+        for (let component of addressComponents) {
+            // Проверяем, содержит ли компонент тип, который может указывать на город
+            const hasRelevantType = component.types.some(type => componentTypes.includes(type));
+            
+            if (hasRelevantType) {
+                const componentName = component.long_name.toLowerCase();
+                console.log('Проверяем компонент:', componentName, 'типы:', component.types);
+                
+                // Ищем соответствие в наших городах
+                for (let [cityKey, cityAliases] of Object.entries(cityMappings)) {
+                    if (cityAliases.some(alias => 
+                        componentName.includes(alias.toLowerCase()) || 
+                        alias.toLowerCase().includes(componentName)
+                    )) {
+                        detectedCity = cityKey;
+                        console.log('Найден город:', detectedCity);
+                        break;
+                    }
+                }
+                
+                if (detectedCity) break;
+            }
+        }
+        
+        // Если город не найден в компонентах, пытаемся извлечь из полного адреса
+        if (!detectedCity && place.formatted_address) {
+            const fullAddress = place.formatted_address.toLowerCase();
+            console.log('Ищем город в полном адресе:', fullAddress);
+            
+            for (let [cityKey, cityAliases] of Object.entries(cityMappings)) {
+                if (cityAliases.some(alias => fullAddress.includes(alias.toLowerCase()))) {
+                    detectedCity = cityKey;
+                    console.log('Найден город в полном адресе:', detectedCity);
+                    break;
+                }
+            }
+        }
+        
+        // Устанавливаем найденный город
+        if (detectedCity) {
+            const previousCity = citySelect.value;
+            citySelect.value = detectedCity;
+            
+            // Обновляем область поиска автокомплита для нового города
+            updateAutocompleteBounds();
+            
+            // Показываем уведомление если город изменился
+            if (previousCity !== detectedCity) {
+                console.log(`Город автоматически изменен с "${previousCity}" на "${detectedCity}"`);
+                showCityChangeNotification(detectedCity, true); // true означает автоматическое изменение
+            }
+        } else {
+            console.log('Город не удалось определить автоматически');
+        }
+    }
+    
+    // Функция обновления области поиска автокомплита
+    function updateAutocompleteBounds() {
+        if (!autocomplete || !map) return;
+        
+        const citySelect = document.querySelector('select[name="city"]');
+        const selectedCity = citySelect ? citySelect.value : 'Бишкек';
+        const cityCoords = cityCoordinates[selectedCity];
+        
+        if (cityCoords) {
+            // Создаем область поиска вокруг выбранного города (радиус примерно 30км)
+            const bounds = new google.maps.LatLngBounds();
+            const center = new google.maps.LatLng(cityCoords.lat, cityCoords.lng);
+            
+            // Расширяем границы на ~0.3 градуса (примерно 30км)
+            bounds.extend(new google.maps.LatLng(cityCoords.lat - 0.3, cityCoords.lng - 0.3));
+            bounds.extend(new google.maps.LatLng(cityCoords.lat + 0.3, cityCoords.lng + 0.3));
+            
+            autocomplete.setBounds(bounds);
+        }
+    }
+    
+    // Инициализация обработчика смены города
+    function initCitySelector() {
+        const citySelect = document.querySelector('select[name="city"]');
+        
+        citySelect.addEventListener('change', function() {
+            const selectedCity = this.value;
+            if (selectedCity && cityCoordinates[selectedCity]) {
+                changeCityOnMap(selectedCity);
+            }
+        });
+    }
+    
+    // Функция смены центра карты при выборе города
+    function changeCityOnMap(cityName) {
+        if (!map || !marker) return;
+        
+        const cityCoords = cityCoordinates[cityName];
+        if (!cityCoords) return;
+        
+        // Очищаем поле адреса при смене города
+        const addressInput = document.getElementById('address-input');
+        if (addressInput) {
+            addressInput.value = '';
+            addressInput.placeholder = `Введите адрес в городе ${cityName}...`;
+        }
+        
+        // Очищаем скрытые поля
+        document.getElementById('latitude-input').value = '';
+        document.getElementById('longitude-input').value = '';
+        document.getElementById('formatted-address-input').value = '';
+        
+        // Плавно перемещаем карту к новому городу
+        map.panTo(cityCoords);
+        map.setZoom(12);
+        
+        // Перемещаем маркер в центр нового города
+        marker.setPosition(cityCoords);
+        
+        // Обновляем область поиска автокомплита для нового города
+        updateAutocompleteBounds();
+        
+        // Показываем уведомление пользователю
+        console.log(`Карта перемещена к городу: ${cityName}`);
+        
+        // Показать toast уведомление
+        showCityChangeNotification(cityName);
+    }
+    
+    // Функция показа уведомления о смене города (опционально)
+    function showCityChangeNotification(cityName, automatic = false) {
+        // Создаем временное уведомление
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: ${automatic ? '#3b82f6' : '#10b981'};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+        `;
+        
+        const icon = automatic ? 'fas fa-magic' : 'fas fa-map-marker-alt';
+        const message = automatic ? 
+            `Город автоматически определен: ${cityName}` : 
+            `Карта перемещена к городу: ${cityName}`;
+            
+        notification.innerHTML = `<i class="${icon} mr-2"></i>${message}`;
+        
+        document.body.appendChild(notification);
+        
+        // Убираем уведомление через 3 секунды
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}

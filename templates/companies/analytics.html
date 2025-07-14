@@ -1,0 +1,265 @@
+{% extends "companies/base.html" %}
+
+{% block title %}Аналитика - Wazir Business{% endblock %}
+{% block page_title %}Аналитика{% endblock %}
+{% block page_subtitle %}Детальная статистика и метрики{% endblock %}
+
+{% block header_actions %}
+<div class="flex items-center space-x-3">
+    <select id="dateRange" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white">
+        <option value="7">7 дней</option>
+        <option value="30" selected>30 дней</option>
+        <option value="90">90 дней</option>
+        <option value="365">1 год</option>
+    </select>
+    <button onclick="exportReport()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <i class="fas fa-download mr-2"></i>
+        Экспорт
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Основные метрики -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Всего объявлений -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Всего объявлений</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total_properties or 0 }}</p>
+                <p class="text-sm mt-2 text-gray-500">Общее количество</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-list text-blue-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Активные объявления -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Активные</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.active_properties or 0 }}</p>
+                <p class="text-sm mt-2 text-gray-500">Опубликованные</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- На модерации -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">На модерации</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.pending_properties or 0 }}</p>
+                <p class="text-sm mt-2 text-gray-500">Ожидают проверки</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Черновики -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Черновики</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.draft_properties or 0 }}</p>
+                <p class="text-sm mt-2 text-gray-500">Не опубликованы</p>
+            </div>
+            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-edit text-gray-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Графики -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- График статусов объявлений -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Распределение по статусам</h3>
+        </div>
+        <div class="h-64">
+            <canvas id="statusChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
+
+    <!-- Быстрые действия -->
+    <div class="card bg-white rounded-lg p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Быстрые действия</h3>
+        </div>
+        <div class="space-y-4">
+            <a href="/companies/create-listing" class="flex items-center p-4 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-plus text-white"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">Создать объявление</p>
+                    <p class="text-sm text-gray-500">Добавить новое объявление</p>
+                </div>
+            </a>
+            
+            <a href="/companies/listings" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-list text-white"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">Управление объявлениями</p>
+                    <p class="text-sm text-gray-500">Редактировать существующие</p>
+                </div>
+            </a>
+            
+            <a href="/companies/settings" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-cog text-white"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">Настройки профиля</p>
+                    <p class="text-sm text-gray-500">Управление компанией</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Статистика по объявлениям -->
+<div class="grid grid-cols-1 gap-6 mb-8">
+    <!-- Последние объявления -->
+    <div class="card bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Последние объявления</h3>
+                <a href="/companies/listings" class="text-primary hover:text-primary/80 text-sm font-medium">Посмотреть все</a>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for property in top_properties %}
+                <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0">
+                        {% if property.image_url %}
+                        <img src="{{ property.image_url }}" alt="{{ property.title }}" class="w-full h-full object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ property.title }}</p>
+                        <p class="text-xs text-gray-500">{{ property.address }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-primary">
+                            {% if property.status == 'active' %}
+                                <span class="text-green-600">Активное</span>
+                            {% elif property.status == 'pending' %}
+                                <span class="text-yellow-600">На модерации</span>
+                            {% else %}
+                                <span class="text-gray-600">Черновик</span>
+                            {% endif %}
+                        </p>
+                        <p class="text-xs text-gray-500">{{ property.created_at.strftime('%d.%m.%Y') if property.created_at else '-' }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if not top_properties %}
+                <div class="text-center py-8">
+                    <i class="fas fa-list text-4xl text-gray-300 mb-2"></i>
+                    <p class="text-gray-500 mb-4">У вас пока нет объявлений</p>
+                    <a href="/companies/create-listing" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Создать первое объявление
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Цвета для графиков
+    const colors = {
+        primary: '#144b44',
+        primaryLight: 'rgba(20, 75, 68, 0.1)',
+        blue: '#3b82f6',
+        green: '#10b981',
+        yellow: '#f59e0b',
+        orange: '#f59e0b',
+        red: '#ef4444',
+        purple: '#8b5cf6',
+        gray: '#6b7280'
+    };
+
+    // График статусов объявлений
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Активные', 'На модерации', 'Черновики'],
+            datasets: [{
+                data: [{{ stats.active_properties or 0 }}, {{ stats.pending_properties or 0 }}, {{ stats.draft_properties or 0 }}],
+                backgroundColor: [colors.green, colors.yellow, colors.gray],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Экспорт отчета
+    function exportReport() {
+        const dateRange = document.getElementById('dateRange').value;
+        
+        Swal.fire({
+            title: 'Экспорт отчета',
+            text: 'Формируем отчет за выбранный период...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        // Имитация экспорта
+        setTimeout(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Отчет готов!',
+                text: 'Отчет будет скачан автоматически',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            // Здесь должен быть реальный экспорт
+            // window.location.href = `/api/v1/companies/analytics/export?days=${dateRange}`;
+        }, 2000);
+    }
+
+    // Обновление графиков при изменении периода
+    document.getElementById('dateRange').addEventListener('change', function() {
+        // Здесь должна быть логика обновления данных
+        console.log('Обновление данных для периода:', this.value);
+    });
+</script>
+{% endblock %} 

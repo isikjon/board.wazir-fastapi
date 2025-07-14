@@ -1,0 +1,719 @@
+{% extends "companies/base.html" %}
+
+{% block title %}Массовая загрузка - Wazir Business{% endblock %}
+{% block page_title %}Массовая загрузка{% endblock %}
+{% block page_subtitle %}Загрузка объявлений из Excel файла{% endblock %}
+
+{% block header_actions %}
+<a href="/companies/bulk-upload/template" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium flex items-center">
+    <i class="fas fa-download mr-2"></i>
+    Скачать шаблон
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Инструкция -->
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+        </div>
+        <div class="ml-3">
+            <h3 class="text-lg font-medium text-blue-900 mb-2">Как загрузить объявления:</h3>
+            <ol class="list-decimal list-inside text-sm text-blue-800 space-y-1">
+                <li>Скачайте шаблон Excel файла</li>
+                <li>Заполните данные на русском языке (максимум 10 объявлений)</li>
+                <li>Удобства указывайте как "да" или "нет"</li>
+                <li>Цену можно указывать в любом формате: 3800000, 3.800.000, 3,800,000</li>
+                <li>Загрузите заполненный файл</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<!-- Загрузка файла -->
+<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Загрузить Excel файл</h3>
+    
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <div class="mb-4">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+            </div>
+            <p class="text-lg font-medium text-gray-900 mb-2">Перетащите файл сюда или выберите</p>
+            <p class="text-sm text-gray-500 mb-4">Поддерживаются файлы .xlsx и .xls</p>
+            <input type="file" id="fileInput" name="file" accept=".xlsx,.xls" class="hidden">
+            <button type="button" onclick="document.getElementById('fileInput').click()" 
+                    class="btn-primary px-6 py-2 rounded-lg text-white font-medium">
+                Выбрать файл
+            </button>
+        </div>
+        
+        <div id="selectedFile" class="hidden mt-4">
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-file-excel text-green-600 mr-2"></i>
+                    <span id="fileName" class="text-sm font-medium"></span>
+                </div>
+                <button type="button" id="uploadBtn" class="btn-primary px-4 py-2 rounded text-white text-sm">
+                    Загрузить
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Результат загрузки -->
+<div id="uploadResult" class="hidden mb-6"></div>
+
+<!-- Черновики -->
+{% if draft_properties %}
+<div class="bg-white rounded-lg border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Черновики ({{ draft_properties|length }})</h3>
+        <p class="text-sm text-gray-500">Объявления готовы к редактированию и отправке на модерацию</p>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Название</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Цена</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Адрес</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Создано</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Действия</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for property in draft_properties %}
+                <tr>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">{{ property.title }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-900">{{ "{:,.0f}".format(property.price) }} сом</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-500">{{ property.address }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-500">{{ property.created_at.strftime('%d.%m.%Y') }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="editProperty({{ property.id }})" 
+                                    class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-edit mr-1"></i>Редактировать
+                            </button>
+                            <button onclick="uploadPhotos({{ property.id }})" 
+                                    class="text-green-600 hover:text-green-800 text-sm">
+                                <i class="fas fa-camera mr-1"></i>Фото
+                            </button>
+                            <button onclick="upload360({{ property.id }})" 
+                                    class="text-purple-600 hover:text-purple-800 text-sm">
+                                <i class="fas fa-vr-cardboard mr-1"></i>360°
+                            </button>
+                            <button onclick="submitToModeration({{ property.id }})" 
+                                    class="text-orange-600 hover:text-orange-800 text-sm">
+                                <i class="fas fa-check mr-1"></i>На модерацию
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-12">
+    <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">Нет черновиков</h3>
+    <p class="text-gray-500">Загрузите Excel файл для создания объявлений</p>
+</div>
+{% endif %}
+
+<!-- Модальные окна -->
+
+<!-- Модальное окно для редактирования объявления -->
+<div id="editPropertyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b pb-3 mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Редактирование объявления</h3>
+            <button onclick="closeModal('editPropertyModal')" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <input type="hidden" id="edit-property-id" value="">
+            
+            <!-- Основная информация -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-md font-medium text-gray-900 mb-3">Основная информация</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-1">Название *</label>
+                        <input type="text" id="edit-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-price" class="block text-sm font-medium text-gray-700 mb-1">Цена (сом) *</label>
+                        <input type="number" id="edit-price" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-category" class="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+                        <select id="edit-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                            <option value="">Выберите категорию</option>
+                            <option value="1">Продажа</option>
+                            <option value="2">Аренда</option>
+                            <option value="3">Новостройки</option>
+                            <option value="4">Коммерческая</option>
+                            <option value="5">Ипотека</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-type" class="block text-sm font-medium text-gray-700 mb-1">Тип недвижимости</label>
+                        <select id="edit-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                            <option value="квартира">Квартира</option>
+                            <option value="дом">Дом</option>
+                            <option value="коммерческая">Коммерческая</option>
+                            <option value="участок">Участок</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label for="edit-description" class="block text-sm font-medium text-gray-700 mb-1">Описание *</label>
+                    <textarea id="edit-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label for="edit-address" class="block text-sm font-medium text-gray-700 mb-1">Адрес *</label>
+                        <input type="text" id="edit-address" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-city" class="block text-sm font-medium text-gray-700 mb-1">Город</label>
+                        <input type="text" id="edit-city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Характеристики -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-md font-medium text-gray-900 mb-3">Характеристики</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="edit-area" class="block text-sm font-medium text-gray-700 mb-1">Площадь (м²)</label>
+                        <input type="number" id="edit-area" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-rooms" class="block text-sm font-medium text-gray-700 mb-1">Комнаты</label>
+                        <select id="edit-rooms" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                            <option value="">Выберите</option>
+                            <option value="1">1 комната</option>
+                            <option value="2">2 комнаты</option>
+                            <option value="3">3 комнаты</option>
+                            <option value="4">4 комнаты</option>
+                            <option value="5">5+ комнат</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-floor" class="block text-sm font-medium text-gray-700 mb-1">Этаж</label>
+                        <input type="number" id="edit-floor" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label for="edit-building-floors" class="block text-sm font-medium text-gray-700 mb-1">Этажность здания</label>
+                        <input type="number" id="edit-building-floors" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-bathroom-type" class="block text-sm font-medium text-gray-700 mb-1">Санузел</label>
+                        <select id="edit-bathroom-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                            <option value="">Выберите</option>
+                            <option value="раздельный">Раздельный</option>
+                            <option value="совмещенный">Совмещенный</option>
+                            <option value="несколько">Несколько</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Удобства -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-md font-medium text-gray-900 mb-3">Дополнительные удобства</h4>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-balcony" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Балкон</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-furniture" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Мебель</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-renovation" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Ремонт</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-parking" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Парковка</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-elevator" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Лифт</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-security" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Охрана</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-internet" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Интернет</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-air-conditioning" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Кондиционер</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-heating" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Отопление</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-yard" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Двор/сад</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-pool" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Бассейн</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="edit-has-gym" class="rounded border-gray-300 text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-700">Спортзал</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+            <button onclick="closeModal('editPropertyModal')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none transition-colors">
+                Отмена
+            </button>
+            <button onclick="savePropertyChanges()" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark focus:outline-none transition-colors font-medium">
+                Сохранить изменения
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для загрузки 360° панорамы -->
+<div id="upload360Modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg relative">
+            <!-- Заголовок модального окна -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <h2 class="text-xl font-semibold">Загрузка 360° панорамы</h2>
+                <button onclick="closeModal('upload360Modal')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Содержимое модального окна -->
+            <div class="p-4">
+                <!-- Переключатель между загрузкой файла и URL -->
+                <div class="mb-4">
+                    <div class="flex border-b">
+                        <button id="upload-tab" onclick="switchUploadMode('file')" class="flex-1 py-2 px-4 text-center border-b-2 border-blue-500 text-blue-600 font-medium">
+                            Загрузить файл
+                        </button>
+                        <button id="url-tab" onclick="switchUploadMode('url')" class="flex-1 py-2 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                            Указать URL
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Форма загрузки файла -->
+                <div id="file-upload-form" class="upload-form">
+                    <input type="hidden" id="property-id-for-360" name="property_id" value="">
+                    
+                    <div class="mb-4">
+                        <label for="panorama-file" class="block text-sm font-medium text-gray-700 mb-2">
+                            Выберите 360° изображение
+                        </label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="panorama-file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <span>Загрузить файл</span>
+                                        <input id="panorama-file" name="panorama-file" type="file" class="sr-only" accept="image/*" />
+                                    </label>
+                                    <p class="pl-1">или перетащите сюда</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, JPEG до 100MB</p>
+                                <p class="text-xs text-gray-500">Соотношение сторон должно быть примерно 2:1</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Форма URL -->
+                <div id="url-upload-form" class="upload-form hidden">
+                    <div class="mb-4">
+                        <label for="tour-360-url" class="block text-sm font-medium text-gray-700 mb-1">URL 360° панорамы</label>
+                        <input type="text" id="tour-360-url" name="tour_360_url" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="https://kuula.co/share/xxxxxxx">
+                        <p class="text-sm text-gray-500 mt-1">Вставьте ссылку на 360° панораму</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t p-4 flex justify-end gap-2">
+                <button onclick="closeModal('upload360Modal')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none">Отмена</button>
+                <button onclick="save360Data()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для фотографий -->
+<div id="photosModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg w-full max-w-2xl">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold">Загрузка фотографий</h3>
+                <button onclick="closeModal('photosModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <input type="hidden" id="photos-property-id" value="">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input type="file" id="photos-input" multiple accept="image/*" class="hidden">
+                    <div onclick="document.getElementById('photos-input').click()" class="cursor-pointer">
+                        <i class="fas fa-camera text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600">Нажмите для выбора фотографий</p>
+                        <p class="text-sm text-gray-400 mt-1">Максимум 10 фотографий</p>
+                    </div>
+                </div>
+                <div id="photos-preview" class="mt-4 grid grid-cols-3 gap-2 hidden"></div>
+            </div>
+            <div class="border-t p-4 flex justify-end gap-2">
+                <button onclick="closeModal('photosModal')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Отмена</button>
+                <button onclick="uploadPhotos()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Загрузить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPropertyId = null;
+
+// Обработка выбора файла
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('selectedFile').classList.remove('hidden');
+    }
+});
+
+// Загрузка файла
+document.getElementById('uploadBtn').addEventListener('click', function() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Выберите файл');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Показываем индикатор загрузки
+    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Загружаем...';
+    this.disabled = true;
+    
+    fetch('/companies/bulk-upload/properties', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        showUploadResult(data);
+        if (data.success) {
+            setTimeout(() => location.reload(), 2000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showUploadResult({success: false, message: 'Ошибка загрузки файла'});
+    })
+    .finally(() => {
+        this.innerHTML = 'Загрузить';
+        this.disabled = false;
+    });
+});
+
+function showUploadResult(data) {
+    const resultDiv = document.getElementById('uploadResult');
+    let html = '';
+    
+    if (data.success) {
+        html = `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    <span class="text-green-800">${data.message}</span>
+                </div>
+        `;
+        
+        if (data.errors && data.errors.length > 0) {
+            html += `
+                <div class="mt-3">
+                    <p class="text-sm text-orange-700 font-medium mb-2">Предупреждения:</p>
+                    <ul class="list-disc list-inside text-sm text-orange-600">
+            `;
+            data.errors.forEach(error => {
+                html += `<li>${error}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        html += '</div>';
+    } else {
+        html = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                    <span class="text-red-800">${data.message}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    resultDiv.innerHTML = html;
+    resultDiv.classList.remove('hidden');
+}
+
+function editProperty(propertyId) {
+    // Получаем данные объявления
+    fetch(`/api/v1/companies/properties/${propertyId}`)
+        .then(response => response.json())
+        .then(property => {
+            // Заполняем форму редактирования
+            document.getElementById('edit-property-id').value = property.id;
+            document.getElementById('edit-title').value = property.title || '';
+            document.getElementById('edit-description').value = property.description || '';
+            document.getElementById('edit-price').value = property.price || '';
+            document.getElementById('edit-address').value = property.address || '';
+            document.getElementById('edit-city').value = property.city || '';
+            document.getElementById('edit-category').value = property.category_id || '';
+            document.getElementById('edit-type').value = property.type || '';
+            document.getElementById('edit-area').value = property.area || '';
+            document.getElementById('edit-rooms').value = property.rooms || '';
+            document.getElementById('edit-floor').value = property.floor || '';
+            document.getElementById('edit-building-floors').value = property.building_floors || '';
+            document.getElementById('edit-bathroom-type').value = property.bathroom_type || '';
+            
+            // Удобства
+            document.getElementById('edit-has-balcony').checked = property.has_balcony || false;
+            document.getElementById('edit-has-furniture').checked = property.has_furniture || false;
+            document.getElementById('edit-has-renovation').checked = property.has_renovation || false;
+            document.getElementById('edit-has-parking').checked = property.has_parking || false;
+            document.getElementById('edit-has-elevator').checked = property.has_elevator || false;
+            document.getElementById('edit-has-security').checked = property.has_security || false;
+            document.getElementById('edit-has-internet').checked = property.has_internet || false;
+            document.getElementById('edit-has-air-conditioning').checked = property.has_air_conditioning || false;
+            document.getElementById('edit-has-heating').checked = property.has_heating || false;
+            document.getElementById('edit-has-yard').checked = property.has_yard || false;
+            document.getElementById('edit-has-pool').checked = property.has_pool || false;
+            document.getElementById('edit-has-gym').checked = property.has_gym || false;
+            
+            // Открываем модальное окно
+            document.getElementById('editPropertyModal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Ошибка загрузки данных объявления');
+        });
+}
+
+function savePropertyChanges() {
+    const propertyId = document.getElementById('edit-property-id').value;
+    const formData = new FormData();
+    
+    // Основные данные
+    formData.append('title', document.getElementById('edit-title').value);
+    formData.append('description', document.getElementById('edit-description').value);
+    formData.append('price', document.getElementById('edit-price').value);
+    formData.append('address', document.getElementById('edit-address').value);
+    formData.append('city', document.getElementById('edit-city').value);
+    formData.append('category_id', document.getElementById('edit-category').value);
+    formData.append('type', document.getElementById('edit-type').value);
+    formData.append('area', document.getElementById('edit-area').value);
+    formData.append('rooms', document.getElementById('edit-rooms').value);
+    formData.append('floor', document.getElementById('edit-floor').value);
+    formData.append('building_floors', document.getElementById('edit-building-floors').value);
+    formData.append('bathroom_type', document.getElementById('edit-bathroom-type').value);
+    
+    // Удобства
+    formData.append('has_balcony', document.getElementById('edit-has-balcony').checked);
+    formData.append('has_furniture', document.getElementById('edit-has-furniture').checked);
+    formData.append('has_renovation', document.getElementById('edit-has-renovation').checked);
+    formData.append('has_parking', document.getElementById('edit-has-parking').checked);
+    formData.append('has_elevator', document.getElementById('edit-has-elevator').checked);
+    formData.append('has_security', document.getElementById('edit-has-security').checked);
+    formData.append('has_internet', document.getElementById('edit-has-internet').checked);
+    formData.append('has_air_conditioning', document.getElementById('edit-has-air-conditioning').checked);
+    formData.append('has_heating', document.getElementById('edit-has-heating').checked);
+    formData.append('has_yard', document.getElementById('edit-has-yard').checked);
+    formData.append('has_pool', document.getElementById('edit-has-pool').checked);
+    formData.append('has_gym', document.getElementById('edit-has-gym').checked);
+    
+    fetch(`/api/v1/companies/properties/${propertyId}`, {
+        method: 'PUT',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Объявление успешно обновлено!');
+            closeModal('editPropertyModal');
+            location.reload();
+        } else {
+            alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении');
+    });
+}
+
+function uploadPhotos(propertyId) {
+    document.getElementById('photos-property-id').value = propertyId;
+    document.getElementById('photosModal').classList.remove('hidden');
+}
+
+function upload360(propertyId) {
+    document.getElementById('property-id-for-360').value = propertyId;
+    document.getElementById('upload360Modal').classList.remove('hidden');
+}
+
+function submitToModeration(propertyId) {
+    if (confirm('Отправить объявление на модерацию?')) {
+        fetch(`/api/v1/companies/properties/${propertyId}/submit`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Объявление отправлено на модерацию');
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+function uploadPropertyPhotos() {
+    const propertyId = document.getElementById('photos-property-id').value;
+    const fileInput = document.getElementById('photos-input');
+    const files = fileInput.files;
+    
+    if (files.length === 0) {
+        alert('Выберите файлы для загрузки');
+        return;
+    }
+    
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('photos', files[i]);
+    }
+    
+    fetch(`/api/v1/companies/properties/${propertyId}/photos`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeModal('photosModal');
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при загрузке фотографий');
+    });
+}
+
+function save360Data() {
+    const propertyId = document.getElementById('property-id-for-360').value;
+    const url = document.getElementById('tour-360-url').value;
+    
+    if (!url) {
+        alert('Введите URL');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('tour_360_url', url);
+    
+    fetch(`/api/v1/companies/properties/${propertyId}/360`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeModal('upload360Modal');
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении URL');
+    });
+}
+
+function switchUploadMode(mode) {
+    const fileUploadForm = document.getElementById('file-upload-form');
+    const urlUploadForm = document.getElementById('url-upload-form');
+    const uploadTab = document.getElementById('upload-tab');
+    const urlTab = document.getElementById('url-tab');
+    
+    if (mode === 'file') {
+        fileUploadForm.classList.remove('hidden');
+        urlUploadForm.classList.add('hidden');
+        uploadTab.classList.add('border-blue-500', 'text-blue-600');
+        uploadTab.classList.remove('border-transparent', 'text-gray-500');
+        urlTab.classList.remove('border-blue-500', 'text-blue-600');
+        urlTab.classList.add('border-transparent', 'text-gray-500');
+    } else if (mode === 'url') {
+        fileUploadForm.classList.add('hidden');
+        urlUploadForm.classList.remove('hidden');
+        urlTab.classList.add('border-blue-500', 'text-blue-600');
+        urlTab.classList.remove('border-transparent', 'text-gray-500');
+        uploadTab.classList.remove('border-blue-500', 'text-blue-600');
+        uploadTab.classList.add('border-transparent', 'text-gray-500');
+    }
+}
+</script>
+{% endblock %} 

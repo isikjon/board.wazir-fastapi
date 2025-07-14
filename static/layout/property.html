@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Объявление</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="assets/scss/main.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+        <style>
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary);
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .nav-icons {
+                font-size: 1.8rem;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+            .swiper {
+                width: 100%;
+                height: 280px;
+                border-radius: 0;
+                overflow: hidden;
+            }
+            .swiper-slide {
+                position: relative;
+                background-color: #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+                font-size: 1.3rem;
+            }
+            .swiper-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .thumbnails-container {
+                display: flex;
+                overflow-x: auto;
+                gap: 8px;
+                padding: 10px 0;
+                margin-top: 10px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: #cbd5e0 #f3f4f6;
+            }
+            .thumbnails-container::-webkit-scrollbar {
+                height: 6px;
+            }
+            .thumbnails-container::-webkit-scrollbar-track {
+                background: #f3f4f6;
+            }
+            .thumbnails-container::-webkit-scrollbar-thumb {
+                background-color: #cbd5e0;
+                border-radius: 3px;
+            }
+            .thumbnail {
+                flex: 0 0 auto;
+                width: 80px;
+                height: 70px;
+                background-color: #f3f4f6;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+                font-size: 1rem;
+                cursor: pointer;
+                opacity: 0.6;
+                transition: opacity 0.2s ease;
+                border: 1px solid #e5e7eb;
+            }
+            .thumbnail.active {
+                opacity: 1;
+                border-color: #9ca3af;
+            }
+            .thumbnail:hover {
+                opacity: 0.8;
+            }
+            .action-buttons .btn {
+                border: 1px solid #e5e7eb;
+                border-radius: 4px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                background-color: #f9fafb;
+                color: #4b5563;
+            }
+            .property-id {
+                color: #9ca3af;
+                font-size: 1rem;
+                font-weight: 400;
+            }
+            .property-price {
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: #111827;
+            }
+            .property-specs {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .property-spec {
+                display: flex;
+                align-items: center;
+                padding: 6px 10px;
+                border-radius: 4px;
+                background-color: #f3f4f6;
+                color: #6b7280;
+                font-size: 1rem;
+            }
+            .property-description {
+                font-size: 1.05rem;
+                line-height: 1.5;
+                color: #4b5563;
+            }
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .info-item {
+                display: flex;
+                align-items: center;
+                font-size: 1rem;
+                color: #4b5563;
+                padding: 4px 0;
+            }
+            .info-item i {
+                width: 20px;
+                margin-right: 8px;
+                color: #9ca3af;
+            }
+            .action-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 12px;
+                font-weight: 500;
+                border-radius: 4px;
+                font-size: 1.05rem;
+                width: 100%;
+                transition: all 0.2s ease;
+            }
+            .action-btn.primary {
+                background-color: #f3f4f6;
+                color: #4b5563;
+                border: 1px solid #e5e7eb;
+            }
+            .action-btn.secondary {
+                background-color: #f3f4f6;
+                color: #4b5563;
+                border: 1px solid #e5e7eb;
+            }
+            .seller-info {
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                margin-bottom: 16px;
+            }
+            .avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+                overflow: hidden;
+                margin-right: 12px;
+            }
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .seller-name {
+                font-weight: 500;
+                color: #111827;
+                font-size: 1rem;
+            }
+            .seller-meta {
+                color: #6b7280;
+                font-size: 0.85rem;
+            }
+            .rating {
+                display: flex;
+                align-items: center;
+                color: #fbbf24;
+                font-size: 0.9rem;
+            }
+            .similar-properties {
+                margin-bottom: 80px;
+            }
+            .similar-title {
+                font-size: 1.2rem;
+                font-weight: 500;
+                margin-bottom: 12px;
+                color: #111827;
+            }
+            .property-card {
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                overflow: hidden;
+                background-color: white;
+            }
+            .property-card-img {
+                height: 120px;
+                overflow: hidden;
+            }
+            .property-card-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .property-card-content {
+                padding: 10px;
+            }
+            .property-card-price {
+                font-weight: 600;
+                font-size: 1.15rem;
+                color: #111827;
+            }
+            .property-card-info {
+                font-size: 0.95rem;
+                color: #6b7280;
+                margin-top: 4px;
+            }
+            .property-card-address {
+                font-size: 0.9rem;
+                color: #9ca3af;
+                margin-top: 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 font-sans">
+        <div class="min-h-screen flex flex-col">
+            <!-- Верхний блок: Лого, Погода, Валюта -->
+            <header class="bg-white shadow-sm">
+                <div class="container mx-auto px-4 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="assets/img/logo_non.png" alt="Wazir Logo"
+                                class="h-10">
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center weather-currency">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="#f59e0b"
+                                    stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="weather-icon mr-2"><circle cx="12"
+                                        cy="12" r="5"></circle><line x1="12"
+                                        y1="1" x2="12" y2="3"></line><line
+                                        x1="12" y1="21" x2="12"
+                                        y2="23"></line><line x1="4.22" y1="4.22"
+                                        x2="5.64" y2="5.64"></line><line
+                                        x1="18.36" y1="18.36" x2="19.78"
+                                        y2="19.78"></line><line x1="1" y1="12"
+                                        x2="3" y2="12"></line><line x1="21"
+                                        y1="12" x2="23" y2="12"></line><line
+                                        x1="4.22" y1="19.78" x2="5.64"
+                                        y2="18.36"></line><line x1="18.36"
+                                        y1="5.64" x2="19.78"
+                                        y2="4.22"></line></svg>
+                                <span>+20°</span>
+                            </div>
+                            <div class="flex items-center weather-currency">
+                                <img src="https://flagcdn.com/w20/us.png"
+                                    alt="USD" class="h-5 mr-2">
+                                <span>69.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Основное содержимое -->
+            <main class="flex-grow pb-20">
+                <!-- Слайдер изображений -->
+                <div class="property-slider">
+                    <div class="swiper main-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <img
+                                    src="https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=1200&auto=format&fit=crop"
+                                    alt="Фото квартиры">
+                            </div>
+                            <div class="swiper-slide">
+                                <img
+                                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop"
+                                    alt="Фото квартиры">
+                            </div>
+                            <div class="swiper-slide">
+                                <img
+                                    src="https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=1200&auto=format&fit=crop"
+                                    alt="Фото квартиры">
+                            </div>
+                        </div>
+                        <div
+                            class="absolute bottom-3 right-3 bg-black bg-opacity-50 text-white px-3 py-1 rounded text-sm font-medium">
+                            1/8
+                        </div>
+                    </div>
+
+                    <div class="container mx-auto px-4">
+                        <div class="thumbnails-container">
+                            <div class="thumbnail active" data-index="0">
+                                <img
+                                    src="https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 1">
+                            </div>
+                            <div class="thumbnail" data-index="1">
+                                <img
+                                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 2">
+                            </div>
+                            <div class="thumbnail" data-index="2">
+                                <img
+                                    src="https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 3">
+                            </div>
+                            <div class="thumbnail" data-index="3">
+                                <img
+                                    src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 4">
+                            </div>
+                            <div class="thumbnail" data-index="4">
+                                <img
+                                    src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 5">
+                            </div>
+                            <div class="thumbnail" data-index="5">
+                                <img
+                                    src="https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=150&auto=format&fit=crop"
+                                    alt="Миниатюра 6">
+                            </div>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div
+                            class="action-buttons flex justify-between mt-4 mb-3">
+                            <a href="chat.html" class="btn flex items-center">
+                                <i class="far fa-comment-dots mr-2"></i>
+                                Написать
+                            </a>
+                            <button class="btn flex items-center">
+                                <i class="far fa-bookmark mr-2"></i>
+                                Сохранить
+                            </button>
+                            <button class="btn flex items-center">
+                                <i class="fas fa-share-alt mr-2"></i>
+                                Поделиться
+                            </button>
+                        </div>
+
+                        <!-- Цена и ID -->
+                        <div class="property-header pb-3">
+                            <div class="property-id mb-1">
+                                ID: 12345678
+                            </div>
+                            <div class="property-price mb-2">
+                                1 800 000 KGZ
+                            </div>
+                            <div class="property-specs">
+                                <div class="property-spec">
+                                    3-комн.кв
+                                </div>
+                                <div class="property-spec">
+                                    116 м²
+                                </div>
+                                <div class="property-spec">
+                                    3 из 5 этаж
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Адрес -->
+                        <div class="property-address mb-4">
+                            <p class="text-gray-600 font-medium">
+                                г.Ош, Асымова 19/7
+                            </p>
+                        </div>
+
+                        <!-- Описание -->
+                        <div class="property-description mb-6">
+                            <h3 class="text-gray-800 font-medium mb-2">
+                                Описание
+                            </h3>
+                            <p class="text-gray-600">
+                                Современная квартира в спокойном и
+                                благоустроенном доме в Придорожном районе, в 10
+                                минутах ходьбы от Московского проспекта.
+                                <br><br>
+                                Квартира просторная, светлая с удобной
+                                планировкой. Имеется вместительный коридор, где
+                                можно поставить большой вместительный шкаф.
+                                <br><br>
+                                Комнаты изолированные, окна выходят на
+                                противоположные стороны.
+                            </p>
+                        </div>
+
+                        <!-- Общая информация -->
+                        <div class="property-info mb-6">
+                            <h3 class="text-gray-800 font-medium mb-3">
+                                Общая информация
+                            </h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Мебель в комнатах</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Кондиционер</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Холодильник</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Стиральная машина</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Телевизор</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Кухонная плита</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Центральное отопление</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Постоянная вода</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки тур и звонок -->
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <a href="#" class="action-btn primary">
+                                360° Тур
+                            </a>
+                            <a href="tel:+996123456789"
+                                class="action-btn secondary">
+                                Позвонить
+                            </a>
+                        </div>
+
+                        <!-- Информация о продавце -->
+                        <div class="seller-info">
+                            <div class="avatar">
+                                <img
+                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
+                                    alt="Фото продавца">
+                            </div>
+                            <div class="seller-details flex-1">
+                                <div class="seller-name">
+                                    Собственник
+                                </div>
+                                <div class="seller-meta">
+                                    Поздняков И.В.
+                                </div>
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span class="ml-1 text-gray-700">4.5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Похожие объявления -->
+                        <div class="similar-properties">
+                            <h3 class="similar-title">
+                                Похожие объявления
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Объявление 1 -->
+                                <div class="property-card">
+                                    <div class="property-card-img">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=400&auto=format&fit=crop"
+                                            alt="Фото объекта"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="property-card-content">
+                                        <div class="property-card-price">
+                                            2 650 000 KGZ
+                                        </div>
+                                        <div class="property-card-info">
+                                            3-комн.кв • 75 м² • 4/9 этаж
+                                        </div>
+                                        <div class="property-card-address">
+                                            г.Ош, ул. Московская 91/12
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Объявление 2 -->
+                                <div class="property-card">
+                                    <div class="property-card-img">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1565183997392-2f6f122e5912?q=80&w=400&auto=format&fit=crop"
+                                            alt="Фото объекта"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="property-card-content">
+                                        <div class="property-card-price">
+                                            1 900 000 KGZ
+                                        </div>
+                                        <div class="property-card-info">
+                                            2-комн.кв • 68 м² • 3/10 этаж
+                                        </div>
+                                        <div class="property-card-address">
+                                            г.Ош, ул. Салиева 144
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Объявление 3 -->
+                                <div class="property-card">
+                                    <div class="property-card-img">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?q=80&w=400&auto=format&fit=crop"
+                                            alt="Фото объекта"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="property-card-content">
+                                        <div class="property-card-price">
+                                            2 650 000 KGZ
+                                        </div>
+                                        <div class="property-card-info">
+                                            2-комн.кв • 65 м² • 5/9 этаж
+                                        </div>
+                                        <div class="property-card-address">
+                                            г.Ош, ул. Мадумарова 91/2
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Объявление 4 -->
+                                <div class="property-card">
+                                    <div class="property-card-img">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=400&auto=format&fit=crop"
+                                            alt="Фото объекта"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="property-card-content">
+                                        <div class="property-card-price">
+                                            1 900 000 KGZ
+                                        </div>
+                                        <div class="property-card-info">
+                                            2-комн.кв • 62 м² • 3/7 этаж
+                                        </div>
+                                        <div class="property-card-address">
+                                            г.Ош, ул. Салиева 31/20
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Нижняя навигация -->
+            <nav
+                class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+                <div class="flex justify-around items-center py-4">
+                    <a href="dashboard.html"
+                        class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline
+                                points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </a>
+                    <a href="search.html"
+                        class="nav-item active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="11" cy="11"
+                                r="8"></circle><line x1="21" y1="21" x2="16.65"
+                                y2="16.65"></line></svg>
+                    </a>
+                    <a href="chats.html"
+                        class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </a>
+                    <a href="support.html"
+                        class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="12" cy="12"
+                                r="10"></circle><path
+                                d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line
+                                x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </a>
+                    <a href="profile.html"
+                        class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
+                                cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Инициализация основного слайдера
+            const mainSwiper = new Swiper('.main-swiper', {
+                loop: true,
+                spaceBetween: 10
+            });
+            
+            // Обработка клика по миниатюрам
+            $('.thumbnail').on('click', function() {
+                const index = $(this).data('index');
+                mainSwiper.slideTo(index + 1);
+                $('.thumbnail').removeClass('active');
+                $(this).addClass('active');
+            });
+            
+            // Обновление активной миниатюры при изменении слайда
+            mainSwiper.on('slideChange', function() {
+                const realIndex = mainSwiper.realIndex;
+                $('.thumbnail').removeClass('active');
+                $(`.thumbnail[data-index="${realIndex}"]`).addClass('active');
+            });
+            
+            // Обработка клика по навигационным элементам
+            $('.nav-item').on('click', function(e) {
+                // Не предотвращаем стандартное поведение, чтобы переходить по ссылкам
+                $('.nav-item').removeClass('active').addClass('text-gray-500');
+                $(this).addClass('active').removeClass('text-gray-500');
+            });
+        });
+        </script>
+    </body>
+</html>

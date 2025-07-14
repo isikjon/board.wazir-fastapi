@@ -1,0 +1,437 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Логи системы - SuperAdmin{% endblock %}
+{% block page_title %}Логи системы{% endblock %}
+{% block page_subtitle %}Мониторинг событий в реальном времени{% endblock %}
+
+{% block content %}
+<!-- Control Panel -->
+<div class="bg-white rounded-lg border border-gray-200 mb-6">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Управление логами</h3>
+                <p class="text-sm text-muted">Режим реального времени</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div id="connectionStatus" class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span id="connectionText" class="text-sm text-muted">Подключение...</span>
+                </div>
+                <button id="clearLogs" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg font-medium transition-colors duration-150">
+                    <i class="fas fa-trash mr-2"></i>
+                    Очистить
+                </button>
+                <button id="toggleLogs" class="btn-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-150">
+                    <i class="fas fa-pause mr-2"></i>
+                    Пауза
+                </button>
+                <button id="downloadLogs" class="bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg font-medium transition-colors duration-150">
+                    <i class="fas fa-download mr-2"></i>
+                    Скачать
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="px-6 py-4">
+        <div class="flex items-center space-x-4">
+            <div>
+                <label class="text-sm font-medium text-gray-700 mr-2">Уровень:</label>
+                <select id="logLevel" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                    <option value="">Все</option>
+                    <option value="ERROR">ERROR</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="INFO">INFO</option>
+                    <option value="DEBUG">DEBUG</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-700 mr-2">Поиск:</label>
+                <input type="text" id="searchInput" placeholder="Поиск в логах..." 
+                       class="px-3 py-1 border border-gray-300 rounded text-sm w-64">
+            </div>
+            <div class="flex items-center">
+                <input type="checkbox" id="autoScroll" checked class="mr-2">
+                <label for="autoScroll" class="text-sm text-gray-700">Автопрокрутка</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Statistics -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-lg font-semibold text-gray-900" id="totalLogs">0</p>
+                <p class="text-sm text-muted">Всего записей</p>
+            </div>
+            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-file-alt text-blue-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-lg font-semibold text-gray-900" id="errorCount">0</p>
+                <p class="text-sm text-muted">Ошибки</p>
+            </div>
+            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-red-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-lg font-semibold text-gray-900" id="warningCount">0</p>
+                <p class="text-sm text-muted">Предупреждения</p>
+            </div>
+            <div class="w-8 h-8 bg-yellow-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-exclamation-circle text-yellow-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-lg font-semibold text-gray-900" id="infoCount">0</p>
+                <p class="text-sm text-muted">Информация</p>
+            </div>
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-info-circle text-green-600"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Container -->
+<div class="bg-white rounded-lg border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Лог события</h3>
+    </div>
+    
+    <div class="h-96 overflow-y-auto bg-gray-900 font-mono text-sm" id="logsContainer">
+        <div class="p-4">
+            <div class="text-green-400 mb-2">
+                <i class="fas fa-terminal mr-2"></i>
+                Wazir System Logs - Подключение к потоку логов...
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let logsWebSocket = null;
+let isPaused = false;
+let logEntries = [];
+let filteredEntries = [];
+let isConnected = false;
+
+// Счетчики
+let totalLogs = 0;
+let errorCount = 0;
+let warningCount = 0;
+let infoCount = 0;
+
+// Элементы
+const logsContainer = document.getElementById('logsContainer');
+const connectionStatus = document.getElementById('connectionStatus');
+const connectionText = document.getElementById('connectionText');
+const toggleButton = document.getElementById('toggleLogs');
+const clearButton = document.getElementById('clearLogs');
+const downloadButton = document.getElementById('downloadLogs');
+const logLevelFilter = document.getElementById('logLevel');
+const searchInput = document.getElementById('searchInput');
+const autoScrollCheckbox = document.getElementById('autoScroll');
+
+// Инициализация WebSocket подключения
+function initializeWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/superadmin/ws/logs`;
+    
+    logsWebSocket = new WebSocket(wsUrl);
+    
+    logsWebSocket.onopen = function(event) {
+        isConnected = true;
+        connectionStatus.className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+        connectionText.textContent = 'Подключено';
+        addSystemMessage('Подключение к логам установлено', 'success');
+    };
+    
+    logsWebSocket.onmessage = function(event) {
+        if (!isPaused) {
+            const logEntry = JSON.parse(event.data);
+            addLogEntry(logEntry);
+        }
+    };
+    
+    logsWebSocket.onclose = function(event) {
+        isConnected = false;
+        connectionStatus.className = 'w-3 h-3 bg-red-500 rounded-full';
+        connectionText.textContent = 'Отключено';
+        addSystemMessage('Соединение с логами потеряно. Попытка переподключения...', 'error');
+        
+        // Попытка переподключения через 3 секунды
+        setTimeout(() => {
+            if (!isConnected) {
+                initializeWebSocket();
+            }
+        }, 3000);
+    };
+    
+    logsWebSocket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+        addSystemMessage('Ошибка подключения к логам', 'error');
+    };
+}
+
+// Добавление записи в лог
+function addLogEntry(entry) {
+    logEntries.push(entry);
+    totalLogs++;
+    
+    // Определение уровня лога
+    const level = determineLogLevel(entry.message);
+    entry.level = level;
+    
+    // Обновление счетчиков
+    switch (level) {
+        case 'ERROR':
+            errorCount++;
+            break;
+        case 'WARNING':
+            warningCount++;
+            break;
+        case 'INFO':
+            infoCount++;
+            break;
+    }
+    
+    // Обновление статистики
+    updateStatistics();
+    
+    // Применение фильтров
+    if (shouldShowEntry(entry)) {
+        displayLogEntry(entry);
+        
+        // Автопрокрутка
+        if (autoScrollCheckbox.checked) {
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+    }
+    
+    // Ограничиваем количество записей в памяти
+    if (logEntries.length > 1000) {
+        logEntries = logEntries.slice(-500);
+    }
+}
+
+// Определение уровня лога из сообщения
+function determineLogLevel(message) {
+    const upperMessage = message.toUpperCase();
+    if (upperMessage.includes('ERROR') || upperMessage.includes('EXCEPTION') || upperMessage.includes('FAILED')) {
+        return 'ERROR';
+    } else if (upperMessage.includes('WARNING') || upperMessage.includes('WARN')) {
+        return 'WARNING';
+    } else if (upperMessage.includes('DEBUG')) {
+        return 'DEBUG';
+    } else {
+        return 'INFO';
+    }
+}
+
+// Проверка, нужно ли показывать запись
+function shouldShowEntry(entry) {
+    // Фильтр по уровню
+    const selectedLevel = logLevelFilter.value;
+    if (selectedLevel && entry.level !== selectedLevel) {
+        return false;
+    }
+    
+    // Поиск
+    const searchTerm = searchInput.value.toLowerCase();
+    if (searchTerm && !entry.message.toLowerCase().includes(searchTerm)) {
+        return false;
+    }
+    
+    return true;
+}
+
+// Отображение записи лога
+function displayLogEntry(entry) {
+    const logElement = document.createElement('div');
+    logElement.className = 'py-1 px-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-150';
+    
+    const timestamp = new Date(entry.timestamp).toLocaleTimeString('ru-RU');
+    const levelColor = getLevelColor(entry.level);
+    
+    logElement.innerHTML = `
+        <div class="flex items-start space-x-3">
+            <span class="text-gray-400 text-xs font-mono">${timestamp}</span>
+            <span class="text-xs px-2 py-1 rounded ${levelColor} font-semibold">${entry.level}</span>
+            <span class="text-gray-300 flex-1">${escapeHtml(entry.message)}</span>
+        </div>
+    `;
+    
+    logsContainer.appendChild(logElement);
+}
+
+// Получение цвета для уровня лога
+function getLevelColor(level) {
+    switch (level) {
+        case 'ERROR':
+            return 'bg-red-500 text-white';
+        case 'WARNING':
+            return 'bg-yellow-500 text-white';
+        case 'DEBUG':
+            return 'bg-gray-500 text-white';
+        default:
+            return 'bg-blue-500 text-white';
+    }
+}
+
+// Добавление системного сообщения
+function addSystemMessage(message, type = 'info') {
+    const logElement = document.createElement('div');
+    logElement.className = 'py-2 px-4 border-b border-gray-700';
+    
+    const timestamp = new Date().toLocaleTimeString('ru-RU');
+    const colorClass = type === 'success' ? 'text-green-400' : 
+                      type === 'error' ? 'text-red-400' : 'text-blue-400';
+    
+    logElement.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <span class="text-gray-400 text-xs font-mono">${timestamp}</span>
+            <i class="fas fa-info-circle ${colorClass}"></i>
+            <span class="${colorClass}">${message}</span>
+        </div>
+    `;
+    
+    logsContainer.appendChild(logElement);
+    
+    if (autoScrollCheckbox.checked) {
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+}
+
+// Обновление статистики
+function updateStatistics() {
+    document.getElementById('totalLogs').textContent = totalLogs;
+    document.getElementById('errorCount').textContent = errorCount;
+    document.getElementById('warningCount').textContent = warningCount;
+    document.getElementById('infoCount').textContent = infoCount;
+}
+
+// Очистка логов
+function clearLogs() {
+    logsContainer.innerHTML = '<div class="p-4"><div class="text-green-400 mb-2"><i class="fas fa-terminal mr-2"></i>Логи очищены</div></div>';
+    logEntries = [];
+    totalLogs = 0;
+    errorCount = 0;
+    warningCount = 0;
+    infoCount = 0;
+    updateStatistics();
+}
+
+// Переключение паузы
+function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        toggleButton.innerHTML = '<i class="fas fa-play mr-2"></i>Возобновить';
+        toggleButton.className = 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-150';
+        addSystemMessage('Лог поставлен на паузу', 'warning');
+    } else {
+        toggleButton.innerHTML = '<i class="fas fa-pause mr-2"></i>Пауза';
+        toggleButton.className = 'btn-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-150';
+        addSystemMessage('Лог возобновлен', 'success');
+    }
+}
+
+// Скачивание логов
+function downloadLogs() {
+    const logText = logEntries.map(entry => {
+        const timestamp = new Date(entry.timestamp).toISOString();
+        return `[${timestamp}] ${entry.level}: ${entry.message}`;
+    }).join('\n');
+    
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wazir_logs_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Логи скачаны', 'success');
+}
+
+// Применение фильтров
+function applyFilters() {
+    // Очищаем контейнер логов
+    logsContainer.innerHTML = '<div class="p-4"><div class="text-green-400 mb-2"><i class="fas fa-terminal mr-2"></i>Применение фильтров...</div></div>';
+    
+    // Показываем отфильтрованные записи
+    logEntries.forEach(entry => {
+        if (shouldShowEntry(entry)) {
+            displayLogEntry(entry);
+        }
+    });
+    
+    if (autoScrollCheckbox.checked) {
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+}
+
+// Escape HTML
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Обработчики событий
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация
+    initializeWebSocket();
+    
+    // Кнопки
+    toggleButton.addEventListener('click', togglePause);
+    clearButton.addEventListener('click', clearLogs);
+    downloadButton.addEventListener('click', downloadLogs);
+    
+    // Фильтры
+    logLevelFilter.addEventListener('change', applyFilters);
+    searchInput.addEventListener('input', applyFilters);
+    
+    // Очистка поиска по ESC
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            applyFilters();
+        }
+    });
+});
+
+// Очистка при закрытии страницы
+window.addEventListener('beforeunload', function() {
+    if (logsWebSocket) {
+        logsWebSocket.close();
+    }
+});
+</script>
+{% endblock %} 

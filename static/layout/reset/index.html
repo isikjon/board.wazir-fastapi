@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Восстановление пароля</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="../assets/scss/main.css">
+    </head>
+    <body class="bg-gray-50 font-sans">
+        <div
+            class="min-h-screen flex flex-col items-center justify-center px-4 fade-in">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex justify-center mb-4">
+                        <img src="../assets/img/logo.png" alt="Wazir Logo"
+                            style="width: 120px;">
+                    </div>
+                    <h1
+                        class="text-2xl font-semibold text-gray-700 mb-2 font-playfair">Восстановление
+                        аккаунта</h1>
+                    <h2
+                        class="text-xl font-medium text-gray-600 font-playfair">Wazir
+                        Недвижимость</h2>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
+                    <!-- Табы для выбора способа восстановления -->
+                    <div class="flex w-full mb-6 border-b border-gray-200">
+                        <button type="button" id="tab-phone"
+                            class="tab-btn active font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Телефон
+                        </button>
+                        <button type="button" id="tab-email"
+                            class="tab-btn font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Почта
+                        </button>
+                    </div>
+
+                    <form id="reset-form">
+                        <div class="mb-5">
+                            <label for="user-id"
+                                class="block text-sm font-medium text-gray-500 mb-1 font-montserrat">
+                                <span id="label-text">Введите телефон</span>
+                            </label>
+                            <input type="tel" id="user-id"
+                                class="form-input font-montserrat"
+                                placeholder="Введите телефон">
+                            <p
+                                class="text-xs text-gray-500 mt-1 font-montserrat"
+                                id="phone-format-hint">Формат: +996 XXX XXX
+                                XXX</p>
+                        </div>
+
+                        <div id="error-message"
+                            class="hidden mb-4 text-sm text-red-500 font-montserrat"></div>
+
+                        <div class="space-y-3 mt-6">
+                            <button type="submit"
+                                class="btn btn-primary w-full py-3 rounded-lg font-montserrat">
+                                Продолжить
+                            </button>
+
+                            <a href="../auth.html"
+                                class="btn btn-secondary w-full py-3 rounded-lg font-montserrat text-center">
+                                У меня уже есть аккаунт
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Маска для телефона (Киргизия)
+            $('#user-id').mask('+996 000 000 000', {
+                onKeyPress: function(cep, e, field, options) {
+                    // Если пользователь пытается изменить префикс +996, восстанавливаем его
+                    if (cep.length < 5) {
+                        $(field).val('+996 ');
+                    }
+                },
+                placeholder: "+996 ___ ___ ___"
+            });
+            
+            // Установка курсора после префикса при фокусе
+            $('#user-id').on('focus', function() {
+                if ($(this).val().length <= 5) {
+                    $(this).val('+996 ');
+                    // Устанавливаем курсор после префикса
+                    setTimeout(function() {
+                        const input = document.getElementById('user-id');
+                        const pos = 5;
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(pos, pos);
+                        }
+                    }, 10);
+                }
+            });
+            
+            // Обработка табов
+            $('.tab-btn').on('click', function() {
+                $('.tab-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Изменение плейсхолдера и метки в зависимости от выбранного таба
+                if ($(this).attr('id') === 'tab-phone') {
+                    $('#user-id').attr('placeholder', 'Введите телефон');
+                    $('#label-text').text('Введите телефон');
+                    $('#user-id').attr('type', 'tel');
+                    $('#user-id').mask('+996 000 000 000', {
+                        onKeyPress: function(cep, e, field, options) {
+                            // Если пользователь пытается изменить префикс +996, восстанавливаем его
+                            if (cep.length < 5) {
+                                $(field).val('+996 ');
+                            }
+                        },
+                        placeholder: "+996 ___ ___ ___"
+                    });
+                    $('#phone-format-hint').show();
+                    
+                    // Установка курсора после префикса
+                    setTimeout(function() {
+                        const input = document.getElementById('user-id');
+                        const pos = 5;
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(pos, pos);
+                        }
+                    }, 10);
+                } else {
+                    $('#user-id').unmask();
+                    $('#user-id').attr('placeholder', 'Введите почту');
+                    $('#label-text').text('Введите почту');
+                    $('#user-id').attr('type', 'email');
+                    $('#phone-format-hint').hide();
+                }
+            });
+            
+            // Обработка отправки формы
+            $('#reset-form').on('submit', function(e) {
+                e.preventDefault();
+                const userId = $('#user-id').val();
+                
+                if (!userId) {
+                    $('#error-message').text('Пожалуйста, заполните поле').removeClass('hidden');
+                    return;
+                }
+                
+                // Базовая валидация
+                const activeTab = $('.tab-btn.active').attr('id');
+                if (activeTab === 'tab-email') {
+                    // Проверка формата email
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(userId)) {
+                        $('#error-message').text('Введите корректный адрес электронной почты').removeClass('hidden');
+                        return;
+                    }
+                } else {
+                    // Проверка формата телефона для Кыргызстана
+                    const phoneValue = userId.replace(/\D/g, '');
+                    if (phoneValue.length !== 12 || !phoneValue.startsWith('996')) {
+                        $('#error-message').text('Введите корректный номер телефона Кыргызстана').removeClass('hidden');
+                        return;
+                    }
+                }
+                
+                $('#error-message').addClass('hidden');
+                
+                // Имитация загрузки
+                const $submitBtn = $(this).find('button[type="submit"]');
+                $submitBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Отправка...');
+                $submitBtn.prop('disabled', true);
+                
+                // Имитация отправки кода через 1 секунду
+                setTimeout(function() {
+                    // Сохраняем тип идентификатора (телефон или почта)
+                    const idType = $('#tab-phone').hasClass('active') ? 'phone' : 'email';
+                    localStorage.setItem('resetIdType', idType);
+                    localStorage.setItem('resetUserId', userId);
+                    
+                    // Переход на страницу ввода кода
+                    window.location.href = 'code.html';
+                }, 1000);
+            });
+        });
+    </script>
+    </body>
+</html>

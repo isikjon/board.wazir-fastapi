@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест медиа-сервера</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Тест медиа-сервера</h1>
+        
+        <!-- Информация о сервере -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Информация о медиа-сервере</h2>
+            <p><strong>URL:</strong> {{ media_server }}</p>
+            <p><strong>Статус:</strong> <span id="server-status" class="text-gray-500">Проверяем...</span></p>
+            <button id="check-connection" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Проверить связь</button>
+        </div> 
+
+        <!-- Форма загрузки -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Тестовая загрузка изображений</h2>
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Заголовок</label>
+                    <input type="text" name="title" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Тестовое объявление">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Выберите изображения</label>
+                    <input type="file" name="photos" multiple accept="image/*" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <p class="text-sm text-gray-500 mt-1">Выберите 2 или более изображений</p>
+                </div>
+                
+                <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded">
+                    Загрузить тест
+                </button>
+            </form>
+        </div>
+
+        <!-- Результаты -->
+        <div id="results" class="bg-white rounded-lg shadow p-6 hidden">
+            <h2 class="text-xl font-semibold mb-4">Результаты</h2>
+            <div id="results-content"></div>
+        </div>
+
+        <!-- API тесты -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">API тесты</h2>
+            <div class="space-y-2">
+                <button id="test-ping" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
+                    Ping медиа-сервера
+                </button>
+                <button id="test-info" class="bg-purple-500 text-white px-4 py-2 rounded mr-2">
+                    Информация о системе
+                </button>
+                <button id="generate-id" class="bg-yellow-500 text-white px-4 py-2 rounded">
+                    Сгенерировать ID
+                </button>
+            </div>
+            <div id="api-results" class="mt-4 p-4 bg-gray-100 rounded hidden">
+                <pre id="api-output" class="text-sm overflow-x-auto"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        // Проверка связи при загрузке
+        checkConnection();
+        
+        function checkConnection() {
+            $('#server-status').text('Проверяем...').removeClass('text-green-500 text-red-500').addClass('text-gray-500');
+            
+            $.get('/api/v1/media/ping')
+                .done(function(data) {
+                    if (data.connected) {
+                        $('#server-status').text('Подключен ✓').removeClass('text-gray-500 text-red-500').addClass('text-green-500');
+                    } else {
+                        $('#server-status').text('Не подключен ✗').removeClass('text-gray-500 text-green-500').addClass('text-red-500');
+                    }
+                })
+                .fail(function() {
+                    $('#server-status').text('Ошибка соединения ✗').removeClass('text-gray-500 text-green-500').addClass('text-red-500');
+                });
+        }
+        
+        // Кнопка проверки связи
+        $('#check-connection').click(checkConnection);
+        
+        // Форма загрузки
+        $('#upload-form').submit(function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const files = $('input[name="photos"]')[0].files;
+            
+            if (files.length < 2) {
+                alert('Выберите минимум 2 изображения');
+                return;
+            }
+            
+            $('#results').removeClass('hidden');
+            $('#results-content').html('<p class="text-blue-500">Загружаем изображения...</p>');
+            
+            $.ajax({
+                url: '/mobile/test-upload',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    let html = '<div class="space-y-2">';
+                    
+                    if (data.status === 'success') {
+                        html += `<p class="text-green-500 font-semibold">✓ Успешно загружено!</p>`;
+                        html += `<p><strong>Property ID:</strong> ${data.property_id}</p>`;
+                        html += `<p><strong>Количество файлов:</strong> ${data.files_count}</p>`;
+                        
+                        if (data.files && data.files.length > 0) {
+                            html += '<div class="mt-4"><h3 class="font-semibold">Загруженные изображения:</h3>';
+                            data.files.forEach(function(file, index) {
+                                html += `<div class="border p-2 mt-2 rounded">`;
+                                html += `<p class="text-sm"><strong>Файл ${index + 1}:</strong> ${file.original_name}</p>`;
+                                html += `<p class="text-sm"><strong>ID:</strong> ${file.file_id}</p>`;
+                                
+                                if (file.urls) {
+                                    html += '<div class="grid grid-cols-2 gap-2 mt-2">';
+                                    Object.entries(file.urls).forEach(function([size, url]) {
+                                        if (size !== 'original') {
+                                            html += `<div>`;
+                                            html += `<p class="text-xs text-gray-500">${size}</p>`;
+                                            html += `<img src="${url}" alt="${size}" class="w-full h-24 object-cover rounded">`;
+                                            html += `</div>`;
+                                        }
+                                    });
+                                    html += '</div>';
+                                }
+                                
+                                html += '</div>';
+                            });
+                            html += '</div>';
+                        }
+                    } else {
+                        html += `<p class="text-red-500 font-semibold">✗ Ошибка: ${data.message}</p>`;
+                    }
+                    
+                    html += '</div>';
+                    $('#results-content').html(html);
+                },
+                error: function(xhr) {
+                    $('#results-content').html(`<p class="text-red-500">Ошибка: ${xhr.responseText}</p>`);
+                }
+            });
+        });
+        
+        // API тесты
+        $('#test-ping').click(function() {
+            apiRequest('/api/v1/media/ping');
+        });
+        
+        $('#test-info').click(function() {
+            apiRequest('/api/v1/media/info');
+        });
+        
+        $('#generate-id').click(function() {
+            const id = generatePropertyId();
+            showApiResult({generated_id: id, format: "xxxx-xxxx-xxxx-xxxx"});
+        });
+        
+        function apiRequest(url) {
+            $('#api-results').removeClass('hidden');
+            $('#api-output').text('Загружаем...');
+            
+            $.get(url)
+                .done(function(data) {
+                    showApiResult(data);
+                })
+                .fail(function(xhr) {
+                    showApiResult({error: xhr.responseText});
+                });
+        }
+        
+        function showApiResult(data) {
+            $('#api-output').text(JSON.stringify(data, null, 2));
+        }
+        
+        function generatePropertyId() {
+            const hex = () => Math.floor(Math.random() * 16).toString(16);
+            const part = () => Array.from({length: 4}, hex).join('');
+            return `${part()}-${part()}-${part()}-${part()}`;
+        }
+    });
+    </script>
+</body>
+</html> 

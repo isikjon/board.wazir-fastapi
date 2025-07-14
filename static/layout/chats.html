@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Сообщения</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="assets/scss/main.css">
+        <style> 
+            .bottom-nav {
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                transition: all 0.2s ease;
+            }
+            .nav-item.active {
+                color: var(--color-primary);
+            }
+            .nav-item:hover {
+                color: var(--color-primary-hover);
+            }
+            .city-banner {
+                height: 180px;
+                background-image: url('https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?q=80&w=1200&auto=format&fit=crop');
+                background-size: cover;
+                background-position: center;
+                position: relative;
+            }
+            .city-banner::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+            }
+            .city-content {
+                position: relative;
+                z-index: 2;
+            }
+            .weather-currency {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .weather-icon {
+                font-size: 1.4rem;
+            }
+            .nav-icons {
+                font-size: 1.6rem;
+                font-weight: 300;
+            }
+            .chat-header {
+                border-bottom: 1px solid #e5e7eb;
+                position: sticky;
+                top: 0;
+                background-color: white;
+                z-index: 10;
+            }
+            .chat-item {
+                padding: 16px;
+                border-bottom: 1px solid #f3f4f6;
+                transition: background-color 0.2s ease;
+            }
+            .chat-item:hover {
+                background-color: #f9fafb;
+            }
+            .chat-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+                overflow: hidden;
+                background-color: #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+            }
+            .chat-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .chat-name {
+                font-weight: 500;
+                font-size: 1.05rem;
+                color: #111827;
+            }
+            .chat-status {
+                font-size: 0.8rem;
+                color: #6b7280;
+            }
+            .chat-last-message {
+                font-size: 0.95rem;
+                color: #4b5563;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 220px;
+            }
+            .chat-time {
+                font-size: 0.8rem;
+                color: #9ca3af;
+            }
+            .chat-unread {
+                width: 18px;
+                height: 18px;
+                border-radius: 9px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #4b5563;
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 600;
+            }
+            .search-container {
+                padding: 12px 16px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .search-input {
+                width: 100%;
+                padding: 10px 16px 10px 40px;
+                border: 1px solid #e5e7eb;
+                border-radius: 24px;
+                background-color: #f9fafb;
+                font-size: 0.95rem;
+                outline: none;
+            }
+            .search-icon {
+                position: absolute;
+                left: 28px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #9ca3af;
+            }
+        </style>
+    </head>
+    <body class="bg-white font-sans">
+        <div class="min-h-screen flex flex-col">
+            <!-- Верхний блок: Лого, Погода, Валюта -->
+            <header class="bg-white shadow-sm">
+                <div class="container mx-auto px-4 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="assets/img/logo_non.png" alt="Wazir Logo"
+                                class="h-10">
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center weather-currency">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="#f59e0b"
+                                    stroke-width="1.75" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="weather-icon mr-2"><circle cx="12"
+                                        cy="12" r="5"></circle><line x1="12"
+                                        y1="1" x2="12" y2="3"></line><line
+                                        x1="12" y1="21" x2="12"
+                                        y2="23"></line><line x1="4.22" y1="4.22"
+                                        x2="5.64" y2="5.64"></line><line
+                                        x1="18.36" y1="18.36" x2="19.78"
+                                        y2="19.78"></line><line x1="1" y1="12"
+                                        x2="3" y2="12"></line><line x1="21"
+                                        y1="12" x2="23" y2="12"></line><line
+                                        x1="4.22" y1="19.78" x2="5.64"
+                                        y2="18.36"></line><line x1="18.36"
+                                        y1="5.64" x2="19.78"
+                                        y2="4.22"></line></svg>
+                                <span id="weather-temp">+20°</span>
+                            </div>
+                            <div class="flex items-center weather-currency">
+                                <img src="https://flagcdn.com/w20/us.png"
+                                    alt="USD" class="h-5 mr-2">
+                                <span id="currency-rate">69.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Шапка страницы -->
+            <div class="chat-header px-4 py-4">
+                <h1 class="text-xl font-semibold text-gray-800">Сообщения</h1>
+            </div>
+
+            <!-- Поиск -->
+            <div class="search-container relative">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                    viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+                    stroke-width="1.75" stroke-linecap="round"
+                    stroke-linejoin="round" class="search-icon"><circle cx="11"
+                        cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65"
+                        y2="16.65"></line></svg>
+                <input type="text" class="search-input" placeholder="Поиск">
+            </div>
+
+            <!-- Список чатов -->
+            <div class="chats-list flex-1">
+                <!-- Чат 1 -->
+                <a href="chat.html" class="chat-item flex items-start">
+                    <div class="chat-avatar mr-3">
+                        <img
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
+                            alt="Аватар пользователя">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="chat-name">Поздняков И.В.</div>
+                            <div class="chat-time">11:05</div>
+                        </div>
+                        <div class="chat-status mb-1">Собственник</div>
+                        <div class="flex justify-between items-center">
+                            <div class="chat-last-message">Отлично! Я бы хотел
+                                посмотреть квартиру. Когда вам будет удобно
+                                организовать просмотр?</div>
+                            <div class="chat-unread">2</div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Чат 2 -->
+                <a href="chat.html" class="chat-item flex items-start">
+                    <div class="chat-avatar mr-3">
+                        <img
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop"
+                            alt="Аватар пользователя">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="chat-name">Соколова А.М.</div>
+                            <div class="chat-time">Вчера</div>
+                        </div>
+                        <div class="chat-status mb-1">Риелтор</div>
+                        <div class="flex justify-between items-center">
+                            <div class="chat-last-message">Нашла для вас
+                                отличный вариант в центре, как раз по вашим
+                                критериям. Можем обсудить детали.</div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Чат 3 -->
+                <a href="chat.html" class="chat-item flex items-start">
+                    <div class="chat-avatar mr-3"
+                        style="background-color: #e5e7eb">
+                        <img
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop"
+                            alt="Аватар пользователя">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="chat-name">Михайлов Игорь</div>
+                            <div class="chat-time">28 июн</div>
+                        </div>
+                        <div class="chat-status mb-1">Покупатель</div>
+                        <div class="flex justify-between items-center">
+                            <div class="chat-last-message">Спасибо за
+                                информацию. Буду ждать звонка от вас.</div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Чат 4 -->
+                <a href="chat.html" class="chat-item flex items-start">
+                    <div class="chat-avatar mr-3"
+                        style="background-color: #e5e7eb">
+                        <img
+                            src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=100&auto=format&fit=crop"
+                            alt="Аватар пользователя">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="chat-name">Алексеев Константин</div>
+                            <div class="chat-time">25 июн</div>
+                        </div>
+                        <div class="chat-status mb-1">Собственник</div>
+                        <div class="flex justify-between items-center">
+                            <div class="chat-last-message">Вы: Да, конечно,
+                                завтра в 15:00 подойдет</div>
+                            <div class="chat-unread">1</div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Чат 5 -->
+                <a href="chat.html" class="chat-item flex items-start">
+                    <div class="chat-avatar mr-3">
+                        <img
+                            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop"
+                            alt="Аватар пользователя">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="chat-name">Ольга Петрова</div>
+                            <div class="chat-time">21 июн</div>
+                        </div>
+                        <div class="chat-status mb-1">Риелтор</div>
+                        <div class="flex justify-between items-center">
+                            <div class="chat-last-message">Вы: Спасибо за помощь
+                                с документами!</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Нижняя навигация -->
+            <nav
+                class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+                <div class="flex justify-around items-center py-4">
+                    <a href="dashboard.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline
+                                points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </a>
+                    <a href="search.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="11" cy="11"
+                                r="8"></circle><line x1="21" y1="21" x2="16.65"
+                                y2="16.65"></line></svg>
+                    </a>
+                    <a href="chats.html" class="nav-item active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </a>
+                    <a href="support.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><circle cx="12" cy="12"
+                                r="10"></circle><path
+                                d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line
+                                x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </a>
+                    <a href="profile.html" class="nav-item text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="nav-icons"><path
+                                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
+                                cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Обработка клика по навигационным элементам
+            $('.nav-item').on('click', function() {
+                $('.nav-item').removeClass('active').addClass('text-gray-500');
+                $(this).addClass('active').removeClass('text-gray-500');
+            });
+            
+            // Функции для работы с погодой
+            function getWeatherFromCache() {
+                const weatherData = localStorage.getItem('weatherData');
+                if (!weatherData) return null;
+                
+                try {
+                    const data = JSON.parse(weatherData);
+                    const timestamp = data.timestamp || 0;
+                    const now = new Date().getTime();
+                    
+                    // Если данные старше 1 часа, считаем их устаревшими
+                    if (now - timestamp > 60 * 60 * 1000) {
+                        return null;
+                    }
+                    
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            }
+            
+            function saveWeatherToCache(data) {
+                data.timestamp = new Date().getTime();
+                localStorage.setItem('weatherData', JSON.stringify(data));
+            }
+            
+            function displayWeatherData(data) {
+                // Отображаем температуру
+                $('#weather-temp').text(data.temperature);
+            }
+            
+            function showFallbackWeather() {
+                const fallbackData = {
+                    temperature: '+20°',
+                    source: 'fallback'
+                };
+                
+                saveWeatherToCache(fallbackData);
+                displayWeatherData(fallbackData);
+            }
+            
+            function getWeather() {
+                // Проверяем кэш перед запросом
+                const cachedWeather = getWeatherFromCache();
+                if (cachedWeather) {
+                    displayWeatherData(cachedWeather);
+                    return;
+                }
+                
+                // Делаем запрос к API погоды
+                $.ajax({
+                    url: 'https://api.openweathermap.org/data/2.5/weather',
+                    data: {
+                        q: 'Bishkek,kg',
+                        units: 'metric',
+                        appid: '11db64c2bb730756af5573ee156a2a26'
+                    },
+                    success: function(data) {
+                        if (data && data.main && data.main.temp) {
+                            // Округляем температуру до целых градусов
+                            const temp = Math.round(data.main.temp);
+                            const tempStr = (temp > 0 ? '+' : '') + temp + '°';
+                            
+                            // Сохраняем данные в кэш
+                            const weatherData = {
+                                temperature: tempStr,
+                                source: 'openweathermap'
+                            };
+                            saveWeatherToCache(weatherData);
+                            
+                            // Отображаем данные
+                            displayWeatherData(weatherData);
+                        } else {
+                            showFallbackWeather();
+                        }
+                    },
+                    error: function() {
+                        showFallbackWeather();
+                    }
+                });
+            }
+            
+            // Функции для работы с валютой
+            function getCurrencyFromCache() {
+                const currencyData = localStorage.getItem('currencyData');
+                if (!currencyData) return null;
+                
+                try {
+                    const data = JSON.parse(currencyData);
+                    const timestamp = data.timestamp || 0;
+                    const now = new Date().getTime();
+                    
+                    // Если данные старше 1 часа, считаем их устаревшими
+                    if (now - timestamp > 60 * 60 * 1000) {
+                        return null;
+                    }
+                    
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            }
+            
+            function saveCurrencyToCache(data) {
+                data.timestamp = new Date().getTime();
+                localStorage.setItem('currencyData', JSON.stringify(data));
+            }
+            
+            function displayCurrencyData(data) {
+                // Отображаем курс валюты
+                $('#currency-rate').text(data.rate);
+            }
+            
+            function getCurrencyRate() {
+                // Сначала проверяем, есть ли кэшированные данные
+                const cachedCurrency = getCurrencyFromCache();
+                if (cachedCurrency) {
+                    // Если есть кэшированные данные, сразу их отображаем
+                    displayCurrencyData(cachedCurrency);
+                    return;
+                }
+                
+                // Если кэша нет или он устарел, запрашиваем данные с API
+                $.ajax({
+                    url: "https://data.fx.kg/api/v1/central",
+                    headers: {
+                        "Authorization": "Bearer HuJSCtMKCYVv7QFMKKauRlwbFQIgo4omR85aRwCO919e391c"
+                    },
+                    success: function(data) {
+                        if (data && data.usd) {
+                            const rate = parseFloat(data.usd).toFixed(1);
+                            
+                            // Сохраняем данные в кэш
+                            const currencyData = {
+                                rate: rate,
+                                source: 'fx.kg'
+                            };
+                            saveCurrencyToCache(currencyData);
+                            
+                            // Отображаем данные
+                            displayCurrencyData(currencyData);
+                        } else {
+                            // Пробуем альтернативный метод
+                            getCurrencyRateGoogle();
+                        }
+                    },
+                    error: function() {
+                        // При ошибке используем альтернативный метод
+                        getCurrencyRateGoogle();
+                    }
+                });
+            }
+              
+            function getCurrencyRateGoogle() {
+                // Проверка кэша перед запросом
+                const cachedCurrency = getCurrencyFromCache();
+                if (cachedCurrency) {
+                    displayCurrencyData(cachedCurrency);
+                    return;
+                }
+                
+                // Запрос данных через Google Apps Script
+                $.ajax({
+                    url: "https://script.google.com/macros/s/AKfycbzuBnGgEZdYMvWPJmyqO0eLP7dMWyU45OyEUEGHhdJ7LWNwx1IU7F8Wl_uLF9YADjVx/exec",
+                    data: {
+                        from: "USD",
+                        to: "KGS"
+                    },
+                    dataType: "jsonp",
+                    success: function(data) {
+                        if (data && data.rate) {
+                            const rate = parseFloat(data.rate).toFixed(1);
+                            
+                            // Сохраняем данные в кэш
+                            const currencyData = {
+                                rate: rate,
+                                source: 'google'
+                            };
+                            saveCurrencyToCache(currencyData);
+                            
+                            // Отображаем данные
+                            displayCurrencyData(currencyData);
+                        } else {
+                            getCurrencyRateAlt();
+                        }
+                    },
+                    error: function() {
+                        getCurrencyRateAlt();
+                    }
+                });
+            }
+            
+            function getCurrencyRateAlt() {
+                // Проверка кэша перед запросом
+                const cachedCurrency = getCurrencyFromCache();
+                if (cachedCurrency) {
+                    displayCurrencyData(cachedCurrency);
+                    return;
+                }
+                
+                // В данном случае просто используем резервные данные
+                showFallbackCurrency();
+            }
+            
+            function showFallbackCurrency() {
+                const fallbackData = {
+                    rate: '88888888888888',
+                    source: 'fallback'
+                };
+                
+                // Сохраняем резервные данные в кэш
+                saveCurrencyToCache(fallbackData);
+                
+                // Отображаем данные
+                displayCurrencyData(fallbackData);
+            }
+            
+            // Загружаем данные о погоде и курсе валют
+            getWeather();
+            getCurrencyRate();
+        });
+        </script>
+    </body>
+</html>

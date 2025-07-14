@@ -1,0 +1,160 @@
+// Стили для форм
+.form-input {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 0.5rem;
+    width: 100%;
+    outline: none;
+    font-family: var(--font-body);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+
+    &:focus {
+        border-color: var(--color-primary);
+        background-image: linear-gradient(to right, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+        background-size: 100% 2px;
+    }
+}
+
+// Стили для табов
+.tab-btn {
+    position: relative;
+    transition: opacity 0.2s ease;
+    opacity: 0.7;
+    outline: none !important;
+    background: transparent;
+    border: none;
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &.active {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        opacity: 1;
+        border-bottom-color: var(--color-primary) !important;
+    }
+}
+
+// Стили для кнопок
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
+
+    &-primary {
+        background-color: var(--color-bg-primary);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-primary);
+        box-shadow: 0 2px 10px rgba(251, 146, 60, 0.1);
+
+        &:hover {
+            background-color: #fff7ed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(251, 146, 60, 0.15);
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(251, 146, 60, 0.1);
+        }
+    }
+
+    &-secondary {
+        background-color: var(--color-bg-primary);
+        color: var(--color-text-primary);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+
+        &:hover {
+            background-color: var(--color-bg-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.02);
+        }
+    }
+}
+
+// Кнопка видимости пароля
+#toggle-password {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+    background: transparent;
+    border: none;
+    outline: none;
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:hover {
+        color: var(--color-primary);
+    }
+
+    i {
+        font-size: 1.1em;
+    }
+}
+
+// Анимации
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+// Эффекты при наведении
+.hover-lift {
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  wazir-api:
+    build: .
+    expose:
+      - "8000"
+    environment:
+      - DB_HOST=91.218.141.27
+      - DB_PORT=3306
+      - DB_NAME=wazir
+      - DB_USER=wazir
+      - DB_PASSWORD=c:ICx9Pr{48y>6BmBc3r
+      - SECRET_KEY=7775c3c9d85f5a9b8c2c28234c2c5d9b8c2c2823
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=2880
+      - TELEGRAM_BOT_TOKEN=7635146586:AAHfyRr_8S7Dq5CWneST3LdHbLCsrh-vUq8
+      - SMS_LOGIN=almaz-91
+      - SMS_PASSWORD=sams1488
+      - MEDIA_SERVER_URL=https://wazir.kg/media
+    volumes:
+      - ./media:/app/media
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - wazir-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./media:/var/www/media
+    depends_on:
+      - wazir-api
+    restart: unless-stopped
+    networks:
+      - wazir-network
+
+networks:
+  wazir-network:
+    driver: bridge
+
+volumes:
+  media_data:
+  logs_data: 

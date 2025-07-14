@@ -1,0 +1,1166 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Wazir Недвижимость - Заявки{% endblock %}
+
+{% block page_title %}Заявки{% endblock %}
+
+{% block content %}
+<div class="p-5"> 
+    <!-- Табы для переключения между типами заявок -->
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="flex border-b">
+            <a href="{{ url_for('admin_requests') }}?tab=listings"
+                class="tab-link active">
+                <!-- <a href="{{ url_for('admin_requests') }}?tab=listings"
+                class="tab-link {{ 'active' if tab == 'listings' else '' }} active"> -->
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-building"></i>
+                    <span>Новые объявления</span>
+                    <span class="tab-count">{{ listing_requests_count }}</span>
+                </div>
+            </a> 
+        </div>
+    </div>
+
+    <!-- Содержимое вкладки -->
+    <div class="bg-white rounded-lg shadow-sm p-0">
+        <!-- Фильтры и поиск -->
+        <div class="flex flex-wrap gap-4 p-5 border-b">
+            <div class="filter-select">
+                <select id="statusFilter" class="filter-select-input">
+                    <option value>Все статусы</option>
+                    <option value="new" {{ 'selected' if status == 'new' else '' }}>Ожидающие</option>
+                </select>
+            </div>
+
+            <div class="filter-select">
+                <select id="typeFilter" class="filter-select-input">
+                    <option value>Все типы</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {{ 'selected' if property_type == cat.id|string else '' }}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        {% if requests %}
+        <!-- Список заявок -->
+        <div class="requests-list">
+            {% for request in requests %}
+            <div class="request-item">
+                <div class="request-item-image">
+                    {% if request.property.images and request.property.images|length > 0 %}
+                    <div class="image-slider" data-property-id="{{ request.property.id }}">
+                        <div class="slider-container">
+                            {% for image in request.property.images %}
+                            <img src="{{ image.url }}" 
+                                 alt="{{ request.property.title }}"
+                                 class="slider-image {{ 'active' if loop.first else '' }}">
+                            {% endfor %}
+                        </div>
+                        {% if request.property.images|length > 1 %}
+                        <div class="slider-controls">
+                            <button class="slider-btn prev-btn" data-property-id="{{ request.property.id }}" data-action="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="slider-btn next-btn" data-property-id="{{ request.property.id }}" data-action="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="slider-dots">
+                            {% for image in request.property.images %}
+                            <span class="slider-dot {{ 'active' if loop.first else '' }}" 
+                                  data-property-id="{{ request.property.id }}" 
+                                  data-image-index="{{ loop.index0 }}"></span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400 text-2xl"></i>
+                    </div>
+                    {% endif %}
+                    {% if request.status == 'new' %}
+                    <div class="status-badge new">Новая</div>
+                    {% elif request.status == 'in_progress' %}
+                    <div class="status-badge in-progress">В работе</div>
+                    {% elif request.status == 'completed' %}
+                    <div class="status-badge completed">Завершена</div>
+                    {% elif request.status == 'rejected' %}
+                    <div class="status-badge rejected">Отклонена</div>
+                    {% endif %}
+                </div>
+
+                <div class="request-item-content">
+                    <div class="request-title">{{ request.property.title }}</div>
+                    <div class="request-address">{{ request.property.address }}</div>
+                    {% if request.property.category %}
+                    <div class="request-category">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ request.property.category.name }}</span>
+                    </div>
+                    {% endif %}
+                    {% if request.scheduled_date %}
+                    <div style="margin-top: 8px; font-weight: bold; color: #0066cc; background-color: #e6f7ff; padding: 5px 10px; border-radius: 4px; display: inline-block;">
+                        <i class="fas fa-calendar-check"></i>
+                        <span> Дата съемки 360: {{ request.scheduled_date }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="request-price">{{ request.property.price_formatted }}</div>
+
+                    <div class="request-meta">
+                        <div class="request-created">
+                            <i class="far fa-clock"></i>
+                            <span>{{ request.created_at }}</span>
+                        </div>
+                        <div class="request-user">
+                            <i class="far fa-user"></i>
+                            <span>{{ request.user.name }}</span>
+                        </div>
+                        <div class="request-id">
+                            <i class="far fa-hashtag"></i>
+                            <span>ID: {{ request.id }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-item-actions">
+                    {% if tab == 'tours' %}
+                    {% if request.status == 'new' %}
+                    <button class="action-btn schedule"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Назначить</span>
+                    </button>
+                    <button class="action-btn reject"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-times"></i>
+                        <span>Отклонить</span>
+                    </button>
+                    {% elif request.scheduled_date %}
+                    <div class="scheduled-date">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Дата съемки: {{ request.scheduled_date }}</span>
+                    </div>
+                    <button class="action-btn complete"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-check-double"></i>
+                        <span>Завершить</span>
+                    </button>
+                    <button class="action-btn reschedule"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Перенести</span>
+                    </button>
+                    {% else %}
+                    <button class="action-btn view"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-eye"></i>
+                        <span>Просмотр</span>
+                    </button>
+                    <button class="action-btn archive"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-archive"></i>
+                        <span>В архив</span>
+                    </button>
+                    {% endif %}
+                    {% else %}
+                    {% if request.status == 'new' %}
+                    <button class="action-btn accept"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-check"></i>
+                        <span>Одобрить</span>
+                    </button>
+                    <button class="action-btn reject"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-times"></i>
+                        <span>Отклонить</span>
+                    </button>
+                    {% elif request.status == 'in_progress' %}
+                    <button class="action-btn complete"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-check-double"></i>
+                        <span>Опубликовать</span>
+                    </button>
+                    <button class="action-btn edit"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-edit"></i>
+                        <span>Изменить</span>
+                    </button>
+                    <button class="action-btn reject"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-times"></i>
+                        <span>Отклонить</span>
+                    </button>
+                    {% else %}
+                    <button class="action-btn view"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-eye"></i>
+                        <span>Просмотр</span>
+                    </button>
+                    <button class="action-btn archive"
+                        data-request-id="{{ request.id }}">
+                        <i class="fas fa-archive"></i>
+                        <span>В архив</span>
+                    </button>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Показано {{ start_item }} - {{ end_item }} из {{ total_requests
+                }} заявок
+            </div>
+
+            <div class="pagination">
+                {% if current_page > 1 %}
+                <a
+                    href="{{ url_for('admin_requests') }}?tab={{ tab }}&page={{ current_page - 1 }}{{ query_params }}"
+                    class="pagination-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+                {% endif %}
+
+                {% for p in pages %}
+                {% if p == current_page %}
+                <span class="pagination-btn active">{{ p }}</span>
+                {% else %}
+                <a
+                    href="{{ url_for('admin_requests') }}?tab={{ tab }}&page={{ p }}{{ query_params }}"
+                    class="pagination-btn">{{ p }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if current_page < total_pages %}
+                <a
+                    href="{{ url_for('admin_requests') }}?tab={{ tab }}&page={{ current_page + 1 }}{{ query_params }}"
+                    class="pagination-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Нет заявок -->
+        <div class="no-requests">
+            <div class="no-requests-icon">
+                <i class="far fa-clipboard"></i>
+            </div>
+            <div class="no-requests-text">Нет активных заявок</div>
+            <div class="no-requests-subtext">По выбранным фильтрам ничего не
+                найдено</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Табы заявок */
+.tab-link {
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.tab-link:hover {
+    color: #4b5563;
+    background-color: #f9fafb;
+}
+
+.tab-link.active {
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+    background-color: #fff;
+}
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.tab-link.active .tab-count {
+    background-color: #fef3c7;
+    color: var(--color-primary);
+}
+
+/* Фильтры */
+.filter-select {
+    position: relative;
+}
+
+.filter-select-input {
+    min-width: 160px;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    background-color: white;
+    appearance: none;
+    cursor: pointer;
+}
+
+.filter-select::after {
+    content: '\f078';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+    font-size: 0.75rem;
+}
+
+.more-filters-btn {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.more-filters-btn:hover {
+    background-color: #f9fafb;
+}
+
+.more-filters-btn i {
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.search-box {
+    position: relative;
+    min-width: 260px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+/* Заявки */
+.requests-list {
+    overflow-x: hidden;
+}
+
+.request-item {
+    padding: 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.request-item:hover {
+    background-color: #f9fafb;
+}
+
+.request-item-image {
+    width: 120px;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    margin-right: 1.25rem;
+    flex-shrink: 0;
+}
+
+.request-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.status-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.status-badge.new {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.status-badge.in-progress {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.status-badge.completed {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.status-badge.rejected {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.request-item-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.request-title {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.request-address {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.request-category {
+    display: flex;
+    align-items: center;
+    color: #6366f1;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    background-color: #f0f9ff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.request-category i {
+    margin-right: 0.25rem;
+    font-size: 0.7rem;
+}
+
+.request-price {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.request-meta {
+    display: flex;
+    gap: 1rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.request-created,
+.request-user,
+.request-id {
+    display: flex;
+    align-items: center;
+}
+
+.request-meta i {
+    margin-right: 0.35rem;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.request-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 120px;
+    margin-left: 1.25rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.action-btn i {
+    margin-right: 0.35rem;
+    font-size: 0.75rem;
+}
+
+.action-btn.accept {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.action-btn.accept:hover {
+    background-color: #d1fae5;
+}
+
+.action-btn.reject {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.action-btn.reject:hover {
+    background-color: #fee2e2;
+}
+
+.action-btn.schedule,
+.action-btn.edit {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.action-btn.schedule:hover,
+.action-btn.edit:hover {
+    background-color: #dbeafe;
+}
+
+.action-btn.complete {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.action-btn.complete:hover {
+    background-color: #d1fae5;
+}
+
+.action-btn.reschedule {
+    background-color: #fff7ed;
+    color: #c2410c;
+}
+
+.action-btn.reschedule:hover {
+    background-color: #ffedd5;
+}
+
+.action-btn.view {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.action-btn.view:hover {
+    background-color: #e5e7eb;
+}
+
+.action-btn.archive {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.action-btn.archive:hover {
+    background-color: #e5e7eb;
+}
+
+.scheduled-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background-color: #fef3c7;
+    color: #b45309;
+    width: 100%;
+}
+
+.scheduled-date i {
+    margin-right: 0.35rem;
+    font-size: 0.75rem;
+}
+
+/* Пагинация */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #f9fafb;
+}
+
+.pagination-btn.active {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Нет заявок */
+.no-requests {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.no-requests-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.no-requests-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.no-requests-subtext {
+    font-size: 0.875rem;
+    color: #6b7280;
+    max-width: 400px;
+}
+
+/* Слайдер изображений */
+.image-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slider-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.slider-image.active {
+    opacity: 1;
+}
+
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    pointer-events: none;
+}
+
+.slider-btn {
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    pointer-events: all;
+    font-size: 10px;
+}
+
+.slider-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.slider-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.slider-dot.active {
+    background-color: white;
+}
+
+.slider-dot:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Респонсивный дизайн */
+@media (max-width: 768px) {
+    .request-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .request-item-image {
+        width: 100%;
+        height: 180px;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .request-item-content {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .request-item-actions {
+        width: 100%;
+        flex-direction: row;
+        margin-left: 0;
+    }
+    
+    .action-btn {
+        flex: 1;
+    }
+    
+    .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .pagination {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Фильтры
+        $('#statusFilter, #typeFilter').on('change', function() {
+            applyFilters();
+        });
+        
+        // Поиск
+        let searchTimeout;
+        $('#searchInput').on('keyup', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                applyFilters();
+            }, 500);
+        });
+        
+        // Применение фильтров
+        function applyFilters() {
+            const status = $('#statusFilter').val();
+            const type = $('#typeFilter').val();
+            let url = `{{ url_for('admin_requests') }}?tab={{ tab }}`;
+            if (status) url += `&status=${status}`;
+            if (type) url += `&property_type=${type}`;
+            window.location.href = url;
+        }
+        
+        // Дополнительные фильтры
+        $('#moreFiltersBtn').on('click', function() {
+            alert('Дополнительные фильтры - в разработке');
+        });
+        
+        // Обработка кнопок действий
+        $('.action-btn').on('click', function() {
+            const requestId = $(this).data('request-id');
+            // Извлекаем все классы и находим класс действия (accept, reject, schedule, etc.)
+            const classes = $(this).attr('class').split(' ');
+            let action = '';
+            
+            // Ищем класс действия среди всех классов кнопки
+            for (const cls of classes) {
+                if (['accept', 'reject', 'schedule', 'complete', 'reschedule', 'edit', 'view', 'archive'].includes(cls)) {
+                    action = cls;
+                    break;
+                }
+            }
+            
+            switch(action) {
+                case 'accept':
+                    acceptRequest(requestId);
+                    break;
+                case 'reject':
+                    rejectRequest(requestId);
+                    break;
+                case 'schedule':
+                    scheduleRequest(requestId);
+                    break;
+                case 'complete':
+                    completeRequest(requestId);
+                    break;
+                case 'reschedule':
+                    rescheduleRequest(requestId);
+                    break;
+                case 'edit':
+                    editRequest(requestId);
+                    break;
+                case 'view':
+                    viewRequest(requestId);
+                    break;
+                case 'archive':
+                    archiveRequest(requestId);
+                    break;
+            }
+        });
+        
+        // Получение токена авторизации из куки
+        function getAuthHeader() {
+            if (document.cookie.includes('access_token')) {
+                const token = document.cookie.split('access_token=')[1].split(';')[0];
+                return { 'Authorization': `Bearer ${token}` };
+            }
+            return {};
+        }
+        
+        // Функции обработки действий
+        function acceptRequest(id) {
+            if (confirm('Одобрить объявление #' + id + '?')) {
+                fetch(`/api/v1/properties/${id}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка ответа: ' + response.status);
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+        
+        function rejectRequest(id) {
+            if (confirm('Отклонить объявление #' + id + '?')) {
+                fetch(`/api/v1/properties/${id}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка ответа: ' + response.status);
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+        
+        function scheduleRequest(id) {
+            const scheduledDate = prompt('Укажите дату съемки 360 (ДД.ММ.ГГГГ) для объявления #' + id);
+            if (scheduledDate) {
+                fetch(`/api/v1/properties/${id}/schedule`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({ scheduled_date: scheduledDate })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка ответа: ' + response.status);
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+        
+        function completeRequest(id) {
+            if (confirm('Завершить съемку 360 для объявления #' + id + '?')) {
+                fetch(`/api/v1/properties/${id}/complete-tour`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка ответа: ' + response.status);
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+        
+        function rescheduleRequest(id) {
+            const date = prompt('Укажите новую дату съемки (ДД.ММ.ГГГГ) для объявления #' + id);
+            if (date) {
+                fetch(`/api/v1/properties/${id}/schedule`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({ scheduled_date: date })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка ответа: ' + response.status);
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+        
+        function editRequest(id) {
+            window.location.href = `/admin/requests/${id}/edit`;
+        }
+        
+        function viewRequest(id) {
+            window.location.href = `/admin/requests/${id}`;
+        }
+        
+        function archiveRequest(id) {
+            if (confirm('Архивировать заявку #' + id + '?')) {
+                fetch(`/api/v1/requests/${id}/archive`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Ошибка: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Произошла ошибка при обработке запроса');
+                    console.error(error);
+                });
+            }
+        }
+
+        // Функции для слайдера изображений
+        $(document).on('click', '.slider-btn', function() {
+            const propertyId = $(this).data('property-id');
+            const action = $(this).data('action');
+            
+            if (action === 'next') {
+                nextImage(propertyId);
+            } else if (action === 'prev') {
+                prevImage(propertyId);
+            }
+        });
+        
+        $(document).on('click', '.slider-dot', function() {
+            const propertyId = $(this).data('property-id');
+            const imageIndex = $(this).data('image-index');
+            showImage(propertyId, imageIndex);
+        });
+        
+        function nextImage(propertyId) {
+            const slider = document.querySelector(`[data-property-id="${propertyId}"]`);
+            const images = slider.querySelectorAll('.slider-image');
+            const dots = slider.querySelectorAll('.slider-dot');
+            const activeIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+            const nextIndex = (activeIndex + 1) % images.length;
+            
+            // Убираем активный класс с текущего изображения и точки
+            images[activeIndex].classList.remove('active');
+            dots[activeIndex].classList.remove('active');
+            
+            // Добавляем активный класс к следующему изображению и точке
+            images[nextIndex].classList.add('active');
+            dots[nextIndex].classList.add('active');
+        }
+        
+        function prevImage(propertyId) {
+            const slider = document.querySelector(`[data-property-id="${propertyId}"]`);
+            const images = slider.querySelectorAll('.slider-image');
+            const dots = slider.querySelectorAll('.slider-dot');
+            const activeIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+            const prevIndex = activeIndex === 0 ? images.length - 1 : activeIndex - 1;
+            
+            // Убираем активный класс с текущего изображения и точки
+            images[activeIndex].classList.remove('active');
+            dots[activeIndex].classList.remove('active');
+            
+            // Добавляем активный класс к предыдущему изображению и точке
+            images[prevIndex].classList.add('active');
+            dots[prevIndex].classList.add('active');
+        }
+        
+        function showImage(propertyId, imageIndex) {
+            const slider = document.querySelector(`[data-property-id="${propertyId}"]`);
+            const images = slider.querySelectorAll('.slider-image');
+            const dots = slider.querySelectorAll('.slider-dot');
+            
+            // Убираем активный класс со всех изображений и точек
+            images.forEach(img => img.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            // Добавляем активный класс к выбранному изображению и точке
+            images[imageIndex].classList.add('active');
+            dots[imageIndex].classList.add('active');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему - Wazir Business</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#144b44',
+                        'primary-light': '#1a5650',
+                        'primary-dark': '#0f3d37',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .bg-primary { background-color: #144b44; }
+        .text-primary { color: #144b44; }
+        .border-primary { border-color: #144b44; }
+        
+        .login-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .form-input:focus {
+            border-color: #144b44;
+            box-shadow: 0 0 0 3px rgba(20, 75, 68, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-16 w-16 bg-primary rounded-xl flex items-center justify-center mb-4">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900">Wazir Business</h2>
+                <p class="mt-2 text-sm text-gray-600">Войдите в корпоративную панель</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-card rounded-xl shadow-lg p-8 border border-gray-200">
+                <form id="loginForm" class="space-y-6" method="POST" action="/companies/login">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400 text-sm"></i>
+                            </div>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-primary sm:text-sm transition-all duration-200"
+                                placeholder="company@example.com"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Пароль
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400 text-sm"></i>
+                            </div>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                class="form-input block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-primary sm:text-sm transition-all duration-200"
+                                placeholder="••••••••"
+                            >
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input
+                                id="remember"
+                                name="remember"
+                                type="checkbox"
+                                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                            >
+                            <label for="remember" class="ml-2 block text-sm text-gray-700">
+                                Запомнить меня
+                            </label>
+                        </div>
+
+                        <div class="text-sm">
+                            <a href="/companies/forgot-password" class="font-medium text-primary hover:text-primary-dark transition-colors">
+                                Забыли пароль?
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            id="loginButton"
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200"
+                        >
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <i class="fas fa-sign-in-alt text-primary-light group-hover:text-white text-sm"></i>
+                            </span>
+                            <span id="loginText">Войти в систему</span>
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">
+                            Нет корпоративного аккаунта? 
+                            <a href="/companies/contact" class="font-medium text-primary hover:text-primary-dark transition-colors">
+                                Связаться с нами
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Features -->
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <i class="fas fa-chart-line text-primary text-xl mb-2"></i>
+                    <p class="text-xs text-gray-600">Аналитика</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <i class="fas fa-plus-circle text-primary text-xl mb-2"></i>
+                    <p class="text-xs text-gray-600">Объявления</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <i class="fas fa-users text-primary text-xl mb-2"></i>
+                    <p class="text-xs text-gray-600">Клиенты</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Form submission
+        $('#loginForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const remember = $('#remember').is(':checked');
+            
+            // Validation
+            if (!email || !password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ошибка',
+                    text: 'Пожалуйста, заполните все поля'
+                });
+                return;
+            }
+            
+            // Loading state
+            $('#loginButton').prop('disabled', true);
+            $('#loginText').text('Вход...');
+            
+            // Submit form
+            $.ajax({
+                url: '/companies/login',
+                method: 'POST',
+                data: {
+                    email: email,
+                    password: password,
+                    remember: remember
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Успешно!',
+                        text: 'Добро пожаловать в Wazir Business',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/companies/dashboard';
+                    });
+                },
+                error: function(xhr) {
+                    let message = 'Произошла ошибка при входе';
+                    
+                    if (xhr.status === 401) {
+                        message = 'Неверный email или пароль';
+                    } else if (xhr.status === 403) {
+                        message = 'Доступ запрещен. Обратитесь к администратору.';
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ошибка входа',
+                        text: message
+                    });
+                    
+                    // Reset button
+                    $('#loginButton').prop('disabled', false);
+                    $('#loginText').text('Войти в систему');
+                }
+            });
+        });
+
+        // Auto-focus on email field
+        $(document).ready(function() {
+            $('#email').focus();
+        });
+    </script>
+</body>
+</html> 

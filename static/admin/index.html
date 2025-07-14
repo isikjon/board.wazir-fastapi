@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Панель администратора</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <style>
+        :root {
+            --color-primary: #f97316;
+            --color-primary-hover: #ea580c;
+            --color-secondary: #0f172a;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .admin-badge {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-primary);
+            color: white;
+            padding: 5px 15px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .login-container {
+            background-color: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            padding: 1.5rem;
+            color: white;
+            position: relative;
+        }
+        
+        .login-form-container {
+            padding: 2rem;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        
+        .form-input {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+            font-size: 0.95rem;
+            color: #111827;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f97316' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+            z-index: -1;
+        }
+        
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .logo {
+            max-width: 100px;
+            margin-bottom: 1rem;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            font-size: 0.8rem;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .forgot-password a {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .forgot-password a:hover {
+            color: var(--color-primary-hover);
+            text-decoration: underline;
+        }
+        
+        .version-info {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            color: #9ca3af;
+        }
+    </style>
+    </head>
+    <body class="min-h-screen flex items-center justify-center p-4">
+        <div class="background-pattern"></div>
+
+        <div class="login-container relative">
+            <div class="admin-badge">АДМИНИСТРАТОР</div>
+
+            <div class="login-header text-center">
+                <img src="../layout/assets/img/logo_non.png" alt="Wazir Logo"
+                    class="logo mx-auto">
+                <h1 class="text-2xl font-bold playfair">Wazir Недвижимость</h1>
+                <p class="text-sm mt-1 text-gray-300">Панель
+                    администрирования</p>
+            </div>
+
+            <div class="login-form-container">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Вход в
+                    систему</h2>
+
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="admin-id" class="form-label">ID
+                            администратора</label>
+                        <div class="relative">
+                            <span class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" id="admin-id" class="form-input"
+                                placeholder="Введите ваш ID" required>
+                            <div class="error-msg" id="id-error">Неверный ID
+                                администратора</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password" class="form-label">Пароль</label>
+                        <div class="relative">
+                            <span class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" id="password"
+                                class="form-input"
+                                placeholder="Введите ваш пароль" required>
+                            <div class="error-msg" id="password-error">Неверный
+                                пароль</div>
+                        </div>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#" id="forgot-link">Забыли пароль?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        Войти <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center text-sm text-gray-500">
+                    <p>Возникли проблемы? <a href="#"
+                            class="text-primary hover:underline">Свяжитесь с
+                            технической поддержкой</a></p>
+                </div>
+            </div>
+
+            <div class="version-info">Версия 1.0.5</div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Обработка отправки формы
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Получаем значения полей
+                const adminId = $('#admin-id').val().trim();
+                const password = $('#password').val().trim();
+                
+                // Сбрасываем ошибки
+                $('.error-msg').hide();
+                
+                // Проверяем, что поля не пустые
+                if (!adminId || !password) {
+                    if (!adminId) {
+                        $('#id-error').text('Поле не может быть пустым').show();
+                    }
+                    
+                    if (!password) {
+                        $('#password-error').text('Поле не может быть пустым').show();
+                    }
+                    return;
+                }
+                
+                // Показываем индикатор загрузки
+                const $loginBtn = $('.login-btn');
+                const originalText = $loginBtn.html();
+                $loginBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Вход...').prop('disabled', true);
+                
+                // Имитация задержки авторизации
+                setTimeout(function() {
+                    // Перенаправляем на страницу панели администратора
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            });
+            
+            // Обработка нажатия на "Забыли пароль?"
+            $('#forgot-link').on('click', function(e) {
+                e.preventDefault();
+                alert('Для восстановления пароля обратитесь к системному администратору.');
+            });
+        });
+    </script>
+    </body>
+</html>

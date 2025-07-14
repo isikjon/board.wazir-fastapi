@@ -1,0 +1,396 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Главная{% endblock %}
+
+{% block extra_css %}
+<style>
+    .city-banner {
+        height: 220px;
+        background-image: url('https://wazir.kg/static/dashboard_bg.png');
+        background-size: 117%;
+        background-position: top center;
+        background-repeat: no-repeat;
+        margin-bottom: 0;
+        border: none;
+        position: relative;
+    }
+    
+    .banner-text {
+        clip-path: polygon(6% 0%, 96% 0%, 100% 100%, 0% 100%);
+        width: 63%;
+        padding: 8px 0;
+        background-color: white;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: 'Montserrat', sans-serif;
+        color: #333;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: -10px;
+        left: 18%;
+        border: 1px solid #ccc;
+    }
+    
+    .nav-tabs {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    
+    .nav-tab {
+        background: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        flex: 1;
+        box-shadow: 7px 7px 7px -4px #5b5b5b;
+    }
+    
+    .nav-tab.active {
+        color: #333;
+        box-shadow: 7px 7px 7px -4px #f80909;
+    }
+    
+    .nav-tab:hover {
+        background: #f9f9f9;
+    }
+    
+    .main-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        margin: 15px 0 10px 0;
+        padding: 0 15px;
+    }
+    
+    .subtitle {
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+        line-height: 1.4;
+        margin-bottom: 20px;
+        padding: 0 15px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    
+    .action-btn:hover {
+        background: #e9ecef;
+        transform: translateY(-1px);
+    }
+    
+    .category-card {
+        transition: all 0.3s ease;
+        height: 100px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        border-radius: 12px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    }
+    
+    .category-title {
+        position: relative;
+        z-index: 2;
+        text-align: left;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        width: 100%;
+    }
+    
+    .tab-content {
+        display: none;
+        text-align: center;
+        color: #666;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .weather-currency {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    
+    .weather-icon {
+        font-size: 1.4rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="city-banner">
+    <div class="banner-text">
+        Ош • Ошская обл. •
+    </div>
+</div>
+
+<div class="nav-tabs">
+    <button class="nav-tab active" data-tab="news"><img src="https://wazir.kg/board/news.png" alt="Новости"></button>
+    <button class="nav-tab" data-tab="services"><img src="https://wazir.kg/board/uslugi.png" alt="Коммунальные услуги"></button>
+    <button class="nav-tab" data-tab="promotions"><img src="https://wazir.kg/board/aksii.png" alt="Акции"></button>
+    <button class="nav-tab" data-tab="sponsors"><img src="https://wazir.kg/board/partner.png" alt="Спонсорам и партнерам"></button>
+    <button class="nav-tab" data-tab="contacts"><img src="https://wazir.kg/board/contacts.png" alt="Контакты"></button>
+</div>
+
+<div class="tab-content active" id="news" style="margin-bottom: 20%;">
+    <h1 class="main-title">Ош - культурная столица тюркского мира</h1>
+    <p class="subtitle">
+            Ош считается одним из самых древних городов Средней Азии.
+            Ему 3000 лет, рассказываем об исторических достопримечательностях
+            Оша: Сулайман-Тоо, петроглифах, пещерах, мечетях и других 
+            интересных местах. Город республиканского подчинения в Киргизской 
+            Республике,административный центр Ошской области. 
+            Ош - второй по численности населения Кыргызстана после Бишкека,
+            крупнейший город юга страны, официально именуемый «южной столицей». 
+    </p>
+    
+    <div class="action-buttons">
+        <a href="#" class="action-btn">
+            <img src="https://wazir.kg/board/maps_btn.png" alt="Карта">
+        </a>
+        <a href="#" class="action-btn">
+            <img src="https://wazir.kg/board/photo_btn.png" alt="Фото/Видео">
+        </a>
+        <a href="#" class="action-btn">
+            <img src="https://wazir.kg/board/360.png" alt="360 - VR Тур">
+        </a>
+        <a href="#" class="action-btn">
+            <img src="https://wazir.kg/board/wiki_btn.png" alt="Википедия">
+        </a>
+    </div>
+    
+    <div class="mx-auto" style="background-color: #fff; padding: 0 10px;">
+        <div class="grid grid-cols-2 gap-1">
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/1.png')">
+                <h3 class="category-title">Гора Сулайман - Тоо</h3>
+            </a>
+            
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/2.png')">
+                <h3 class="category-title">Пещера Кыр Чилтен Унукур</h3>
+            </a>
+            
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/3.png')">
+                <h3 class="category-title">Пещера Эшен</h3>
+            </a>
+            
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/4.png')">
+                <h3 class="category-title">Пещера Тамчы Томар</h3>
+            </a>
+            
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/5.png')">
+                <h3 class="category-title">Петроглифы железного века</h3>
+            </a>
+            
+            <a href="#" class="category-card" style="background-image: url('https://wazir.kg/board/location/6.png')">
+                <h3 class="category-title">Мечеть "Тахты - Сулайман"</h3>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content" id="services">
+    <h2 class="main-title">Коммунальные услуги</h2>
+    <p class="subtitle">Информация о коммунальных услугах будет добавлена позже</p>
+</div>
+
+<div class="tab-content" id="promotions">
+    <h2 class="main-title">Акции</h2>
+    <p class="subtitle">Актуальные акции будут размещены здесь</p>
+</div>
+
+<div class="tab-content" id="sponsors">
+    <h2 class="main-title">Спонсорам и партнерам</h2>
+    <p class="subtitle">Информация для спонсоров и партнеров</p>
+</div>
+
+<div class="tab-content" id="contacts">
+    <h2 class="main-title">Контакты</h2>
+    <p class="subtitle">Контактная информация</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Обработчик переключения табов
+        $('.nav-tab').on('click', function() {
+            const tabId = $(this).data('tab');
+            
+            // Удаляем активный класс со всех табов
+            $('.nav-tab').removeClass('active');
+            $('.tab-content').removeClass('active');
+            
+            // Добавляем активный класс к выбранному табу
+            $(this).addClass('active');
+            $(`#${tabId}`).addClass('active');
+        });
+        
+        // Функция для получения данных о погоде через Visual Crossing Weather
+        function getWeather() {
+            const cachedWeather = getWeatherFromCache();
+            if (cachedWeather) {
+                displayWeatherData(cachedWeather);
+                return;
+            }
+            
+            const city = "Osh,Kyrgyzstan";
+            const apiKey = "JPWU9UY254WNDKUNM9MH9E8AR";
+            
+            $.ajax({
+                url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}/today`,
+                data: {
+                    unitGroup: "metric",
+                    key: apiKey,
+                    include: "current"
+                },
+                success: function(data) {
+                    try {
+                        if (data && data.currentConditions && data.currentConditions.temp !== undefined) {
+                            const temp = Math.round(data.currentConditions.temp);
+                            const condition = data.currentConditions.conditions ? 
+                                data.currentConditions.conditions.toLowerCase() : '';
+                            const iconCode = data.currentConditions.icon ? 
+                                data.currentConditions.icon.toLowerCase() : '';
+                            
+                            let iconHtml;
+                            if (iconCode.includes('rain') || condition.includes('дождь')) {
+                                iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4c94f2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><line x1="16" y1="13" x2="16" y2="21"></line><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>`;
+                            } else if (iconCode.includes('snow') || condition.includes('снег')) {
+                                iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9cc0fa" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="8" y1="20" x2="8.01" y2="20"></line><line x1="12" y1="18" x2="12.01" y2="18"></line><line x1="12" y1="22" x2="12.01" y2="22"></line><line x1="16" y1="16" x2="16.01" y2="16"></line><line x1="16" y1="20" x2="16.01" y2="20"></line></svg>`;
+                            } else if (iconCode === 'clear-day' || condition.includes('ясно')) {
+                                iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+                            } else {
+                                iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c8aa0" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`;
+                            }
+                            
+                            const weatherData = {
+                                temp: temp,
+                                iconHtml: iconHtml,
+                                condition: condition
+                            };
+                            saveWeatherToCache(weatherData);
+                            displayWeatherData(weatherData);
+                        } else {
+                            showFallbackWeather();
+                        }
+                    } catch (e) {
+                        showFallbackWeather();
+                    }
+                },
+                error: function() {
+                    showFallbackWeather();
+                }
+            });
+        }
+        
+        function showFallbackWeather() {
+            const month = new Date().getMonth() + 1;
+            let temp;
+            if (month >= 12 || month <= 2) {
+                temp = -2;
+            } else if (month >= 3 && month <= 5) {
+                temp = 15;
+            } else if (month >= 6 && month <= 8) {
+                temp = 28;
+            } else {
+                temp = 12;
+            }
+            
+            const weatherData = {
+                temp: temp,
+                iconHtml: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="weather-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
+            };
+            displayWeatherData(weatherData);
+        }
+        
+        function getCurrencyRate() {
+            const cachedCurrency = getCurrencyFromCache();
+            if (cachedCurrency) {
+                displayCurrencyData(cachedCurrency);
+                return;
+            }
+            
+            $.ajax({
+                url: "https://data.fx.kg/api/v1/central",
+                headers: {
+                    "Authorization": "Bearer d2WimsDMvhnYStSsq1VRd7jKLZDSS6DQMbzut6rNa9a33c51"
+                },
+                success: function(data) {
+                    if (data && data.usd) {
+                        const rate = parseFloat(data.usd).toFixed(1);
+                        const currencyData = {
+                            rate: rate,
+                            source: 'fx.kg'
+                        };
+                        saveCurrencyToCache(currencyData);
+                        displayCurrencyData(currencyData);
+                    } else {
+                        showFallbackCurrency();
+                    }
+                },
+                error: function() {
+                    showFallbackCurrency();
+                }
+            });
+        }
+        
+        function showFallbackCurrency() {
+            const fallbackData = {
+                rate: '88.8',
+                source: 'fallback'
+            };
+            saveCurrencyToCache(fallbackData);
+            displayCurrencyData(fallbackData);
+        }
+        
+        // Функции кэширования (заглушки)
+        function getWeatherFromCache() { return null; }
+        function saveWeatherToCache(data) { }
+        function getCurrencyFromCache() { return null; }
+        function saveCurrencyToCache(data) { }
+        function displayWeatherData(data) { }
+        function displayCurrencyData(data) { }
+        
+        // Инициализация
+        getWeather();
+        getCurrencyRate();
+    });
+</script>
+{% endblock %}

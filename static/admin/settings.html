@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Настройки</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googlearpis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <style>
+        :root {
+            --color-primary: #f97316;
+            --color-primary-hover: #ea580c;
+            --color-secondary: #0f172a;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--color-secondary);
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            left: -250px;
+        }
+        
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-sidebar {
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toggle-sidebar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .sidebar-menu-item {
+            padding: 0.75rem 1.5rem;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            font-weight: 300;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 1.5rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content-expanded {
+            margin-left: 0;
+        }
+        
+        /* Top Navbar */
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.63rem 1.5rem;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .page-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .admin-dropdown {
+            position: relative;
+        }
+        
+        .admin-dropdown button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+        
+        .admin-dropdown button:hover {
+            color: var(--color-primary);
+        }
+        
+        .admin-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 6px;
+            width: 200px;
+            z-index: 20;
+            display: none;
+        }
+        
+        .admin-menu.show {
+            display: block;
+        }
+        
+        .admin-menu-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            color: #4b5563;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .admin-menu-item:hover {
+            background-color: #f9fafb;
+            color: var(--color-primary);
+        }
+        
+        .admin-menu-item i {
+            margin-right: 0.75rem;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+            display: none;
+        }
+        
+        .mobile-overlay.show {
+            display: block;
+        }
+        
+        /* Settings Styles */
+        .settings-container {
+            padding: 1.5rem;
+        }
+        
+        .settings-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            padding: 1.25rem;
+            color: white;
+        }
+        
+        .settings-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-title i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .settings-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-hint {
+            display: block;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+        
+        .form-checkbox,
+        .form-radio {
+            margin-right: 0.5rem;
+        }
+        
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-label,
+        .radio-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--color-primary);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        
+        .color-swatch {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-swatch.active {
+            border-color: var(--color-secondary);
+        }
+        
+        .color-orange {
+            background-color: #f97316;
+        }
+        
+        .color-blue {
+            background-color: #3b82f6;
+        }
+        
+        .color-green {
+            background-color: #10b981;
+        }
+        
+        .color-red {
+            background-color: #ef4444;
+        }
+        
+        .color-purple {
+            background-color: #8b5cf6;
+        }
+        
+        .color-swatches {
+            display: flex;
+            margin-top: 0.5rem;
+        }
+        
+        .settings-footer {
+            padding: 1rem 1.5rem;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .save-button {
+            padding: 0.625rem 1rem;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .save-button:hover {
+            background-color: var(--color-primary-hover);
+        }
+        
+        .reset-button {
+            padding: 0.625rem 1rem;
+            background-color: white;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 0.5rem;
+        }
+        
+        .reset-button:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .input-group {
+            display: flex;
+        }
+        
+        .input-group .form-input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .input-group-append {
+            padding: 0.625rem 0.75rem;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-left: none;
+            font-size: 0.875rem;
+            color: #6b7280;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar.mobile-show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Сайдбар -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="flex items-center">
+                    <img src="../layout/assets/img/logo_non.png"
+                        alt="Wazir Logo" class="h-8 mr-2">
+                    <h1 class="text-white text-lg font-semibold playfair">
+                        <a href="dashboard.html"
+                            class="text-white hover:text-white">Wazir Admin</a>
+                    </h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="requests.html" class="sidebar-menu-item">
+                    <i class="far fa-clipboard"></i>
+                    <span>Заявки</span>
+                </a>
+                <a href="users.html" class="sidebar-menu-item">
+                    <i class="far fa-user"></i>
+                    <span>Пользователи</span>
+                </a>
+                <a href="properties.html" class="sidebar-menu-item">
+                    <i class="far fa-building"></i>
+                    <span>Объявления</span>
+                </a>
+                <a href="support.html" class="sidebar-menu-item">
+                    <i class="far fa-life-ring"></i>
+                    <span>Тех. поддержка</span>
+                </a>
+                <a href="settings.html" class="sidebar-menu-item"
+                    style="background:#f97316">
+                    <i class="far fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="index.html" class="sidebar-menu-item">
+                    <i class="far fa-sign-out-alt"></i>
+                    <span>Выход</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <div class="main-content" id="main-content">
+            <!-- Верхняя навигация -->
+            <div class="top-navbar">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar" class="toggle-sidebar mr-3">
+                        <i class="fas fa-bars text-gray-600"></i>
+                    </button>
+                    <h1 class="page-title text-xl">Настройки</h1>
+                </div>
+
+                <div class="admin-dropdown">
+                    <button id="admin-dropdown-toggle">
+                        <span class="mr-2 hidden sm:inline">Администратор</span>
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </button>
+
+                    <div class="admin-menu" id="admin-menu">
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-user"></i>
+                            <span>Профиль</span>
+                        </a>
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="border-t border-gray-200 my-1"></div>
+                        <a href="index.html" class="admin-menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выйти</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контейнер настроек -->
+            <div class="settings-container">
+                <!-- Основные настройки -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <div class="settings-title">
+                            <i class="fas fa-globe"></i>
+                            <span>Основные настройки сайта</span>
+                        </div>
+                    </div>
+                    <div class="settings-body">
+                        <div class="form-group">
+                            <label class="form-label">Название сайта</label>
+                            <input type="text" class="form-input"
+                                value="Wazir Недвижимость">
+                            <span class="form-hint">Отображается в заголовке
+                                страницы и в шапке сайта</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email
+                                администратора</label>
+                            <input type="email" class="form-input"
+                                value="admin@wazir.ru">
+                            <span class="form-hint">Используется для системных
+                                уведомлений</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Количество объявлений на
+                                странице</label>
+                            <input type="number" class="form-input" value="12">
+                            <span class="form-hint">Рекомендуемое значение:
+                                9-15</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Язык по умолчанию</label>
+                            <select class="form-select">
+                                <option value="ru" selected>Русский</option>
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="de">Deutsch</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Настройки уведомлений -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <div class="settings-title">
+                            <i class="fas fa-bell"></i>
+                            <span>Настройки уведомлений</span>
+                        </div>
+                    </div>
+                    <div class="settings-body">
+                        <div class="form-group">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Email-уведомления о
+                                    новых объявлениях</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Email-уведомления о
+                                    новых пользователях</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Push-уведомления в
+                                    браузере</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Частота дайджеста</label>
+                            <select class="form-select">
+                                <option value="daily">Ежедневно</option>
+                                <option value="weekly"
+                                    selected>Еженедельно</option>
+                                <option value="monthly">Ежемесячно</option>
+                                <option value="never">Не отправлять</option>
+                            </select>
+                            <span class="form-hint">Периодичность отправки
+                                сводки активности</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Настройки модерации -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <div class="settings-title">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Настройки модерации</span>
+                        </div>
+                    </div>
+                    <div class="settings-body">
+                        <div class="form-group">
+                            <label class="form-label">Модерация
+                                объявлений</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="moderation_auto"
+                                        name="moderation" class="form-radio">
+                                    <label for="moderation_auto"
+                                        class="radio-label">Автоматическая
+                                        публикация</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="moderation_manual"
+                                        name="moderation" class="form-radio"
+                                        checked>
+                                    <label for="moderation_manual"
+                                        class="radio-label">Ручная
+                                        модерация</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="moderation_mixed"
+                                        name="moderation" class="form-radio">
+                                    <label for="moderation_mixed"
+                                        class="radio-label">Смешанная (для
+                                        проверенных пользователей
+                                        автоматически)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Проверять изображения
+                                на</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="check_watermarks"
+                                        class="form-checkbox" checked>
+                                    <label for="check_watermarks"
+                                        class="checkbox-label">Наличие водяных
+                                        знаков</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="check_quality"
+                                        class="form-checkbox" checked>
+                                    <label for="check_quality"
+                                        class="checkbox-label">Качество
+                                        изображения</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="check_content"
+                                        class="form-checkbox" checked>
+                                    <label for="check_content"
+                                        class="checkbox-label">Соответствие
+                                        контента</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Срок активности
+                                объявления</label>
+                            <div class="input-group">
+                                <input type="number" class="form-input"
+                                    value="30">
+                                <span class="input-group-append">дней</span>
+                            </div>
+                            <span class="form-hint">По истечении срока
+                                объявление автоматически деактивируется</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Настройки внешнего вида -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <div class="settings-title">
+                            <i class="fas fa-paint-brush"></i>
+                            <span>Настройки внешнего вида</span>
+                        </div>
+                    </div>
+                    <div class="settings-body">
+                        <div class="form-group">
+                            <label class="form-label">Цветовая схема</label>
+                            <div class="color-swatches">
+                                <span
+                                    class="color-swatch color-orange active"></span>
+                                <span class="color-swatch color-blue"></span>
+                                <span class="color-swatch color-green"></span>
+                                <span class="color-swatch color-red"></span>
+                                <span class="color-swatch color-purple"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Тема интерфейса</label>
+                            <select class="form-select">
+                                <option value="light" selected>Светлая</option>
+                                <option value="dark">Тёмная</option>
+                                <option value="auto">Системная</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Компактный режим
+                                    отображения</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Анимации
+                                    интерфейса</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопки -->
+                <div class="settings-footer">
+                    <button class="reset-button">Сбросить изменения</button>
+                    <button class="save-button">Сохранить настройки</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобильное наложение -->
+        <div class="mobile-overlay" id="mobile-overlay"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Переключение видимости сайдбара
+                $('#toggle-sidebar').on('click', function() {
+                    $('#sidebar').toggleClass('sidebar-collapsed mobile-show');
+                    $('#main-content').toggleClass('main-content-expanded');
+                    $('#mobile-overlay').toggleClass('show');
+                });
+                
+                // Закрытие сайдбара на мобильных устройствах
+                $('#close-sidebar, #mobile-overlay').on('click', function() {
+                    $('#sidebar').removeClass('mobile-show');
+                    $('#mobile-overlay').removeClass('show');
+                });
+                
+                // Раскрытие меню администратора
+                $('#admin-dropdown-toggle').on('click', function() {
+                    $('#admin-menu').toggleClass('show');
+                });
+                
+                // Закрытие меню администратора при клике вне его
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.admin-dropdown').length) {
+                        $('#admin-menu').removeClass('show');
+                    }
+                });
+                
+                // Выбор цветовой схемы
+                $('.color-swatch').on('click', function() {
+                    $('.color-swatch').removeClass('active');
+                    $(this).addClass('active');
+                });
+                
+                // Сохранение настроек (демонстрационное)
+                $('.save-button').on('click', function() {
+                    alert('Настройки успешно сохранены');
+                });
+                
+                // Сброс настроек (демонстрационное)
+                $('.reset-button').on('click', function() {
+                    if (confirm('Вы уверены, что хотите сбросить все изменения?')) {
+                        alert('Настройки сброшены к значениям по умолчанию');
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

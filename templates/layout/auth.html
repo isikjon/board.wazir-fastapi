@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Wazir Недвижимость - Авторизация</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://wazir.kg/static/css/main.css"
+        />
+        <style>
+            .remember-me-block {
+                transition: all 0.3s ease;
+            }
+            .remember-me-block:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+                border-color: #93c5fd;
+            }
+            .remember-me-checkbox:checked {
+                animation: checkBounce 0.3s ease;
+            }
+            @keyframes checkBounce {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50 font-sans">
+        <div
+            class="min-h-screen flex flex-col items-center justify-center px-4 fade-in">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8 mt-4"> <div
+                        class="flex justify-center mb-4">
+                        <img
+                            style="box-shadow: 0px 0px 25px 3px rgba(0,0,0,0.22); border-radius: 35%; max-width: 100px; max-height: 120px; height: 100px; width: 120px;"
+                            src="{{ url_for('static', path='layout/assets/img/logo.png') }}"
+                            alt="Wazir Logo">
+                    </div>
+                    <h1
+                        class="text-2xl font-semibold text-gray-700 mb-2 font-montserrat">Войдите
+                        с Wazir ID</h1>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
+                    <!-- Табы для выбора способа входа -->
+                    <div class="flex w-full mb-6 border-b border-gray-200">
+                        <button type="button" id="tab-phone"
+                            class="w-full tab-btn active font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Телефон
+                        </button>
+                        <!-- <button type="button" id="tab-email"
+                            class="tab-btn font-montserrat w-1/2 py-2 text-center text-gray-600 focus:outline-none border-0 border-b-2 border-transparent">
+                            Почта
+                        </button> -->
+                    </div>
+
+                    <form id="login-form">
+                        <input type="hidden" name="contact_type"
+                            id="contact-type-input">
+                        <div class="mb-5">
+                            <label for="user-id"
+                                class="block text-sm font-medium text-gray-500 mb-1 font-montserrat">
+                                <span id="label-text">Введите телефон</span>
+                            </label>
+                            <input type="tel" id="user-id" name="contact"
+                                class="form-input font-montserrat"
+                                placeholder="Введите телефон">
+                            <p
+                                class="text-xs text-gray-500 mt-1 font-montserrat"
+                                id="phone-format-hint">Формат: +996 XXX XXX
+                                XXX</p>
+                        </div>
+
+                        <div class="mb-4 relative">
+                            <label for="password"
+                                class="block text-sm font-medium text-gray-500 mb-1 font-montserrat">Введите
+                                пароль</label>
+                            <div class="relative">
+                                <input type="password" id="password"
+                                    name="password"
+                                    class="form-input font-montserrat pr-10"
+                                    placeholder>
+                                <button type="button" id="toggle-password"
+                                    class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="error-message"
+                            class="hidden mb-4 text-sm text-red-500 font-montserrat"></div>
+
+                        <div class="flex justify-center mb-3">
+                            <a href="{{ url_for('mobile_reset') }}"
+                                class="text-sm text-gray-500 hover:text-gray-700 font-montserrat">Не
+                                помню пароль</a>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mx-auto my-4 border border-blue-100 shadow-sm remember-me-block">
+                            <label class="flex items-center justify-center cursor-pointer">
+                                <input type="checkbox" id="remember-me" class="mr-3 w-5 h-5 text-blue-600 bg-white border-2 border-blue-300 rounded focus:ring-blue-500 focus:ring-2 transition-all remember-me-checkbox">
+                                <div class="flex items-center">
+                                    <!-- <i class="fas fa-shield-alt mr-2 text-blue-500"></i> -->
+                                    <span class="text-sm text-blue-700 font-medium font-montserrat">
+                                        Запомнить данные
+                                    </span>
+                                </div>
+                            </label>
+                            <!-- <p class="text-xs text-blue-600 text-center mt-2 font-montserrat opacity-75">
+                                Данные будут сохранены безопасно в вашем браузере
+                            </p> -->
+                        </div>
+
+                        <div class="space-y-3">
+                            <button type="submit"
+                                class="btn btn-primary w-full py-3 rounded-lg font-montserrat">
+                                Войти
+                            </button>
+
+                            <a href="{{ url_for('mobile_register') }}"
+                                class="btn btn-secondary w-full py-3 rounded-lg font-montserrat text-center">
+                                Создать ID
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Красивый блок "Запомнить меня" -->
+
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            // Устанавливаем начальное значение contact_type
+            $('#contact-type-input').val('phone');
+            
+            // Функция для сохранения данных в localStorage
+            function saveRememberMeData(contact, password, contactType) {
+                if ($('#remember-me').is(':checked')) {
+                    const rememberData = {
+                        contact: contact,
+                        password: password,
+                        contactType: contactType,
+                        timestamp: new Date().getTime()
+                    };
+                    localStorage.setItem('wazir_remember_me', JSON.stringify(rememberData));
+                } else {
+                    // Если чекбокс не отмечен, удаляем сохраненные данные
+                    localStorage.removeItem('wazir_remember_me');
+                }
+            }
+            
+            // Функция для загрузки сохраненных данных
+            function loadRememberMeData() {
+                const savedData = localStorage.getItem('wazir_remember_me');
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        const currentTime = new Date().getTime();
+                        const dayInMs = 24 * 60 * 60 * 1000;
+                        
+                        // Проверяем, не истекли ли данные (30 дней)
+                        if (currentTime - data.timestamp < 30 * dayInMs) {
+                            // Восстанавливаем данные
+                            $('#user-id').val(data.contact);
+                            $('#password').val(data.password);
+                            $('#remember-me').prop('checked', true);
+                            
+                            // Переключаем на нужный таб
+                            if (data.contactType === 'email') {
+                                $('#tab-email').click();
+                            } else {
+                                $('#tab-phone').click();
+                            }
+                            
+                            console.log('Данные авторизации восстановлены из памяти');
+                        } else {
+                            // Данные устарели, удаляем их
+                            localStorage.removeItem('wazir_remember_me');
+                        }
+                    } catch (e) {
+                        console.error('Ошибка при загрузке сохраненных данных:', e);
+                        localStorage.removeItem('wazir_remember_me');
+                    }
+                }
+            }
+            
+            // Загружаем сохраненные данные при загрузке страницы
+            loadRememberMeData();
+            
+            // Обработчик изменения чекбокса "Запомнить меня"
+            $('#remember-me').on('change', function() {
+                if (!$(this).is(':checked')) {
+                    // Если пользователь снял галочку, удаляем сохраненные данные
+                    localStorage.removeItem('wazir_remember_me');
+                    console.log('Сохраненные данные авторизации удалены');
+                }
+            });
+            
+            // Маска для телефона (Киргизия)
+            $('#user-id').mask('+996 000 000 000', {
+                onKeyPress: function(cep, e, field, options) {
+                    // Если пользователь пытается изменить префикс +996, восстанавливаем его
+                    if (cep.length < 5) {
+                        $(field).val('+996 ');
+                    }
+                },
+                placeholder: "+996 ___ ___ ___"
+            });
+            
+            // Установка курсора после префикса при фокусе
+            $('#user-id').on('focus', function() {
+                if ($(this).val().length <= 5) {
+                    $(this).val('+996 ');
+                    // Устанавливаем курсор после префикса
+                    setTimeout(function() {
+                        const input = document.getElementById('user-id');
+                        const pos = 5;
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(pos, pos);
+                        }
+                    }, 10);
+                }
+            });
+            
+            // Обработка табов
+            $('.tab-btn').on('click', function() {
+                $('.tab-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Обновляем значение contact_type
+                $('#contact-type-input').val($(this).attr('id') === 'tab-phone' ? 'phone' : 'email');
+                
+                // Очищаем поля только если не используется "Запомнить меня"
+                if (!$('#remember-me').is(':checked')) {
+                    $('#user-id').val('');
+                    $('#password').val('');
+                }
+                
+                // Изменение плейсхолдера и метки в зависимости от выбранного таба
+                if ($(this).attr('id') === 'tab-phone') {
+                    $('#user-id').attr('type', 'tel');
+                    $('#user-id').attr('placeholder', 'Введите телефон');
+                    $('#label-text').text('Введите телефон');
+                    $('#user-id').mask('+996 000 000 000', {
+                        onKeyPress: function(cep, e, field, options) {
+                            // Если пользователь пытается изменить префикс +996, восстанавливаем его
+                            if (cep.length < 5) {
+                                $(field).val('+996 ');
+                            }
+                        },
+                        placeholder: "+996 ___ ___ ___"
+                    });
+                    $('#phone-format-hint').show();
+                    
+                    // Установка курсора после префикса
+                    setTimeout(function() {
+                        const input = document.getElementById('user-id');
+                        const pos = 5;
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(pos, pos);
+                        }
+                    }, 10);
+                } else {
+                    $('#user-id').unmask();
+                    $('#user-id').attr('type', 'email');
+                    $('#user-id').attr('placeholder', 'Введите почту');
+                    $('#label-text').text('Введите почту');
+                    $('#phone-format-hint').hide();
+                }
+            });
+            
+            // Переключение видимости пароля
+            $('#toggle-password').on('click', function() {
+                const passwordField = $('#password');
+                const passwordFieldType = passwordField.attr('type');
+                const icon = $(this).find('i');
+                
+                if (passwordFieldType === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+            
+            // Обработка отправки формы
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Получаем данные формы
+                const contact = $('#user-id').val();
+                const password = $('#password').val();
+                const contact_type = $('#tab-phone').hasClass('active') ? 'phone' : 'email';
+                
+                if (!contact || !password) {
+                    $('#error-message').text('Пожалуйста, заполните все поля').removeClass('hidden');
+                    return;
+                }
+                
+                // Скрываем сообщение об ошибке
+                $('#error-message').addClass('hidden');
+                
+                // Показываем индикатор загрузки
+                const $submitBtn = $(this).find('button[type="submit"]');
+                $submitBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Вход...');
+                $submitBtn.prop('disabled', true);
+                
+                // Отправляем запрос на сервер
+                $.ajax({
+                    url: '/api/v1/auth/login',
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('Login response:', response); // Добавляем лог ответа
+                        
+                        // Проверяем структуру ответа
+                        if (response && response.access_token) {
+                            // Сохраняем данные для "Запомнить меня" при успешной авторизации
+                            const contactValue = $('#user-id').val();
+                            const passwordValue = $('#password').val();
+                            const contactTypeValue = $('#tab-phone').hasClass('active') ? 'phone' : 'email';
+                            saveRememberMeData(contactValue, passwordValue, contactTypeValue);
+                            
+                            // Сохраняем токен в localStorage
+                            localStorage.setItem('access_token', response.access_token);
+                            
+                            // Сохраняем дополнительные данные, если они есть
+                            if (response.user_id) localStorage.setItem('user_id', response.user_id);
+                            if (response.full_name) localStorage.setItem('full_name', response.full_name);
+                            
+                            // Сохраняем токен в cookie
+                            document.cookie = `access_token=${response.access_token}; path=/; max-age=${60*60*24*30}`; // 30 дней
+                            
+                            // Перенаправляем на страницу дашборда
+                            window.location.href = '/mobile';
+                        } else {
+                            // Показываем сообщение об ошибке
+                            $('#error-message').text(response.detail || 'Ошибка авторизации').removeClass('hidden');
+                            $submitBtn.html('Войти');
+                            $submitBtn.prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Login error:', xhr.responseText); // Добавляем лог ошибки
+                        // Обработка ошибки
+                        let errorMessage = 'Произошла ошибка при входе. Пожалуйста, попробуйте позже.';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.detail) {
+                                errorMessage = response.detail;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                        }
+                        $('#error-message').text(errorMessage).removeClass('hidden');
+                        $submitBtn.html('Войти');
+                        $submitBtn.prop('disabled', false);
+                    }
+                });            });
+        });
+    </script>
+
+        <div class="text-center mt-4 mb-4">
+            <p class="text-sm text-gray-500 font-montserrat">Проект MTT.Inc
+                (c)</p>
+        </div>
+    </body>
+</html>

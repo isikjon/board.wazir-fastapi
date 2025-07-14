@@ -1,0 +1,613 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Wazir Недвижимость - Настройки{% endblock %}
+
+{% block page_title %}Настройки{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --color-primary: #f97316;
+    --color-primary-hover: #ea580c;
+    --color-secondary: #0f172a;
+    --transition-speed: 0.2s;
+    --body-bg: #f9fafb;
+    --card-bg: white;
+    --text-color: #374151;
+    --input-bg: white;
+    --input-border: #e5e7eb;
+    --input-text: #4b5563;
+    --footer-bg: #f9fafb;
+    --header-bg: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+    --header-text: white;
+    --label-color: #374151;
+    --hint-color: #6b7280;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    /* Базовые размеры и отступы */
+    --body-padding: 1.5rem;
+    --card-margin: 1.5rem;
+    --header-padding: 1.25rem;
+    --body-padding: 1.5rem;
+    --footer-padding: 1rem 1.5rem;
+    --form-group-margin: 1.5rem;
+    --input-padding: 0.625rem 0.75rem;
+    --input-font-size: 0.875rem;
+    --title-font-size: 1.1rem;
+}
+
+/* Темная тема */
+body.dark-theme {
+    --body-bg: #111827;
+    --card-bg: #1e293b;
+    --text-color: #f1f5f9;
+    --input-bg: #374151;
+    --input-border: #4b5563;
+    --input-text: #e5e7eb;
+    --footer-bg: #1e293b;
+    --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --header-text: #f8fafc;
+    --label-color: #e5e7eb;
+    --hint-color: #9ca3af;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Компактный режим */
+body.compact-mode {
+    --body-padding: 1rem;
+    --card-margin: 1rem;
+    --header-padding: 0.75rem;
+    --body-padding: 1rem;
+    --footer-padding: 0.75rem 1rem;
+    --form-group-margin: 0.75rem;
+    --input-padding: 0.4rem 0.6rem;
+    --input-font-size: 0.8rem;
+    --title-font-size: 1rem;
+}
+
+/* Отключение анимаций */
+body.no-animations * {
+    transition: none !important;
+}
+
+body {
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* Settings Styles */
+.settings-container {
+    padding: var(--body-padding);
+}
+
+.settings-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    margin-bottom: var(--card-margin);
+    transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.settings-header {
+    background: var(--header-bg);
+    padding: var(--header-padding);
+    color: var(--header-text);
+    transition: background var(--transition-speed), padding var(--transition-speed);
+}
+
+.settings-title {
+    font-weight: 600;
+    font-size: var(--title-font-size);
+    display: flex;
+    align-items: center;
+    transition: font-size var(--transition-speed);
+}
+
+.settings-title i {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.settings-body {
+    padding: var(--body-padding);
+    transition: padding var(--transition-speed);
+}
+
+.form-group {
+    margin-bottom: var(--form-group-margin);
+    transition: margin-bottom var(--transition-speed);
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: var(--label-color);
+    margin-bottom: 0.5rem;
+    transition: color var(--transition-speed);
+}
+
+.form-hint {
+    display: block;
+    font-size: calc(var(--input-font-size) - 0.125rem);
+    color: var(--hint-color);
+    margin-top: 0.25rem;
+    transition: color var(--transition-speed);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: var(--input-padding);
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-size: var(--input-font-size);
+    transition: all var(--transition-speed) ease;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.form-checkbox,
+.form-radio {
+    margin-right: 0.5rem;
+}
+
+.checkbox-group,
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkbox-item,
+.radio-item {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-label,
+.radio-label {
+    font-size: var(--input-font-size);
+    color: var(--input-text);
+    transition: color var(--transition-speed);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--input-border);
+    transition: background-color var(--transition-speed);
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: transform var(--transition-speed);
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-label {
+    font-size: var(--input-font-size);
+    color: var(--input-text);
+    transition: color var(--transition-speed);
+}
+
+.color-swatch {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.color-swatch.active {
+    border-color: var(--color-secondary);
+}
+
+.color-orange {
+    background-color: #f97316;
+}
+
+.color-blue {
+    background-color: #3b82f6;
+}
+
+.color-green {
+    background-color: #10b981;
+}
+
+.color-red {
+    background-color: #ef4444;
+}
+
+.color-purple {
+    background-color: #8b5cf6;
+}
+
+.color-swatches {
+    display: flex;
+    margin-top: 0.5rem;
+}
+
+.settings-footer {
+    padding: var(--footer-padding);
+    background-color: var(--footer-bg);
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    transition: background-color var(--transition-speed), padding var(--transition-speed);
+}
+
+.save-button {
+    padding: var(--input-padding);
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: var(--input-font-size);
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease, padding var(--transition-speed) ease, font-size var(--transition-speed) ease;
+}
+
+.save-button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.reset-button {
+    padding: var(--input-padding);
+    background-color: var(--card-bg);
+    color: var(--input-text);
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: var(--input-font-size);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    margin-right: 0.5rem;
+}
+
+.reset-button:hover {
+    background-color: var(--input-border);
+}
+
+.input-group {
+    display: flex;
+}
+
+.input-group .form-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group-append {
+    padding: var(--input-padding);
+    background-color: var(--input-border);
+    border: 1px solid #e5e7eb;
+    border-left: none;
+    font-size: var(--input-font-size);
+    color: var(--hint-color);
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Контейнер настроек -->
+<div class="settings-container">
+    <!-- Настройки уведомлений -->
+    <div class="settings-card" style="display: none;">
+        <div class="settings-header">
+            <div class="settings-title">
+                <i class="fas fa-bell"></i>
+                <span>Настройки уведомлений</span>
+            </div>
+        </div>
+        <div class="settings-body">
+            <form id="notification-settings-form">
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Email-уведомления о новых
+                            объявлениях</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="email_new_properties"
+                                {% if settings.email_new_properties %}checked{%
+                                endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Email-уведомления о новых
+                            пользователях</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="email_new_users" {% if
+                                settings.email_new_users %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Push-уведомления в
+                            браузере</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="push_notifications" {%
+                                if settings.push_notifications %}checked{% endif
+                                %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <span class="form-hint">Уведомления будут показываться даже
+                        если браузер закрыт</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Частота дайджеста</label>
+                    <select name="digest_frequency" class="form-select">
+                        <option value="daily" {% if settings.digest_frequency ==
+                            'daily' %}selected{% endif %}>Ежедневно</option>
+                        <option value="weekly" {% if settings.digest_frequency
+                            == 'weekly' %}selected{% endif
+                            %}>Еженедельно</option>
+                        <option value="monthly" {% if settings.digest_frequency
+                            == 'monthly' %}selected{% endif
+                            %}>Ежемесячно</option>
+                        <option value="never" {% if settings.digest_frequency ==
+                            'never' %}selected{% endif %}>Не отправлять</option>
+                    </select>
+                    <span class="form-hint">Периодичность отправки сводки
+                        активности</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Настройки внешнего вида -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <div class="settings-title">
+                <i class="fas fa-paint-brush"></i>
+                <span>Настройки внешнего вида</span>
+            </div>
+        </div>
+        <div class="settings-body">
+            <form id="appearance-settings-form">
+                <div class="form-group">
+                    <label class="form-label">Цветовая схема</label>
+                    <div class="color-swatches">
+                        <span
+                            class="color-swatch color-orange {% if settings.color_scheme == 'orange' %}active{% endif %}"
+                            data-color="orange"></span>
+                        <span
+                            class="color-swatch color-blue {% if settings.color_scheme == 'blue' %}active{% endif %}"
+                            data-color="blue"></span>
+                        <span
+                            class="color-swatch color-green {% if settings.color_scheme == 'green' %}active{% endif %}"
+                            data-color="green"></span>
+                        <span
+                            class="color-swatch color-red {% if settings.color_scheme == 'red' %}active{% endif %}"
+                            data-color="red"></span>
+                        <span
+                            class="color-swatch color-purple {% if settings.color_scheme == 'purple' %}active{% endif %}"
+                            data-color="purple"></span>
+                        <input type="hidden" name="color_scheme"
+                            id="color_scheme"
+                            value="{{ settings.color_scheme|default('orange', true) }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Тема интерфейса</label>
+                    <select name="theme" class="form-select">
+                        <option value="light" {% if settings.theme == 'light'
+                            %}selected{% endif %}>Светлая</option>
+                        <option value="dark" {% if settings.theme == 'dark'
+                            %}selected{% endif %}>Тёмная</option>
+                        <option value="auto" {% if settings.theme == 'auto'
+                            %}selected{% endif %}>Системная</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Компактный режим
+                            отображения</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="compact_mode" {% if
+                                settings.compact_mode %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Анимации интерфейса</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="animations_enabled" {%
+                                if settings.animations_enabled %}checked{% endif
+                                %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="settings-footer">
+        <button id="reset-button" class="reset-button">Сбросить
+            изменения</button>
+        <button id="save-button" class="save-button">Сохранить
+            настройки</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/notifications.js"></script>
+<script>
+$(document).ready(function() {
+    // Сохранение настроек
+    $('#save-button').on('click', function() {
+        // Собираем данные со всех форм
+        const notificationForm = document.getElementById('notification-settings-form');
+        const appearanceForm = document.getElementById('appearance-settings-form');
+        
+        // Создаем JSON объект для отправки
+        const allSettings = {
+            // Настройки уведомлений
+            email_new_properties: notificationForm.elements['email_new_properties'].checked,
+            email_new_users: notificationForm.elements['email_new_users'].checked,
+            push_notifications: notificationForm.elements['push_notifications'].checked,
+            digest_frequency: notificationForm.elements['digest_frequency'].value,
+            
+            // Настройки внешнего вида
+            color_scheme: appearanceForm.elements['color_scheme'].value,
+            theme: appearanceForm.elements['theme'].value,
+            compact_mode: appearanceForm.elements['compact_mode'].checked,
+            animations_enabled: appearanceForm.elements['animations_enabled'].checked
+        };
+        
+        // Если настройка push-уведомлений изменилась, обновляем подписку
+        const pushToggle = notificationForm.elements['push_notifications'];
+        if (pushToggle && typeof setupPushNotifications === 'function') {
+            setupPushNotifications(pushToggle.checked);
+        }
+        
+        // Отправляем AJAX запрос на FastAPI эндпоинт
+        fetch('/api/v1/settings', {
+            method: 'POST',
+            body: JSON.stringify(allSettings),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Создаем уведомление об успешном сохранении
+                const notification = $('<div class="fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">Настройки успешно сохранены</div>');
+                $('body').append(notification);
+                
+                // Удаляем уведомление через 3 секунды
+                setTimeout(() => {
+                    notification.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            } else {
+                // Создаем уведомление об ошибке
+                const notification = $('<div class="fixed bottom-4 right-4 bg-red-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">Ошибка сохранения: ' + data.message + '</div>');
+                $('body').append(notification);
+                
+                // Удаляем уведомление через 3 секунды
+                setTimeout(() => {
+                    notification.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            // Создаем уведомление об ошибке
+            const notification = $('<div class="fixed bottom-4 right-4 bg-red-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">Произошла ошибка при сохранении настроек</div>');
+            $('body').append(notification);
+            
+            // Удаляем уведомление через 3 секунды
+            setTimeout(() => {
+                notification.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }, 3000);
+        });
+    });
+    
+    // Сброс настроек
+    $('#reset-button').on('click', function() {
+        if (confirm('Вы уверены, что хотите сбросить все изменения?')) {
+            fetch('/api/v1/settings/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Перезагружаем страницу для отображения сброшенных настроек
+                    window.location.reload();
+                } else {
+                    alert('Ошибка сброса настроек: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при сбросе настроек');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

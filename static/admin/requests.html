@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wazir Недвижимость - Заявки</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+            rel="stylesheet">
+        <style>
+        :root {
+            --color-primary: #f97316; 
+            --color-primary-hover: #ea580c;
+            --color-secondary: #0f172a;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--color-secondary);
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            left: -250px;
+        }
+        
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #1e293b 100%);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-sidebar {
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toggle-sidebar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .sidebar-menu-item {
+            padding: 0.75rem 1.5rem;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .sidebar-menu-item.active {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            font-weight: 300;
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 1.5rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content-expanded {
+            margin-left: 0;
+        }
+        
+        /* Top Navbar */
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.63rem 1.5rem;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .page-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .admin-dropdown {
+            position: relative;
+        }
+        
+        .admin-dropdown button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+        
+        .admin-dropdown button:hover {
+            color: var(--color-primary);
+        }
+        
+        .admin-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 6px;
+            width: 200px;
+            z-index: 20;
+            display: none;
+        }
+        
+        .admin-menu.show {
+            display: block;
+        }
+        
+        .admin-menu-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            color: #4b5563;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .admin-menu-item:hover {
+            background-color: #f9fafb;
+            color: var(--color-primary);
+        }
+        
+        .admin-menu-item i {
+            margin-right: 0.75rem;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+            display: none;
+        }
+        
+        .mobile-overlay.show {
+            display: block;
+        }
+        
+        /* Tabs Styling */
+        .tabs-container {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-grow: 1;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-btn:hover {
+            color: var(--color-primary);
+            background-color: #f9fafb;
+        }
+        
+        .tab-btn.active {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--color-primary);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Request Cards */
+        .request-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .request-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .request-id {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .request-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-new {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        
+        .status-progress {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+        
+        .status-completed {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .request-body {
+            padding: 1rem;
+        }
+        
+        .request-property {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        
+        .property-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+        
+        .property-info h4 {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .property-address {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .property-price {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        
+        .request-details {
+            margin-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .request-footer {
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .request-btn {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .approve-btn {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        
+        .approve-btn:hover {
+            background-color: #d1fae5;
+        }
+        
+        .reject-btn {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+        
+        .reject-btn:hover {
+            background-color: #fee2e2;
+        }
+        
+        .details-btn {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .details-btn:hover {
+            background-color: #e5e7eb;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar.mobile-show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Сайдбар -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="flex items-center">
+                    <img src="../layout/assets/img/logo_non.png"
+                        alt="Wazir Logo" class="h-8 mr-2">
+                    <h1 class="text-white text-lg font-semibold playfair">
+                        <a href="dashboard.html"
+                            class="text-white hover:text-white">Wazir Admin</a>
+                    </h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="requests.html" class="sidebar-menu-item"
+                    style="background:#f97316">
+                    <i class="far fa-clipboard"></i>
+                    <span>Заявки</span>
+                </a>
+                <a href="users.html" class="sidebar-menu-item">
+                    <i class="far fa-user"></i>
+                    <span>Пользователи</span>
+                </a>
+                <a href="properties.html" class="sidebar-menu-item">
+                    <i class="far fa-building"></i>
+                    <span>Объявления</span>
+                </a>
+                <a href="support.html" class="sidebar-menu-item">
+                    <i class="far fa-life-ring"></i>
+                    <span>Тех. поддержка</span>
+                </a>
+                <a href="settings.html" class="sidebar-menu-item">
+                    <i class="far fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+
+                <div class="sidebar-divider"></div>
+
+                <a href="index.html" class="sidebar-menu-item">
+                    <i class="far fa-sign-out-alt"></i>
+                    <span>Выход</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <div class="main-content" id="main-content">
+            <!-- Верхняя навигация -->
+            <div class="top-navbar">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar" class="toggle-sidebar mr-3">
+                        <i class="fas fa-bars text-gray-600"></i>
+                    </button>
+                    <h1 class="page-title text-xl">Заявки</h1>
+                </div>
+
+                <div class="admin-dropdown">
+                    <button id="admin-dropdown-toggle">
+                        <span class="mr-2 hidden sm:inline">Администратор</span>
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </button>
+
+                    <div class="admin-menu" id="admin-menu">
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-user"></i>
+                            <span>Профиль</span>
+                        </a>
+                        <a href="#" class="admin-menu-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="border-t border-gray-200 my-1"></div>
+                        <a href="index.html" class="admin-menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выйти</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- Табы -->
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <div class="tab-btn active" data-tab="tab1">
+                            <i class="fas fa-camera-retro mr-2"></i>Съемка 360
+                            тур
+                            <span
+                                class="ml-2 text-sm bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full"
+                                style="
+                                background: #0000ff69;
+                                color: #fff;
+                            ">24</span>
+                        </div>
+                        <div class="tab-btn" data-tab="tab2">
+                            <i class="fas fa-building mr-2"></i>Новые объявления
+                            <span
+                                class="ml-2 text-sm bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">18</span>
+                        </div>
+                    </div>
+
+                    <!-- Таб: Съемка 360 тур -->
+                    <div class="tab-content active" id="tab1">
+                        <!-- Фильтры и поиск -->
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex space-x-2">
+                                <select
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value>Все статусы</option>
+                                    <option value="new">Новые</option>
+                                    <option value="progress">В
+                                        обработке</option>
+                                    <option
+                                        value="completed">Завершенные</option>
+                                </select>
+                                <select
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value>Все типы съемок</option>
+                                    <option value="basic">Базовый тур</option>
+                                    <option value="premium">Премиум тур</option>
+                                    <option value="ultra">Ультра тур</option>
+                                </select>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-filter mr-1"></i> Еще
+                                    фильтры
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="text" placeholder="Поиск заявок..."
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 pl-10 pr-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                <i
+                                    class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Список заявок -->
+                        <div class="request-list space-y-4">
+                            <!-- Заявка 1 -->
+                            <div class="request-card">
+                                <div class="request-header">
+                                    <span class="request-id">#SH-360-1456</span>
+                                    <span
+                                        class="request-status status-new">Новая
+                                        заявка</span>
+                                </div>
+                                <div class="request-body">
+                                    <div class="request-property">
+                                        <img
+                                            src="https://via.placeholder.com/80x80.png?text=Фото"
+                                            alt="Квартира" class="property-img">
+                                        <div class="property-info">
+                                            <h4>3-комн. квартира, 75 м²</h4>
+                                            <div class="property-address">
+                                                <i
+                                                    class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                                                г. Москва, ул. Ленинградская, д.
+                                                15, кв. 78
+                                            </div>
+                                            <div class="property-price">18 500
+                                                000 ₽</div>
+                                        </div>
+                                    </div>
+                                    <div class="request-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Тип
+                                                съемки:</span>
+                                            <span class="detail-value">Премиум
+                                                тур</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Дата
+                                                заявки:</span>
+                                            <span
+                                                class="detail-value">15.06.2023,
+                                                10:45</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span
+                                                class="detail-label">Клиент:</span>
+                                            <span class="detail-value">Иванов
+                                                Иван</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span
+                                                class="detail-label">Контакт:</span>
+                                            <span class="detail-value">+7 (903)
+                                                123-45-67</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="request-footer">
+                                    <div class="request-btn approve-btn">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Принять
+                                    </div>
+                                    <div class="request-btn details-btn">
+                                        <i class="fas fa-eye mr-1"></i> Детали
+                                    </div>
+                                    <div class="request-btn reject-btn">
+                                        <i class="fas fa-times mr-1"></i>
+                                        Отклонить
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Заявка 2 -->
+                            <div class="request-card">
+                                <div class="request-header">
+                                    <span class="request-id">#SH-360-1455</span>
+                                    <span
+                                        class="request-status status-progress">В
+                                        обработке</span>
+                                </div>
+                                <div class="request-body">
+                                    <div class="request-property">
+                                        <img
+                                            src="https://via.placeholder.com/80x80.png?text=Фото"
+                                            alt="Дом" class="property-img">
+                                        <div class="property-info">
+                                            <h4>Дом, 120 м², участок 12
+                                                сот.</h4>
+                                            <div class="property-address">
+                                                <i
+                                                    class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                                                Московская обл., г. Одинцово, КП
+                                                "Лесной"
+                                            </div>
+                                            <div class="property-price">27 800
+                                                000 ₽</div>
+                                        </div>
+                                    </div>
+                                    <div class="request-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Тип
+                                                съемки:</span>
+                                            <span class="detail-value">Ультра
+                                                тур</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Дата
+                                                заявки:</span>
+                                            <span
+                                                class="detail-value">14.06.2023,
+                                                16:20</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span
+                                                class="detail-label">Клиент:</span>
+                                            <span class="detail-value">Смирнова
+                                                Анна</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span
+                                                class="detail-label">Статус:</span>
+                                            <span class="detail-value">Назначена
+                                                съемка на 18.06.2023</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="request-footer">
+                                    <div class="request-btn approve-btn">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Расписание
+                                    </div>
+                                    <div class="request-btn details-btn">
+                                        <i class="fas fa-eye mr-1"></i> Детали
+                                    </div>
+                                    <div class="request-btn reject-btn">
+                                        <i class="fas fa-ban mr-1"></i> Отменить
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Заявка 3 -->
+                            <div class="request-card">
+                                <div class="request-header">
+                                    <span class="request-id">#SH-360-1452</span>
+                                    <span
+                                        class="request-status status-completed">Завершена</span>
+                                </div>
+                                <div class="request-body">
+                                    <div class="request-property">
+                                        <img
+                                            src="https://via.placeholder.com/80x80.png?text=Фото"
+                                            alt="Квартира" class="property-img">
+                                        <div class="property-info">
+                                            <h4>2-комн. квартира, 58 м²</h4>
+                                            <div class="property-address">
+                                                <i
+                                                    class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                                                г. Москва, ул. Строителей, д. 8,
+                                                кв. 15
+                                            </div>
+                                            <div class="property-price">15 300
+                                                000 ₽</div>
+                                        </div>
+                                    </div>
+                                    <div class="request-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Тип
+                                                съемки:</span>
+                                            <span class="detail-value">Базовый
+                                                тур</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Дата
+                                                заявки:</span>
+                                            <span
+                                                class="detail-value">10.06.2023,
+                                                11:30</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Дата
+                                                съемки:</span>
+                                            <span
+                                                class="detail-value">12.06.2023,
+                                                14:00</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span
+                                                class="detail-label">Результат:</span>
+                                            <a href="#"
+                                                class="text-blue-600 hover:underline">Посмотреть
+                                                тур</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="request-footer">
+                                    <div class="request-btn approve-btn"
+                                        style="background-color: #f8fafc; color: #64748b;">
+                                        <i class="fas fa-check-double mr-1"></i>
+                                        Выполнено
+                                    </div>
+                                    <div class="request-btn details-btn">
+                                        <i class="fas fa-eye mr-1"></i> Детали
+                                    </div>
+                                    <div class="request-btn reject-btn"
+                                        style="background-color: #f8fafc; color: #64748b;">
+                                        <i class="fas fa-archive mr-1"></i>
+                                        Архивировать
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Пагинация -->
+                        <div class="flex justify-between items-center mt-6">
+                            <div class="text-sm text-gray-500">
+                                Показано: <span class="font-medium">1-3</span>
+                                из <span class="font-medium">24</span>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-500 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button
+                                    class="bg-orange-500 border border-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    1
+                                </button>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    2
+                                </button>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    3
+                                </button>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-500 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Таб: Новые объявления (будет добавлено позже) -->
+                    <div class="tab-content" id="tab2">
+                        <!-- Фильтры и поиск -->
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex space-x-2">
+                                <select
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value>Все типы</option>
+                                    <option value="apartment">Квартиры</option>
+                                    <option value="house">Дома</option>
+                                    <option
+                                        value="commercial">Коммерческая</option>
+                                </select>
+                                <select
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value>Любая стоимость</option>
+                                    <option value="economy">До 10 млн ₽</option>
+                                    <option value="comfort">10-20 млн ₽</option>
+                                    <option value="business">20-40 млн
+                                        ₽</option>
+                                    <option value="premium">Свыше 40 млн
+                                        ₽</option>
+                                </select>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-filter mr-1"></i> Больше
+                                    фильтров
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="text"
+                                    placeholder="Поиск по адресу, ID..."
+                                    class="bg-white border border-gray-300 text-gray-700 py-2 pl-10 pr-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                <i
+                                    class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Дополнительное меню для новых объявлений -->
+                        <div
+                            class="bg-gray-50 rounded-lg p-4 mb-4 flex justify-between items-center">
+                            <div class="text-sm font-medium">
+                                <span
+                                    class="text-orange-500 font-semibold">18</span>
+                                новых объявлений требуют проверки
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button
+                                    class="bg-orange-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-check-double mr-2"></i>
+                                    Одобрить все
+                                </button>
+                                <div
+                                    class="bg-white px-3 py-2 rounded-md text-sm font-medium text-gray-500 shadow-sm">
+                                    <i class="fas fa-clock mr-2"></i> Среднее
+                                    время модерации: 1.5ч
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Таблица новых объявлений -->
+                        <div
+                            class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            ID / Дата
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Объект
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Собственник
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Цена
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Статус
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Действия
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-gray-200">
+                                    <!-- Строка 1 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-medium text-gray-900">#PR-2456</div>
+                                            <div
+                                                class="text-sm text-gray-500">15.06.2023</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="flex-shrink-0 h-10 w-10">
+                                                    <img
+                                                        class="h-10 w-10 rounded-md object-cover"
+                                                        src="https://via.placeholder.com/40x40.png?text=Фото"
+                                                        alt>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div
+                                                        class="text-sm font-medium text-gray-900">3-комн.
+                                                        квартира, 82 м²</div>
+                                                    <div
+                                                        class="text-xs text-gray-500">г.
+                                                        Москва, ул. Профсоюзная,
+                                                        д. 110</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm text-gray-900">Соколов
+                                                Дмитрий</div>
+                                            <div
+                                                class="text-xs text-gray-500">+7
+                                                (916) 987-65-43</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-semibold text-gray-900">23
+                                                800 000 ₽</div>
+                                            <div
+                                                class="text-xs text-gray-500">290
+                                                244 ₽/м²</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Ожидает проверки
+                                            </span>
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button
+                                                    class="text-orange-600 hover:text-orange-800"
+                                                    title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button
+                                                    class="text-green-600 hover:text-green-800"
+                                                    title="Одобрить">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="text-red-600 hover:text-red-800"
+                                                    title="Отклонить">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                <button
+                                                    class="text-blue-600 hover:text-blue-800"
+                                                    title="Редактировать">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Строка 2 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-medium text-gray-900">#PR-2455</div>
+                                            <div
+                                                class="text-sm text-gray-500">15.06.2023</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="flex-shrink-0 h-10 w-10">
+                                                    <img
+                                                        class="h-10 w-10 rounded-md object-cover"
+                                                        src="https://via.placeholder.com/40x40.png?text=Фото"
+                                                        alt>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div
+                                                        class="text-sm font-medium text-gray-900">Дом,
+                                                        180 м², участок 15
+                                                        сот.</div>
+                                                    <div
+                                                        class="text-xs text-gray-500">Московская
+                                                        обл., Истринский р-н, д.
+                                                        Бужарово</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm text-gray-900">Петрова
+                                                Елена</div>
+                                            <div
+                                                class="text-xs text-gray-500">+7
+                                                (925) 123-45-67</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-semibold text-gray-900">35
+                                                500 000 ₽</div>
+                                            <div
+                                                class="text-xs text-gray-500">197
+                                                222 ₽/м²</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Ожидает проверки
+                                            </span>
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button
+                                                    class="text-orange-600 hover:text-orange-800"
+                                                    title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button
+                                                    class="text-green-600 hover:text-green-800"
+                                                    title="Одобрить">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="text-red-600 hover:text-red-800"
+                                                    title="Отклонить">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                <button
+                                                    class="text-blue-600 hover:text-blue-800"
+                                                    title="Редактировать">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Строка 3 -->
+                                    <tr class="hover:bg-gray-50 bg-green-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-medium text-gray-900">#PR-2454</div>
+                                            <div
+                                                class="text-sm text-gray-500">14.06.2023</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="flex-shrink-0 h-10 w-10">
+                                                    <img
+                                                        class="h-10 w-10 rounded-md object-cover"
+                                                        src="https://via.placeholder.com/40x40.png?text=Фото"
+                                                        alt>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div
+                                                        class="text-sm font-medium text-gray-900">Офис,
+                                                        120 м²</div>
+                                                    <div
+                                                        class="text-xs text-gray-500">г.
+                                                        Москва, Ленинградский
+                                                        пр-т, д. 80</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm text-gray-900">ООО
+                                                "Бизнес-центр"</div>
+                                            <div
+                                                class="text-xs text-gray-500">+7
+                                                (495) 123-45-67</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="text-sm font-semibold text-gray-900">280
+                                                000 ₽/мес</div>
+                                            <div
+                                                class="text-xs text-gray-500">Аренда</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                <i
+                                                    class="fas fa-check-circle mr-1"></i>
+                                                Проверено
+                                            </span>
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button
+                                                    class="text-orange-600 hover:text-orange-800"
+                                                    title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button
+                                                    class="text-gray-400 cursor-not-allowed"
+                                                    title="Одобрено">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="text-blue-600 hover:text-blue-800"
+                                                    title="Редактировать">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button
+                                                    class="text-purple-600 hover:text-purple-800"
+                                                    title="Продвинуть">
+                                                    <i
+                                                        class="fas fa-bullhorn"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Пагинация -->
+                        <div class="flex justify-between items-center mt-6">
+                            <div class="text-sm text-gray-500">
+                                Показано: <span class="font-medium">1-3</span>
+                                из <span class="font-medium">18</span>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-500 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button
+                                    class="bg-orange-500 border border-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    1
+                                </button>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    2
+                                </button>
+                                <button
+                                    class="bg-white border border-gray-300 text-gray-500 px-4 py-2 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Добавленное от себя: Графики активности модерации -->
+                        <div class="mt-8">
+                            <h3
+                                class="text-lg font-semibold text-gray-900 mb-4">Активность
+                                модерации</h3>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="bg-white rounded-lg p-4 shadow-sm">
+                                    <div
+                                        class="flex justify-between items-center mb-4">
+                                        <h4
+                                            class="font-medium text-gray-700">Новые
+                                            объявления (последние 7 дней)</h4>
+                                        <div
+                                            class="text-xs text-gray-500">Обновлено
+                                            сегодня в 12:45</div>
+                                    </div>
+                                    <div
+                                        class="h-60 bg-gray-50 rounded-lg flex items-end p-4 space-x-3">
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 40px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Пн</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 65px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Вт</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 48px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Ср</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 80px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Чт</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 95px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Пт</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-blue-500 w-full rounded-t-sm"
+                                                style="height: 50px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-gray-500">Сб</div>
+                                        </div>
+                                        <div
+                                            class="flex-1 flex flex-col items-center">
+                                            <div
+                                                class="bg-orange-500 w-full rounded-t-sm"
+                                                style="height: 75px;"></div>
+                                            <div
+                                                class="text-xs mt-1 text-orange-500 font-medium">Вс</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-lg p-4 shadow-sm">
+                                    <div
+                                        class="flex justify-between items-center mb-4">
+                                        <h4
+                                            class="font-medium text-gray-700">Эффективность
+                                            модерации</h4>
+                                        <select
+                                            class="text-xs text-gray-500 bg-transparent border-none focus:outline-none">
+                                            <option>Эта неделя</option>
+                                            <option>Прошлая неделя</option>
+                                            <option>Этот месяц</option>
+                                        </select>
+                                    </div>
+                                    <div
+                                        class="flex items-center justify-center h-60">
+                                        <div
+                                            class="w-40 h-40 rounded-full border-8 border-gray-100 relative flex items-center justify-center">
+                                            <div
+                                                class="absolute inset-0 rounded-full border-8 border-l-orange-500 border-t-orange-500 border-r-orange-300 border-b-orange-300 transform -rotate-45"></div>
+                                            <div class="text-center">
+                                                <div
+                                                    class="text-3xl font-bold text-gray-800">78%</div>
+                                                <div
+                                                    class="text-xs text-gray-500">эффективность</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex justify-between text-xs text-gray-500 mt-4">
+                                        <div>Среднее время обработки: <span
+                                                class="font-medium text-gray-700">2.4ч</span></div>
+                                        <div>Цель: <span
+                                                class="font-medium text-gray-700">1.5ч</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобильное наложение -->
+        <div class="mobile-overlay" id="mobile-overlay"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            // Управление сайдбаром
+            $(document).ready(function() {
+                // Переключение видимости сайдбара
+                $('#toggle-sidebar').on('click', function() {
+                    $('#sidebar').toggleClass('sidebar-collapsed mobile-show');
+                    $('#main-content').toggleClass('main-content-expanded');
+                    $('#mobile-overlay').toggleClass('show');
+                });
+                
+                // Закрытие сайдбара на мобильных устройствах
+                $('#close-sidebar, #mobile-overlay').on('click', function() {
+                    $('#sidebar').removeClass('mobile-show');
+                    $('#mobile-overlay').removeClass('show');
+                });
+                
+                // Раскрытие меню администратора
+                $('#admin-dropdown-toggle').on('click', function() {
+                    $('#admin-menu').toggleClass('show');
+                });
+                
+                // Закрытие меню администратора при клике вне его
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.admin-dropdown').length) {
+                        $('#admin-menu').removeClass('show');
+                    }
+                });
+            });
+            
+            // Переключение табов
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Удаляем класс active у всех кнопок и контента
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Добавляем класс active к текущей кнопке
+                    button.classList.add('active');
+                    
+                    // Активируем соответствующий контент
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,192 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Wazir Недвижимость - Сообщения{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-card {
+        transition: all 0.3s ease;
+        height: 120px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .category-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    }
+    .category-title {
+        position: relative;
+        z-index: 2;
+    }
+    .bottom-nav {
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+        transition: all 0.2s ease;
+    }
+    .nav-item.active {
+        color: var(--color-primary);
+    }
+    .nav-item:hover {
+        color: var(--color-primary-hover);
+    }
+    .city-banner {
+        height: 180px;
+        background-image: url('https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?q=80&w=1200&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .city-banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+    }
+    .city-content {
+        position: relative;
+        z-index: 2;
+    }
+    .weather-currency {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    .weather-icon {
+        font-size: 1.4rem;
+    }
+    .nav-icons {
+        font-size: 1.6rem;
+        font-weight: 300;
+    }
+    .chat-header {
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 10;
+    }
+    .chat-item {
+        padding: 16px;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+    }
+    .chat-item:hover {
+        background-color: #f9fafb;
+    }
+    .chat-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        overflow: hidden;
+        background-color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+    }
+    .chat-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .chat-name {
+        font-weight: 500;
+        font-size: 1.05rem;
+        color: #111827;
+    }
+    .chat-status {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+    .chat-last-message {
+        font-size: 0.95rem;
+        color: #4b5563;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+    }
+    .chat-time {
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+    .chat-unread {
+        width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #4b5563;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    .search-container {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        background-color: #f9fafb;
+        font-size: 0.95rem;
+        outline: none;
+    }
+    .search-icon {
+        position: absolute;
+        left: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Шапка страницы -->
+<div class="chat-header px-4 py-4">
+    <h1 class="text-xl font-semibold text-gray-800">Сообщения</h1>
+</div>
+
+<!-- Поиск -->
+<div class="search-container relative">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+        viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+        stroke-width="1.75" stroke-linecap="round"
+        stroke-linejoin="round" class="search-icon"><circle cx="11"
+            cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65"
+            y2="16.65"></line></svg>
+    <input type="text" class="search-input" placeholder="Поиск"
+        id="searchInput">
+</div>
+
+<!-- Список чатов -->
+<div class="chats-list flex-1" id="chatsContainer">
+    <!-- Динамически заполняемый список чатов -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // ... existing code ...
+    });
+</script>
+{% endblock %}

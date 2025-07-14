@@ -1,0 +1,541 @@
+{% extends "companies/base.html" %}
+
+{% block page_title %}Создать объявление{% endblock %}
+{% block page_subtitle %}Добавление нового объявления{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+    
+    .form-section:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background: #f9fafb;
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #144b44;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(20, 75, 68, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .required {
+        color: #ef4444;
+    }
+    
+    .photo-upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+    }
+    
+    .photo-upload-area:hover {
+        border-color: #144b44;
+        background: #f0f9ff;
+    }
+    
+    .uploaded-photos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    
+    .photo-item {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f3f4f6;
+    }
+    
+    .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .photo-remove {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .photo-remove:hover {
+        background: #ef4444;
+        transform: scale(1.1);
+    }
+    
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+    
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .checkbox-item:hover {
+        border-color: #144b44;
+        background: #f8fafc;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+        margin-right: 8px;
+        accent-color: #144b44;
+    }
+    
+    .btn-save {
+        background: #144b44;
+        color: white;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 16px;
+    }
+    
+    .btn-save:hover {
+        background: #1a5650;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(20, 75, 68, 0.3);
+    }
+    
+    .btn-save:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2, .grid-3 {
+            grid-template-columns: 1fr;
+        }
+        
+        .checkbox-group {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form id="createListingForm" class="max-w-4xl">
+    <!-- Основная информация -->
+    <div class="form-section">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Основная информация</h3>
+        
+        <div class="grid-2">
+            <div>
+                <label class="form-label">Название объявления <span class="required">*</span></label>
+                <input type="text" name="title" class="form-input" placeholder="Например: 3-комнатная квартира в центре" required>
+            </div>
+            
+            <div>
+                <label class="form-label">Цена (сом) <span class="required">*</span></label>
+                <input type="number" name="price" class="form-input" placeholder="0" min="0" required>
+            </div>
+        </div>
+        
+        <div class="grid-2 mt-4">
+            <div>
+                <label class="form-label">Категория <span class="required">*</span></label>
+                <select name="category_id" class="form-select" required>
+                    <option value="">Выберите категорию</option>
+                    <!-- Категории будут загружены через JavaScript -->
+                </select>
+            </div>
+            
+            <div>
+                <label class="form-label">Тип недвижимости</label>
+                <select name="type" class="form-select">
+                    <option value="apartment">Квартира</option>
+                    <option value="house">Дом</option>
+                    <option value="commercial">Коммерческая</option>
+                    <option value="land">Участок</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <label class="form-label">Описание <span class="required">*</span></label>
+            <textarea name="description" class="form-textarea" placeholder="Подробное описание недвижимости..." required></textarea>
+        </div>
+        
+        <div class="grid-2 mt-4">
+            <div>
+                <label class="form-label">Адрес <span class="required">*</span></label>
+                <input type="text" name="address" class="form-input" placeholder="Улица, дом, район" required>
+            </div>
+            
+            <div>
+                <label class="form-label">Город <span class="required">*</span></label>
+                <select name="city" class="form-select" required>
+                    <option value="">Выберите город</option>
+                    <!-- Города будут загружены через JavaScript -->
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Характеристики -->
+    <div class="form-section">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Характеристики</h3>
+        
+        <div class="grid-3">
+            <div>
+                <label class="form-label">Площадь (м²)</label>
+                <input type="number" name="area" class="form-input" placeholder="0" min="0" step="0.1">
+            </div>
+            
+            <div>
+                <label class="form-label">Количество комнат</label>
+                <select name="rooms" class="form-select">
+                    <option value="">Выберите</option>
+                    <option value="1">1 комната</option>
+                    <option value="2">2 комнаты</option>
+                    <option value="3">3 комнаты</option>
+                    <option value="4">4 комнаты</option>
+                    <option value="5">5+ комнат</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="form-label">Этаж</label>
+                <input type="number" name="floor" class="form-input" placeholder="0" min="1" max="50">
+            </div>
+        </div>
+        
+        <div class="grid-2 mt-4">
+            <div>
+                <label class="form-label">Этажность здания</label>
+                <input type="number" name="building_floors" class="form-input" placeholder="0" min="1" max="50">
+            </div>
+            
+            <div>
+                <label class="form-label">Санузел</label>
+                <select name="bathroom_type" class="form-select">
+                    <option value="">Выберите</option>
+                    <option value="separate">Раздельный</option>
+                    <option value="combined">Совмещенный</option>
+                    <option value="multiple">Несколько</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Дополнительные удобства -->
+        <div class="mt-6">
+            <label class="form-label">Дополнительные удобства</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_balcony">
+                    <span>Балкон/лоджия</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_furniture">
+                    <span>Мебель</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_renovation">
+                    <span>Ремонт</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_parking">
+                    <span>Парковка</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_elevator">
+                    <span>Лифт</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_security">
+                    <span>Охрана</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_internet">
+                    <span>Интернет</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_air_conditioning">
+                    <span>Кондиционер</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_heating">
+                    <span>Отопление</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_yard">
+                    <span>Двор/сад</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_pool">
+                    <span>Бассейн</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="has_gym">
+                    <span>Спортзал</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Фотографии -->
+    <div class="form-section">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Фотографии <span class="required">*</span></h3>
+        
+        <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+            <i class="fas fa-camera text-3xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600 text-lg font-medium">Нажмите для добавления фото</p>
+            <p class="text-gray-400 text-sm mt-2">Минимум 2 фотографии, максимум 10</p>
+        </div>
+        
+        <input type="file" id="photoInput" name="photos" multiple accept="image/*" style="display: none;">
+        
+        <div id="uploadedPhotos" class="uploaded-photos"></div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="flex justify-between items-center">
+        <a href="/companies/listings" class="text-gray-600 hover:text-gray-800 font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>Назад к списку
+        </a>
+        
+        <div class="space-x-4">
+            <button type="button" onclick="saveDraft()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                Сохранить черновик
+            </button>
+            <button type="submit" class="btn-save">
+                <i class="fas fa-check mr-2"></i>Опубликовать
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+let uploadedFiles = [];
+
+// Загрузка данных при инициализации
+document.addEventListener('DOMContentLoaded', function() {
+    loadCities();
+    loadCategories();
+});
+
+// Загрузка городов из JSON файла
+async function loadCities() {
+    try {
+        const response = await fetch('/static/data/cities.json');
+        const data = await response.json();
+        
+        const citySelect = document.querySelector('select[name="city"]');
+        citySelect.innerHTML = '<option value="">Выберите город</option>';
+        
+        data.regions.forEach(region => {
+            // Добавляем группу региона
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = region.name;
+            
+            region.cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                optgroup.appendChild(option);
+            });
+            
+            citySelect.appendChild(optgroup);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки городов:', error);
+    }
+}
+
+// Загрузка категорий из БД
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/v1/categories');
+        const categories = await response.json();
+        
+        const categorySelect = document.querySelector('select[name="category_id"]');
+        categorySelect.innerHTML = '<option value="">Выберите категорию</option>';
+        
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            categorySelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки категорий:', error);
+    }
+}
+
+// Обработка загрузки фотографий
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    
+    files.forEach(file => {
+        if (uploadedFiles.length >= 10) {
+            alert('Максимум 10 фотографий');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedFiles.push({
+                file: file,
+                url: e.target.result
+            });
+            renderPhotos();
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+// Отображение загруженных фото
+function renderPhotos() {
+    const container = document.getElementById('uploadedPhotos');
+    container.innerHTML = uploadedFiles.map((item, index) => `
+        <div class="photo-item">
+            <img src="${item.url}" alt="Photo ${index + 1}">
+            <button type="button" class="photo-remove" onclick="removePhoto(${index})">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Удаление фото
+function removePhoto(index) {
+    uploadedFiles.splice(index, 1);
+    renderPhotos();
+}
+
+// Сохранение черновика
+function saveDraft() {
+    const formData = new FormData(document.getElementById('createListingForm'));
+    formData.set('status', 'draft');
+    
+    // Добавляем фотографии
+    uploadedFiles.forEach((item, index) => {
+        formData.append(`photo_${index}`, item.file);
+    });
+    
+    submitForm(formData, 'Черновик сохранен');
+}
+
+// Отправка формы
+document.getElementById('createListingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (uploadedFiles.length < 2) {
+        alert('Необходимо загрузить минимум 2 фотографии');
+        return;
+    }
+    
+    const formData = new FormData(this);
+    formData.set('status', 'pending');
+    
+    // Добавляем фотографии
+    uploadedFiles.forEach((item, index) => {
+        formData.append(`photo_${index}`, item.file);
+    });
+    
+    submitForm(formData, 'Объявление отправлено на модерацию');
+});
+
+// Отправка данных на сервер
+async function submitForm(formData, successMessage) {
+    const submitBtn = document.querySelector('.btn-save');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Сохранение...';
+    
+    try {
+        const response = await fetch('/api/v1/companies/properties', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            alert(successMessage);
+            window.location.href = '/companies/listings';
+        } else {
+            const error = await response.json();
+            alert('Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        alert('Ошибка сети: ' + error.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отладка загрузки файлов - Wazir</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Отладка загрузки файлов</h1>
+        <p>Эта страница поможет отладить проблемы с загрузкой изображений на медиа-сервер.</p>
+        
+        <form id="debugForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Название теста:</label>
+                <input type="text" id="title" name="title" value="Отладочный тест" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="photos">Выберите изображения (минимум 2):</label>
+                <input type="file" id="photos" name="photos" multiple accept="image/*" required>
+                <div id="fileInfo" class="file-info" style="display: none;"></div>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 Запустить отладочный тест</button>
+        </form>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('debugForm');
+        const photosInput = document.getElementById('photos');
+        const fileInfo = document.getElementById('fileInfo');
+        const submitBtn = document.getElementById('submitBtn');
+        const result = document.getElementById('result');
+
+        // Показываем информацию о выбранных файлах
+        photosInput.addEventListener('change', function() {
+            const files = this.files;
+            if (files.length > 0) {
+                let info = `Выбрано файлов: ${files.length}\n\n`;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    info += `${i+1}. ${file.name}\n`;
+                    info += `   Размер: ${(file.size / 1024).toFixed(2)} KB\n`;
+                    info += `   Тип: ${file.type}\n\n`;
+                }
+                fileInfo.textContent = info;
+                fileInfo.style.display = 'block';
+            } else {
+                fileInfo.style.display = 'none';
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            // Проверяем количество файлов
+            const files = photosInput.files;
+            if (files.length < 1) {
+                alert('Выберите хотя бы один файл');
+                return;
+            }
+            
+            // Показываем состояние загрузки
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Выполняется отладочный тест...';
+            result.style.display = 'block';
+            result.className = 'result loading';
+            result.textContent = 'Отправляем файлы на сервер для отладки...';
+            
+            try {
+                const response = await fetch('/mobile/test-debug-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    result.className = 'result success';
+                    result.textContent = '✅ ОТЛАДОЧНЫЙ ТЕСТ УСПЕШЕН!\n\n' + 
+                                       'Результат:\n' + 
+                                       JSON.stringify(data, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ ОШИБКА В ОТЛАДОЧНОМ ТЕСТЕ:\n\n' + 
+                                       JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ КРИТИЧЕСКАЯ ОШИБКА:\n\n' + error.message;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Запустить отладочный тест';
+            }
+        });
+    </script>
+</body>
+</html> 
