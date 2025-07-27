@@ -4,11 +4,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_HOST=91.218.141.27
-      - DB_PORT=3306
-      - DB_NAME=wazir
-      - DB_USER=wazir
-      - DB_PASSWORD=c:ICx9Pr{48y>6BmBc3r
+      - DATABASE_URL=mysql+pymysql://wazir:wazirpassword@217.114.10.130:3306/wazir
       - SECRET_KEY=7775c3c9d85f5a9b8c2c28234c2c5d9b8c2c2823
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=2880
@@ -30,4 +26,4 @@ services:
 
 volumes:
   media_data:
-  logs_data: 
+  logs_data:

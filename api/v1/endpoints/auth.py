@@ -57,16 +57,40 @@ def get_user_by_contact(db: Session, contact: str, contact_type: str):
         # Очищаем телефон от пробелов и других символов для сравнения
         phone_clean = re.sub(r'\D', '', contact)
         
+        print(f"DEBUG: Поиск пользователя по телефону")
+        print(f"DEBUG: Исходный контакт: '{contact}'")
+        print(f"DEBUG: Очищенный телефон: '{phone_clean}'")
+        
         # Сначала поробуем точное совпадение
         user = db.query(models.User).filter(models.User.phone == contact).first()
         if user:
+            print(f"DEBUG: Найден пользователь точным совпадением: {user.phone}")
             return user
             
         # Если не нашли, ищем по очищенному номеру с любыми разделителями
-        return db.query(models.User).filter(
+        user = db.query(models.User).filter(
             models.User.phone.ilike(f"%{phone_clean}%") | 
             models.User.phone == phone_clean
         ).first()
+        
+        if user:
+            print(f"DEBUG: Найден пользователь по очищенному номеру: {user.phone}")
+        else:
+            # Попробуем найти по номеру без кода страны
+            if phone_clean.startswith('996'):
+                phone_without_country = phone_clean[3:]  # Убираем 996
+                print(f"DEBUG: Ищем без кода страны: '{phone_without_country}'")
+                user = db.query(models.User).filter(
+                    models.User.phone.ilike(f"%{phone_without_country}%")
+                ).first()
+                if user:
+                    print(f"DEBUG: Найден пользователь без кода страны: {user.phone}")
+                else:
+                    print(f"DEBUG: Пользователь не найден")
+            else:
+                print(f"DEBUG: Пользователь не найден")
+            
+        return user
 
 # Файл для хранения кодов (тот же что использует бот)
 CODES_FILE = "verification_codes.json"
