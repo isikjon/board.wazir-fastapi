@@ -243,20 +243,6 @@
             <div class="nav-indicator"></div>
           </a>
           <a
-            href="{{ url_for('services') }}"
-            class="nav-item {% if request.url.path == '/mobile/services' or request.url.path.startswith('/mobile/services/') %}active{% else %}text-gray-500{% endif %}"
-          >
-            <div class="nav-icon-container">
-              <img
-                src="https://wazir.kg/static/360.png"
-                alt="360"
-                style="width: 30px; height: 24px"
-                class="nav-icons"
-              />
-            </div>
-            <div class="nav-indicator"></div>
-          </a>
-          <a
             href="{{ url_for('support') }}"
             class="nav-item {% if request.url.path == '/mobile/support' %}active{% else %}text-gray-500{% endif %}"
           >
