@@ -11,7 +11,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = 'add_media_fields'
-down_revision = None  # Установите предыдущую ревизию если есть
+down_revision = '449e5825a758'  # Связано с последней миграцией
 branch_labels = None
 depends_on = None
 

@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     
     # Media
     MEDIA_DIR: str = "media"
+    MEDIA_SERVER_URL: Optional[str] = None
     
     # CORS
     BACKEND_CORS_ORIGINS: Union[List[str], str] = ["*"]
