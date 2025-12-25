@@ -29,7 +29,6 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, desc, or_, and_, asc, text
 from sqlalchemy.types import String
 
-from passlib.context import CryptContext
 from jose import JWTError, jwt
 from jose import jwt as pyjwt
 
@@ -3344,9 +3343,7 @@ async def superadmin_settings(request: Request, db: Session = Depends(deps.get_d
     })
 
 # API роуты для суперадмина
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.utils.security import get_password_hash
 
 @app.post("/api/v1/superadmin/admins")
 async def create_admin(
@@ -3375,7 +3372,7 @@ async def create_admin(
                 return JSONResponse(status_code=400, content={"success": False, "message": "Пользователь с таким телефоном уже существует"})
         
         # Хешируем пароль
-        hashed_password = pwd_context.hash(password)
+        hashed_password = get_password_hash(password)
         
         # Создаем нового администратора
         new_admin = models.User(
