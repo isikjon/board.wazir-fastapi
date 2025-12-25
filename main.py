@@ -1083,7 +1083,7 @@ async def mobile_search(
         category = "Недвижимость"
     
     # Формируем базовый запрос для получения активных объявлений
-    query = db.query(models.Property).filter(models.Property.status == 'active')
+    query = db.query(models.Property).filter(models.Property.status == models.PropertyStatus.ACTIVE)
     
     # Получаем все категории для выпадающего списка
     categories = db.query(models.Category).all()
@@ -4833,7 +4833,7 @@ async def mobile_search(
     if not category:
         category = "Недвижимость"
     
-    query = db.query(models.Property).filter(models.Property.status == 'active')
+    query = db.query(models.Property).filter(models.Property.status == models.PropertyStatus.ACTIVE)
     
     categories = db.query(models.Category).all()
     print(f"DEBUG: Загружены категории: {[cat.name for cat in categories]}")
